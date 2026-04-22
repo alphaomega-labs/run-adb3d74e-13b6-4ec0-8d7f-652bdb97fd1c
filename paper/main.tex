@@ -480,21 +480,21 @@ Where aggregates are presented, they are immediately followed by regime-level de
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.68\linewidth]{\mainfigurepath{unsafe_commit.pdf}}
-\caption{Unsafe-commit premise matrix for the committed-prefix safety claim. Rows show assumption profiles, columns show validator composition regimes, and cell values report the mean unsafe-commit rate. The highlighted zero cell is the theorem-valid regime: compositional semantic-and-typed validation with A2 active. All other nonzero cells are premise-breaking falsifier regimes, which is why the figure should be read as a scope map rather than as an aggregate performance bar chart.}
+\caption{Unsafe-commit premise matrix for the committed-prefix safety claim. Rows show assumption profiles, columns show validator composition regimes, and cell values report unsafe commits across four seed-level boundary probes. The highlighted zero cell is the theorem-valid regime: compositional semantic-and-typed validation with A2 active. The other cells are deliberately constructed falsifier regimes; ``4/4 unsafe'' means every seed-level boundary probe produced the expected counterexample after a required premise was removed.}
 \label{fig:unsafe_commit}
 \end{figure}
 
-\Figref{fig:unsafe_commit} directly tests the condition in \eqref{eq:objective_j1} by separating theorem-valid and premise-breaking regimes. In the compositional regime that satisfies A1--A4, unsafe commits are eliminated. When validator fidelity is disabled or non-compositional gates are used, unsafe commits reappear, consistent with Corollary~\ref{cor:ce1}. This pattern supports the theorem as assumption-scoped rather than universal.
+\Figref{fig:unsafe_commit} directly tests the condition in \eqref{eq:objective_j1} by separating theorem-valid and premise-breaking regimes. The values are exact because this audit is a deterministic boundary suite over four seeds, not a calibrated probability model: $0/4$ means no seed produced an unsafe commit, while $4/4$ means all four seeded counterexample probes did so. In the compositional regime that satisfies A1--A4, unsafe commits are eliminated. When validator fidelity is disabled or non-compositional gates are used, unsafe commits reappear, consistent with Corollary~\ref{cor:ce1}. This pattern supports the theorem as assumption-scoped rather than universal.
 We therefore report this claim as supported in the theorem-valid regime and mixed when deliberately falsifying runs are pooled into a single aggregate summary.
 
 \begin{table}[t]
 \caption{Assumption-toggle matrix for committed-prefix safety. The rows show validator regimes and assumption profiles, and the values report unsafe-commit rates. The table demonstrates that the zero-unsafe-commit optimum appears only in the intended compositional regime, which is exactly the scope required by \secref{sec:formal}.}
 \label{tab:assumption_matrix}
 \centering
-\small
+\scriptsize
 \renewcommand{\arraystretch}{1.1}
-\setlength{\tabcolsep}{4pt}
-\resizebox{\linewidth}{!}{\begingroup\catcode`\_=12\relax\input{\maintablepath{safety_assumption_matrix.tex}}\endgroup}
+\setlength{\tabcolsep}{3pt}
+\begingroup\catcode`\_=12\relax\input{\maintablepath{safety_assumption_matrix.tex}}\endgroup
 \end{table}
 
 Table~\ref{tab:assumption_matrix} is the numerical counterpart to \figref{fig:unsafe_commit}. Together, they provide direct evidence that the committed-prefix theorem is empirically aligned with its assumptions and invalid when those assumptions are intentionally violated. Appendix~\ref{app:safety_bundle} documents representative counterexample traces and minimal premise perturbations for these boundary failures.
@@ -505,7 +505,7 @@ This result sharpens the paper's scope claim. We do not interpret compositional-
 \label{sec:results_recovery}
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.68\linewidth]{\mainfigurepath{recovery_bounds.pdf}}
+\includegraphics[width=0.98\linewidth]{\mainfigurepath{recovery_bounds.pdf}}
 \caption{Recovery and oscillation diagnostics for bounded corrective policies. The panels report oscillation behavior and bound adherence across descent and branching settings, with variability shown across seeds. The figure supports a conditional interpretation: bounded, descent-preserving regimes match the finite-recovery theorem, whereas unbounded or non-descent stress settings intentionally violate theorem premises and exhibit oscillatory behavior.}
 \label{fig:recovery_bounds}
 \end{figure}
@@ -530,7 +530,7 @@ The mixed aggregate is informative rather than ambiguous. Confirmatory regimes s
 \label{sec:results_security}
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.68\linewidth]{\mainfigurepath{far_frr_frontier.pdf}}
+\includegraphics[width=0.98\linewidth]{\mainfigurepath{far_frr_frontier.pdf}}
 \caption{False-accept and false-reject frontier under trust-only, protocol-only, and composite guards with attack-class stratification. The panels show threshold-dependent tradeoffs for covered and uncovered classes, including uncertainty across seeds. The main interpretation is conditional: composite guards contract false acceptance on covered classes, while uncovered classes remain explicit boundary cases that bound theorem scope.}
 \label{fig:far_frr}
 \end{figure}
@@ -541,10 +541,10 @@ The mixed aggregate is informative rather than ambiguous. Confirmatory regimes s
 \caption{Attack-class coverage and integrity outcomes for security/provenance evaluation. Rows separate guard composition and attack-class scope, while columns report false acceptance, false rejection, nominal trace-integrity pass rate, and forced-mutation detection rate. The table makes theorem boundaries explicit by showing performance gains on covered classes, residual risk on uncovered classes, and the distinction between valid append-only traces and deliberate mutation tests.}
 \label{tab:attack_coverage}
 \centering
-\small
+\scriptsize
 \renewcommand{\arraystretch}{1.1}
-\setlength{\tabcolsep}{4pt}
-\resizebox{\linewidth}{!}{\begingroup\catcode`\_=12\relax\input{\maintablepath{security_attack_coverage.tex}}\endgroup}
+\setlength{\tabcolsep}{3pt}
+\begingroup\catcode`\_=12\relax\input{\maintablepath{security_attack_coverage.tex}}\endgroup
 \end{table}
 
 Table~\ref{tab:attack_coverage} and \figref{fig:far_frr} jointly provide evidence for the conditional security claim and the necessity of explicit coverage assumptions. Appendix~\ref{app:security_bundle} contains class-granular adversarial traces and forced-mutation diagnostics that delimit the theorem's valid coverage domain.

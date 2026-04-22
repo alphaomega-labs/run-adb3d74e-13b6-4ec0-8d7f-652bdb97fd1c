@@ -288,10 +288,10 @@ def _create_tables(df1: pd.DataFrame, df2: pd.DataFrame, df3: pd.DataFrame, pape
             columns={
                 "guard_mode": "Guard Mode",
                 "attack_class": "Attack Class",
-                "far": "False Accept Rate",
-                "frr": "False Reject Rate",
-                "nominal_integrity_pass_rate": "Nominal Integrity Pass Rate",
-                "forced_mutation_detection_rate": "Forced-Mutation Detection Rate",
+                "far": "FAR",
+                "frr": "FRR",
+                "nominal_integrity_pass_rate": "Nominal integrity",
+                "forced_mutation_detection_rate": "Mutation detected",
             }
         )
     )
