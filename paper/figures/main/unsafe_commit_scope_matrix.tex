@@ -10,7 +10,7 @@
 \def\cellh{0.82}
 
 \node[align=center,font=\sffamily\bfseries] at (5.5,3.65) {Committed-prefix safety scope matrix};
-\node[align=center,font=\sffamily] at (5.5,3.22) {Cell value = unsafe commits across four seed-level boundary probes};
+\node[align=center,font=\sffamily] at (5.5,3.22) {Cell value = unsafe commits across four seeded boundary probes};
 
 \node[anchor=east,font=\sffamily\footnotesize\bfseries] at (-0.22,2.48) {Assumption profile};
 \node[align=center,font=\sffamily\footnotesize] at ({0*\cellw+1.38},2.48) {Semantic\\+ typed};
@@ -46,7 +46,7 @@
 
 \draw[black,line width=1.5pt] (0,1.23) rectangle ++(\cellw,\cellh);
 \node[anchor=west,font=\sffamily\footnotesize] at (0,-1.52) {\tikz\fill[safe] (0,0) rectangle (0.28,0.16); theorem-valid zero-unsafe regime};
-\node[anchor=west,font=\sffamily\footnotesize] at (4.9,-1.52) {\tikz\fill[fail] (0,0) rectangle (0.28,0.16); premise-breaking falsifier regime};
+\node[anchor=west,font=\sffamily\footnotesize] at (4.9,-1.52) {\tikz\fill[fail] (0,0) rectangle (0.28,0.16); premise-violation regime};
 \node[font=\sffamily\footnotesize] at (5.5,-0.98) {Validator mode};
 \end{tikzpicture}
 \end{document}
