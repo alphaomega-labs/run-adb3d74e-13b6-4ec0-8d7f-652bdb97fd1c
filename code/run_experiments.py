@@ -232,32 +232,66 @@ def _create_tables(df1: pd.DataFrame, df2: pd.DataFrame, df3: pd.DataFrame, pape
     write_latex_table(tab1, path1, "HM-TH-01 assumption-toggle safety matrix.")
     out_paths.append(str(path1))
 
-    tab2 = (
-        df2.groupby(["baseline"], as_index=False)[["oscillation_rate", "bound_violation_rate", "regret_vs_pi_rb"]]
+    tab2_aggregate = df2.groupby(["baseline"], as_index=False)[
+        ["oscillation_rate", "bound_violation_rate", "regret_vs_pi_rb"]
+    ].mean()
+    tab2_theorem = (
+        df2[(df2["baseline"] != "BL-UNBOUNDED-BRANCHING") & (df2["delta"] > df2["eta"])]
+        .groupby(["baseline"], as_index=False)[["oscillation_rate"]]
         .mean()
+        .rename(columns={"oscillation_rate": "theorem_regime_oscillation_rate"})
+    )
+    tab2 = (
+        tab2_aggregate.merge(tab2_theorem, on="baseline", how="left")
         .rename(
             columns={
                 "baseline": "Policy Baseline",
-                "oscillation_rate": "Oscillation Rate",
+                "theorem_regime_oscillation_rate": "Theorem-Regime Oscillation Rate",
+                "oscillation_rate": "Aggregate Oscillation Rate",
                 "bound_violation_rate": "Bound Violation Rate",
                 "regret_vs_pi_rb": "Regret vs Pi_rb",
             }
-        )
+        )[
+            [
+                "Policy Baseline",
+                "Theorem-Regime Oscillation Rate",
+                "Aggregate Oscillation Rate",
+                "Bound Violation Rate",
+                "Regret vs Pi_rb",
+            ]
+        ]
+    )
+    tab2["Theorem-Regime Oscillation Rate"] = tab2["Theorem-Regime Oscillation Rate"].where(
+        tab2["Theorem-Regime Oscillation Rate"].notna(), "--"
     )
     path2 = paper_tab / "tab_hm_th_02_regret_summary.tex"
     write_latex_table(tab2, path2, "HM-TH-02 bounded recovery and regret summary.")
     out_paths.append(str(path2))
 
-    tab3 = (
-        df3.groupby(["guard_mode", "attack_class"], as_index=False)[["far", "frr", "trace_hash_integrity_pass_rate"]]
+    tab3_rates = df3.groupby(["guard_mode", "attack_class"], as_index=False)[["far", "frr"]].mean()
+    tab3_nominal = (
+        df3[df3["mutation_rate"] == 0.0]
+        .groupby(["guard_mode", "attack_class"], as_index=False)[["trace_hash_integrity_pass_rate"]]
         .mean()
+        .rename(columns={"trace_hash_integrity_pass_rate": "nominal_integrity_pass_rate"})
+    )
+    tab3_mutation = (
+        df3[df3["mutation_rate"] > 0.0]
+        .assign(forced_mutation_detection_rate=lambda d: 1.0 - d["trace_hash_integrity_pass_rate"])
+        .groupby(["guard_mode", "attack_class"], as_index=False)[["forced_mutation_detection_rate"]]
+        .mean()
+    )
+    tab3 = (
+        tab3_rates.merge(tab3_nominal, on=["guard_mode", "attack_class"], how="left")
+        .merge(tab3_mutation, on=["guard_mode", "attack_class"], how="left")
         .rename(
             columns={
                 "guard_mode": "Guard Mode",
                 "attack_class": "Attack Class",
                 "far": "False Accept Rate",
                 "frr": "False Reject Rate",
-                "trace_hash_integrity_pass_rate": "Hash Integrity Pass Rate",
+                "nominal_integrity_pass_rate": "Nominal Integrity Pass Rate",
+                "forced_mutation_detection_rate": "Forced-Mutation Detection Rate",
             }
         )
     )

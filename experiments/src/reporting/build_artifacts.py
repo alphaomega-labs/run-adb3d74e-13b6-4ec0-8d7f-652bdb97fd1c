@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
 import pandas as pd
 import seaborn as sns
 
@@ -109,18 +110,31 @@ def save_claim_figures(
     )
 
     # HM-TH-01
-    fig1, ax1 = plt.subplots(figsize=(7.5, 4.5))
-    sns.barplot(
-        data=hm_th_01_plot,
-        x="validator_mode",
-        y="unsafe_commit_rate",
-        hue="assumption_profile",
-        errorbar="sd",
+    validator_order = ["Semantic + typed", "Schema-only", "Trust-only", "No hard guard"]
+    assumption_order = ["A2 active", "A2 disabled", "A3 disabled"]
+    safety_matrix = (
+        hm_th_01_plot.groupby(["assumption_profile", "validator_mode"], as_index=False)["unsafe_commit_rate"]
+        .mean()
+        .pivot(index="assumption_profile", columns="validator_mode", values="unsafe_commit_rate")
+        .reindex(index=assumption_order, columns=validator_order)
+    )
+    fig1, ax1 = plt.subplots(figsize=(7.5, 3.6))
+    sns.heatmap(
+        safety_matrix,
+        annot=True,
+        fmt=".1f",
+        cmap="RdYlGn_r",
+        vmin=0.0,
+        vmax=1.0,
+        linewidths=0.8,
+        linecolor="white",
+        cbar_kws={"label": "Unsafe commit rate"},
         ax=ax1,
     )
+    ax1.add_patch(Rectangle((0, 0), 1, 1, fill=False, edgecolor="black", linewidth=2.2))
     ax1.set_xlabel("Validator mode")
-    ax1.set_ylabel("Unsafe commit rate (proportion)")
-    ax1.legend(title="Assumption profile")
+    ax1.set_ylabel("Assumption profile")
+    ax1.set_title("Committed-prefix safety scope matrix")
     th01 = figure_dir / "fig_hm_th_01_unsafe_commit.pdf"
     fig1.tight_layout()
     fig1.savefig(th01, format="pdf")
@@ -128,9 +142,9 @@ def save_claim_figures(
     paths.append(str(th01))
     qa[str(th01)] = _rasterize_pdf(th01)
     captions[str(th01)] = (
-        "Single-panel bar chart of unsafe commit rates across validator modes and assumption toggles. "
-        "X-axis: validator mode; Y-axis: unsafe commit proportion. Error bars show SD across seeds. "
-        "Key takeaway: semantic + typed validation with A2 active remains at 0 while schema-only and A2-disabled settings degrade safety."
+        "Premise matrix of unsafe commit rates across validator modes and assumption toggles. "
+        "Rows: assumption profile; columns: validator mode; color and cell labels show unsafe commit proportion. "
+        "Key takeaway: the theorem-valid semantic + typed / A2-active cell remains at 0, while premise-breaking cells expose boundary failures."
     )
 
     # HM-TH-02
