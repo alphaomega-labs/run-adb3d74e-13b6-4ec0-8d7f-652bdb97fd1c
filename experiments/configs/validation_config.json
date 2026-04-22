@@ -1,0 +1,38 @@
+{
+  "hm_th_01": {
+    "seeds": [11, 23, 37, 101],
+    "baselines": [
+      "BL-SAGALLM-TX-ROLLBACK",
+      "BL-SCHEMA-ONLY-VALIDATOR",
+      "BL-TRUST-ONLY-GATE",
+      "BL-NO-HARD-VALIDATOR"
+    ],
+    "sweep_params": {
+      "assumption_toggle": ["A2_on", "A2_off", "A3_off"],
+      "contract_strictness": ["strict", "moderate", "relaxed"]
+    }
+  },
+  "hm_th_02": {
+    "seeds": [13, 29, 47, 89],
+    "baselines": [
+      "BL-GREEDY-CONTINUE",
+      "BL-UNBOUNDED-BRANCHING",
+      "BL-FIXED-DEPTH-BACKTRACK",
+      "BL-ROLLBACK-ONLY-COMPARATOR-Pi_rb"
+    ],
+    "sweep_params": {
+      "B_max": ["1", "2", "3", "5"],
+      "delta": ["0.05", "0.10", "0.20"],
+      "eta": ["0.02", "0.05", "0.08"]
+    }
+  },
+  "hm_th_03": {
+    "seeds": [17, 31, 43, 97],
+    "sweep_params": {
+      "guard_composition_mode": ["trust_only", "protocol_only", "composite"],
+      "attack_coverage_mode": ["C1_only", "C1_C2", "C1_C2_C3"],
+      "theta_trust_threshold": ["0.55", "0.70", "0.85"],
+      "trace_mutation_rate": ["0.00", "0.01", "0.05"]
+    }
+  }
+}

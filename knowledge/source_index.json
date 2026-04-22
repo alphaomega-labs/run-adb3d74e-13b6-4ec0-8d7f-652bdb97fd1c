@@ -1,0 +1,1174 @@
+{
+  "source_count": 37,
+  "generated_from": "knowledge/refs.jsonl",
+  "records": [
+    {
+      "id": "url:https://doi.org/10.20944/preprints202604.1025.v1",
+      "title": "SAMF: SAWANT (Structured Agentic Workflow for Alignment, Validation, and Negotiated Testing) for Reliable, Safe, and Verifiable LLM Prompting",
+      "url": "https://doi.org/10.20944/preprints202604.1025.v1",
+      "source_type": "paper",
+      "citation": "Prashant Sawant (2026). SAMF: SAWANT (Structured Agentic Workflow for Alignment, Validation, and Negotiated Testing) for Reliable, Safe, and Verifiable LLM Prompting. Preprints.org. https://doi.org/10.20944/preprints202604.1025.v1",
+      "year": 2026,
+      "authors": [
+        "Prashant Sawant"
+      ],
+      "summary": "Large language models are increasingly deployed in agentic workflows that combine planning, retrieval, tool use, and automated decision support. However, these systems remain vulnerable to unsafe behavior, hallucination, misaligned fine-tuning, and weak reproducibility because most prompts are still written as informal",
+      "assumptions": [
+        "Workflow states can be validated against explicit contract-like constraints before transition."
+      ],
+      "contributions": [
+        "Large language models are increasingly deployed in agentic workflows that combine planning, retrieval, tool use, and automated decision support. However, these systems remain vulne",
+        "Defines a structured agentic workflow emphasizing validation and controlled negotiation."
+      ],
+      "claims": [
+        "Large language models are increasingly deployed in agentic workflows that combine planning, retrieval, tool use, and automated decision support. However, these systems remain vulne",
+        "Structured validation and negotiation reduce failure propagation in long-horizon agent workflows."
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "locator": "metadata",
+          "content": "Validation-first workflow design for robust multi-agent coordination."
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.5281/zenodo.19059674",
+      "title": "Prompt-Native Semantic Runtimes for Language Models: Inference-Time Semantic Governance, Provenance, Compression, and Document-Level Process Teaching",
+      "url": "https://doi.org/10.5281/zenodo.19059674",
+      "source_type": "paper",
+      "citation": "Nobel Glas, Talos Morrow (2026). Prompt-Native Semantic Runtimes for Language Models: Inference-Time Semantic Governance, Provenance, Compression, and Document-Level Process Teaching. Zenodo (CERN European Organization for Nuclear Research)...",
+      "year": 2026,
+      "authors": [
+        "Nobel Glas",
+        "Talos Morrow"
+      ],
+      "summary": "Prompt-Native Semantic Runtimes for Language Models We introduce prompt-native semantic runtimes as one component of a broader research program in inference-time semantic governance for large language models. Unlike agent operating systems (AIOS), memory operating systems (MemGPT, MemOS), and orchestration frameworks,",
+      "assumptions": [
+        "Semantic constraints can be enforced online through runtime policies."
+      ],
+      "contributions": [
+        "Prompt-Native Semantic Runtimes for Language Models We introduce prompt-native semantic runtimes as one component of a broader research program in inference-time semantic governanc",
+        "Proposes provenance-aware semantic runtime controls for LLM systems."
+      ],
+      "claims": [
+        "Prompt-Native Semantic Runtimes for Language Models We introduce prompt-native semantic runtimes as one component of a broader research program in inference-time semantic governanc",
+        "Inference-time governance can improve traceability and controllability."
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "procedure",
+          "locator": "metadata",
+          "content": "Inference-time semantic governance with provenance tracking."
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.5281/zenodo.19130521",
+      "title": "Physics_GPT: An Autonomous Scientific Discovery Agent Built on the Physics Intermediate Representation Framework",
+      "url": "https://doi.org/10.5281/zenodo.19130521",
+      "source_type": "paper",
+      "citation": "Muhammad Hanif (2026). Physics_GPT: An Autonomous Scientific Discovery Agent Built on the Physics Intermediate Representation Framework. Zenodo (CERN European Organization for Nuclear Research). https://doi.org/10.5281/zenodo.19130521",
+      "year": 2026,
+      "authors": [
+        "Muhammad Hanif"
+      ],
+      "summary": "Physics_GPT is an autonomous scientific discovery agent that integrates PIR-based symbolic regression, hybrid MSE+OT loss, conservation-law validation, knowledge-graph accumulation, and active-inference experiment selection into a closed-loop system achieving 100% success on L1--L4 physics benchmark tasks without human",
+      "assumptions": [
+        "Domain intermediate representations can stabilize autonomous reasoning for science tasks."
+      ],
+      "contributions": [
+        "Physics_GPT is an autonomous scientific discovery agent that integrates PIR-based symbolic regression, hybrid MSE+OT loss, conservation-law validation, knowledge-graph accumulation",
+        "Introduces a physics-focused autonomous discovery agent with structured representations."
+      ],
+      "claims": [
+        "Physics_GPT is an autonomous scientific discovery agent that integrates PIR-based symbolic regression, hybrid MSE+OT loss, conservation-law validation, knowledge-graph accumulation",
+        "Representation-centric workflows improve autonomy and consistency in scientific discovery loops."
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "locator": "metadata",
+          "content": "Intermediate representations support autonomous scientific workflow control."
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.5281/zenodo.19305235",
+      "title": "Physics_GPT: An Autonomous Scientific Discovery Agent Built on the Physics Intermediate Representation (versioned record)",
+      "url": "https://doi.org/10.5281/zenodo.19305235",
+      "source_type": "paper",
+      "citation": "Muhammad Hanif (2026). Physics_GPT: An Autonomous Scientific Discovery Agent Built on the Physics Intermediate Representation Framework. Zenodo (CERN European Organization for Nuclear Research). https://doi.org/10.5281/zenodo.19305235",
+      "year": 2026,
+      "authors": [
+        "Muhammad Hanif"
+      ],
+      "summary": "Physics_GPT is an autonomous scientific discovery agent that integrates PIR-based symbolic regression, hybrid MSE+OT loss, conservation-law validation, knowledge-graph accumulation, and active-inference experiment selection into a closed-loop system achieving 100% success on L1--L4 physics benchmark tasks without human",
+      "assumptions": [
+        "Structured representations enable reproducible scientific-agent behavior."
+      ],
+      "contributions": [
+        "Physics_GPT is an autonomous scientific discovery agent that integrates PIR-based symbolic regression, hybrid MSE+OT loss, conservation-law validation, knowledge-graph accumulation",
+        "Provides updated release and artifact for autonomous physics discovery workflows."
+      ],
+      "claims": [
+        "Physics_GPT is an autonomous scientific discovery agent that integrates PIR-based symbolic regression, hybrid MSE+OT loss, conservation-law validation, knowledge-graph accumulation",
+        "Versioned agent workflows support reproducibility and auditing."
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "observation",
+          "locator": "metadata",
+          "content": "Versioned autonomous agent artifact for scientific workflow reuse."
+        }
+      ]
+    },
+    {
+      "id": "arxiv:2604.05018",
+      "title": "PaperOrchestra: A Multi-Agent Framework for Automated AI Research Paper Writing",
+      "url": "https://arxiv.org/abs/2604.05018",
+      "source_type": "paper",
+      "citation": "Yiwen Song, Yale Song, Tomas Pfister, Jinsung Yoon (2026). PaperOrchestra: A Multi-Agent Framework for Automated AI Research Paper Writing. arXiv:2604.05018.",
+      "year": 2026,
+      "authors": [
+        "Yiwen Song",
+        "Yale Song",
+        "Tomas Pfister",
+        "Jinsung Yoon"
+      ],
+      "summary": "Synthesizing unstructured research materials into manuscripts is an essential yet under-explored challenge in AI-driven scientific discovery. Existing autonomous writers are rigidly coupled to specific experimental pipelines, and produce superficial literature reviews. We introduce PaperOrchestra, a multi-agent framewo...",
+      "assumptions": [
+        "Role-specialized agents can decompose research writing into tractable sub-problems."
+      ],
+      "contributions": [
+        "Synthesizing unstructured research materials into manuscripts is an essential yet under-explored challenge in AI-driven scientific discovery. Existing autonomous writers are rigidly coupled to specific experimental pipelines, and produce superficial literature reviews. We introduce PaperOrchestra, a multi-agent framewo...",
+        "Defines a multi-agent architecture for automated scientific writing.",
+        "Reports staged pipeline with measurable gains in manuscript quality metrics."
+      ],
+      "claims": [
+        "Synthesizing unstructured research materials into manuscripts is an essential yet under-explored challenge in AI-driven scientific discovery. Existing autonomous writers are rigidly coupled to specific experimental pipelines, and produce superficial literature reviews. We introduce PaperOrchestra, a multi-agent framewo...",
+        "Role-based orchestration improves coherence and quality over single-agent baselines."
+      ],
+      "limitations": [
+        "Generalization across domains and strict factual grounding remain open challenges."
+      ],
+      "future_work": [
+        "Integrate stronger verifier and grounding modules for reliability."
+      ],
+      "key_equations": [
+        "provided (F = \u2205), the pipeline autonomously synthesizes all relevant visuals.",
+        "\ud835\udc43 = ( \ud835\udc43tex , \ud835\udc43pdf ) = \ud835\udc4a (I , E , T , G , F )",
+        "p(a|x)=argmax_a Score(a,x)"
+      ],
+      "notation_seeds": [
+        "provided (F = \u2205), the pipeline autonomously synthesizes all relevant visuals."
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "locator": "abstract",
+          "content": "Role-based orchestration improves automated paper drafting quality."
+        },
+        {
+          "atom_type": "procedure",
+          "locator": "PDF pages 1-12",
+          "content": "Planner-writer-review loop with staged quality validation."
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.1016/j.icte.2025.12.001",
+      "title": "From prompt injections to protocol exploits: Threats in LLM-powered AI agents workflows",
+      "url": "https://doi.org/10.1016/j.icte.2025.12.001",
+      "source_type": "paper",
+      "citation": "(2026). From prompt injections to protocol exploits: Threats in LLM-powered AI agent workflows. https://doi.org/10.1016/j.icte.2025.12.001",
+      "year": 2026,
+      "authors": [
+        "Mohamed Amine Ferrag",
+        "Norbert Tihanyi",
+        "Djallel Hamouda",
+        "LA Maglaras",
+        "Abderrahmane Lakas",
+        "M\u00e9rouane Debbah"
+      ],
+      "summary": "Security analysis of LLM-agent workflow attack surfaces, including prompt-level and protocol-level exploit vectors.",
+      "assumptions": [
+        "Agent workflows expose composition-level security attack surfaces."
+      ],
+      "contributions": [
+        "From prompt injections to protocol exploits: Threats in LLM-powered AI agents workflows",
+        "Maps security threat classes for LLM agent workflows."
+      ],
+      "claims": [
+        "From prompt injections to protocol exploits: Threats in LLM-powered AI agents workflows",
+        "Protocol-level safeguards are required in addition to prompt hardening."
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "limitation",
+          "locator": "metadata",
+          "content": "Prompt-only defenses are insufficient for protocol-level exploits."
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.1007/978-3-031-98660-4_12",
+      "title": "DeViLL: A Methodology to Orchestrate a Formal Method and Its Tool to an IoT Integration Platform for Smart IoT Systems",
+      "url": "https://doi.org/10.1007/978-3-031-98660-4_12",
+      "source_type": "paper",
+      "citation": "Junsup Song, Dongsu Seo, Jinyoung Choi (2026). DeViLL: A Methodology to Orchestrate a Formal Method and Its Tool to an IoT Integration Platform for Smart IoT Systems. OpenAlex-indexed venue. https://doi.org/10.1007/978-3-031-98660-4_12",
+      "year": 2026,
+      "authors": [
+        "Junsup Song",
+        "Dongsu Seo",
+        "Jinyoung Choi"
+      ],
+      "summary": "DeViLL: A Methodology to Orchestrate a Formal Method and Its Tool to an IoT Integration Platform for Smart IoT Systems",
+      "assumptions": [
+        "Formal-method artifacts can be operationalized through orchestrated toolchain interfaces."
+      ],
+      "contributions": [
+        "DeViLL: A Methodology to Orchestrate a Formal Method and Its Tool to an IoT Integration Platform for Smart IoT Systems",
+        "Provides a methodology for orchestrating formal methods with operational platforms."
+      ],
+      "claims": [
+        "DeViLL: A Methodology to Orchestrate a Formal Method and Its Tool to an IoT Integration Platform for Smart IoT Systems",
+        "Methodological orchestration improves trustworthiness and integration of formal analyses."
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "procedure",
+          "locator": "metadata",
+          "content": "Formal-method/tool orchestration for IoT integration workflows."
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.1038/s42004-025-01776-9",
+      "title": "ChemGraph as an agentic framework for computational chemistry workflows",
+      "url": "https://doi.org/10.1038/s42004-025-01776-9",
+      "source_type": "paper",
+      "citation": "Thang D. Pham, Aditya Tanikanti, Murat Ke\u00e7eli (2026). ChemGraph as an agentic framework for computational chemistry workflows. Communications Chemistry. https://doi.org/10.1038/s42004-025-01776-9",
+      "year": 2026,
+      "authors": [
+        "Thang D. Pham",
+        "Aditya Tanikanti",
+        "Murat Ke\u00e7eli"
+      ],
+      "summary": "Atomistic simulations are essential in chemistry and materials science but remain challenging to run due to the expert knowledge required for the setup, execution, and validation stages of these calculations. We present ChemGraph, an agentic framework powered by artificial intelligence and state-of-the-art simulation t",
+      "assumptions": [
+        "Graph-structured orchestration improves composability of domain tools."
+      ],
+      "contributions": [
+        "Atomistic simulations are essential in chemistry and materials science but remain challenging to run due to the expert knowledge required for the setup, execution, and validation s",
+        "Introduces an agentic graph workflow for computational chemistry pipelines."
+      ],
+      "claims": [
+        "Atomistic simulations are essential in chemistry and materials science but remain challenging to run due to the expert knowledge required for the setup, execution, and validation s",
+        "Graph orchestration supports scalable, reproducible scientific pipelines."
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "observation",
+          "locator": "metadata",
+          "content": "Agentic graph abstraction for scientific workflow orchestration."
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.32614/cran.package.mini007",
+      "title": "mini007: Lightweight Framework for Orchestrating Multi-Agent Large Language Models",
+      "url": "https://doi.org/10.32614/cran.package.mini007",
+      "source_type": "paper",
+      "citation": "Mohamed El Fodil Ihaddaden (2025). mini007: Lightweight Framework for Orchestrating Multi-Agent Large Language Models. OpenAlex-indexed venue. https://doi.org/10.32614/cran.package.mini007",
+      "year": 2025,
+      "authors": [
+        "Mohamed El Fodil Ihaddaden"
+      ],
+      "summary": "Provides tools for creating agents with persistent state using R6 classes &lt;<a href=\"https://cran.r-project.org/package=R6\" target=\"_top\">https://cran.r-project.org/package=R6</a>&gt; and the 'ellmer' package &lt;<a href=\"https://cran.r-project.org/package=ellmer\" target=\"_top\">https://cran.r-project.org/package=ellm",
+      "contributions": [
+        "Provides tools for creating agents with persistent state using R6 classes &lt;<a href=\"https://cran.r-project.org/package=R6\" target=\"_top\">https://cran.r-project.org/package=R6</a",
+        "Provides practical lightweight orchestration primitives for multi-agent LLM systems."
+      ],
+      "claims": [
+        "Provides tools for creating agents with persistent state using R6 classes &lt;<a href=\"https://cran.r-project.org/package=R6\" target=\"_top\">https://cran.r-project.org/package=R6</a"
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "Provides tools for creating agents with persistent state using R6 classes &lt;<a href=\"https://cran.r-project.org/package=R6\" target=\"_top\">https://cran.r-project.org/package=R6</a"
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.1038/s42256-025-01110-x",
+      "title": "Towards agentic science for advancing scientific discovery",
+      "url": "https://doi.org/10.1038/s42256-025-01110-x",
+      "source_type": "paper",
+      "citation": "Hongliang Xin, John R. Kitchin, Heather J. Kulik (2025). Towards agentic science for advancing scientific discovery. Nature Machine Intelligence. https://doi.org/10.1038/s42256-025-01110-x",
+      "year": 2025,
+      "authors": [
+        "Hongliang Xin",
+        "John R. Kitchin",
+        "Heather J. Kulik"
+      ],
+      "summary": "Perspective on agentic AI systems for scientific discovery, with opportunities, risks, and governance considerations.",
+      "contributions": [
+        "Towards agentic science for advancing scientific discovery",
+        "Synthesizes opportunities and challenges for agentic science."
+      ],
+      "claims": [
+        "Towards agentic science for advancing scientific discovery"
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "Towards agentic science for advancing scientific discovery"
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.1609/aaai.v39i27.35084",
+      "title": "Towards Scientific Discovery with Generative AI: Progress, Opportunities, and Challenges",
+      "url": "https://doi.org/10.1609/aaai.v39i27.35084",
+      "source_type": "paper",
+      "citation": "Chandan K. Reddy, Parshin Shojaee (2025). Towards Scientific Discovery with Generative AI: Progress, Opportunities, and Challenges. Proceedings of the AAAI Conference on Artificial Intelligence. https://doi.org/10.1609/aaai.v39i27.35084",
+      "year": 2025,
+      "authors": [
+        "Chandan K. Reddy",
+        "Parshin Shojaee"
+      ],
+      "summary": "Scientific discovery is a complex cognitive process that has driven human knowledge and technological progress for centuries. While artificial intelligence (AI) has made significant advances in automating aspects of scientific reasoning, simulation, and experimentation, we still lack integrated AI systems capable of pe",
+      "contributions": [
+        "Scientific discovery is a complex cognitive process that has driven human knowledge and technological progress for centuries. While artificial intelligence (AI) has made significan",
+        "Provides a broad synthesis of scientific-discovery workflows driven by generative AI."
+      ],
+      "claims": [
+        "Scientific discovery is a complex cognitive process that has driven human knowledge and technological progress for centuries. While artificial intelligence (AI) has made significan"
+      ],
+      "limitations": [
+        "Identifies reliability and validation gaps in autonomous science pipelines."
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "Scientific discovery is a complex cognitive process that has driven human knowledge and technological progress for centuries. While artificial intelligence (AI) has made significan"
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.48550/arxiv.2501.11354",
+      "title": "Towards Advancing Code Generation with Large Language Models: A Research Roadmap",
+      "url": "https://doi.org/10.48550/arxiv.2501.11354",
+      "source_type": "paper",
+      "citation": "Haolin Jin, Huaming Chen, Qinghua Lu, Liming Zhu (2025). Towards Advancing Code Generation with Large Language Models: A Research Roadmap. ArXiv.org. https://doi.org/10.48550/arxiv.2501.11354",
+      "year": 2025,
+      "authors": [
+        "Haolin Jin",
+        "Huaming Chen",
+        "Qinghua Lu",
+        "Liming Zhu"
+      ],
+      "summary": "Recently, we have witnessed the rapid development of large language models, which have demonstrated excellent capabilities in the downstream task of code generation. However, despite their potential, LLM-based code generation still faces numerous technical and evaluation challenges, particularly when embedded in real-w",
+      "assumptions": [
+        "aligning with and debugging outputs, which negates any efficiency gains. If the model assumes",
+        "explainability and code comprehension by revealing the model\u2019s assumptions in real time."
+      ],
+      "contributions": [
+        "real-world development. In this paper, we present our vision for current research directions, and provide an",
+        "in-depth analysis of existing studies on this task. We propose a six-layer vision framework that categorizes",
+        "Outlines research roadmap for stronger code-generation pipelines."
+      ],
+      "claims": [
+        "Recently, we have witnessed the rapid development of large language models, which have demonstrated excellent capabilities in the downstream task of code generation. However, despi"
+      ],
+      "limitations": [
+        "still face limitations and challenges across multiple studies.",
+        "reveal a major limitation: most focus on function-level or single-file tasks, which do not reflect the"
+      ],
+      "future_work": [
+        "Calls for stronger verification and orchestration-aware evaluations."
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "Recently, we have witnessed the rapid development of large language models, which have demonstrated excellent capabilities in the downstream task of code generation. However, despi"
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.3390/info16050365",
+      "title": "Toward Robust Security Orchestration and Automated Response in Security Operations Centers with a Hyper-Automation Approach Using Agentic Artificial Intelligence",
+      "url": "https://doi.org/10.3390/info16050365",
+      "source_type": "paper",
+      "citation": "(2025). Toward Robust Security Orchestration and Automated Response in Security Operations Centers with LLMs. https://doi.org/10.3390/info16050365",
+      "year": 2025,
+      "authors": [
+        "Ismail Ismail",
+        "Rahmat Kurnia",
+        "Zilmas Arjuna Brata",
+        "Ghitha Afina Nelistiani",
+        "Shinwook Heo",
+        "Hyeongon Kim"
+      ],
+      "summary": "The evolving landscape of cybersecurity threats demands the modernization of Security Operations Centers (SOCs) to enhance threat detection, response, and mitigation. Security Orchestration, Automation, and Response (SOAR) platforms play a crucial role in addressing operational inefficiencies; however, traditional no-c",
+      "contributions": [
+        "The evolving landscape of cybersecurity threats demands the modernization of Security Operations Centers (SOCs) to enhance threat detection, response, and mitigation. Security Orch",
+        "Applies orchestration patterns to security response pipelines."
+      ],
+      "claims": [
+        "The evolving landscape of cybersecurity threats demands the modernization of Security Operations Centers (SOCs) to enhance threat detection, response, and mitigation. Security Orch"
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "The evolving landscape of cybersecurity threats demands the modernization of Security Operations Centers (SOCs) to enhance threat detection, response, and mitigation. Security Orch"
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.48550/arxiv.2504.08066",
+      "title": "The AI Scientist-v2: Workshop-Level Automated Scientific Discovery via Agentic Tree Search",
+      "url": "https://doi.org/10.48550/arxiv.2504.08066",
+      "source_type": "paper",
+      "citation": "(2025). The AI Scientist-v2: Workshop-Level Automated Scientific Discovery via Agentic Tree Search. https://doi.org/10.48550/arxiv.2504.08066",
+      "year": 2025,
+      "authors": [
+        "Yutaro Yamada",
+        "Robert Tjarko Lange",
+        "Cong Lu",
+        "Shengran Hu",
+        "Chris Lu",
+        "Jakob Foerster"
+      ],
+      "summary": "AI is increasingly playing a pivotal role in transforming how scientific discoveries are made. We introduce The AI Scientist-v2, an end-to-end agentic system capable of producing the first entirely AI generated peer-review-accepted workshop paper. This system iteratively formulates scientific hypotheses, designs and ex",
+      "assumptions": [
+        "various components or assumptions underlying the experiment. Similar to hyperparameter",
+        "incorrectly assume it was applied to the LSTM hidden states rather than input embeddings. We",
+        "Tree-search style branching can improve autonomous research exploration."
+      ],
+      "contributions": [
+        "AI is increasingly playing a pivotal role in transforming how scientific discoveries are made. We introduce",
+        "In this paper, we introduce The AI Scientist-v2, a substantially improved successor that directly",
+        "Extends autonomous AI scientist architecture with branching search control."
+      ],
+      "claims": [
+        "2. We demonstrate, for the first time, that an AI-generated manuscript can successfully pass peer",
+        "Agentic search improves exploration quality over linear workflows."
+      ],
+      "limitations": [
+        "workflow and downstream manuscript production. However, significant limitations constrained its",
+        "addresses these limitations. Our contributions are threefold. First, we eliminate the dependency"
+      ],
+      "future_work": [
+        "interesting question for future work and is likely best done after additional improvements are made in"
+      ],
+      "key_equations": [
+        "argmax_b U(b|state)"
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "procedure",
+          "locator": "metadata",
+          "content": "Agentic tree-search for candidate research branch selection."
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.36227/techrxiv.173611620.02896776/v2",
+      "title": "Semantic-Driven Task Allocation: Elevating Multi-Agent Systems with Language Models",
+      "url": "https://doi.org/10.36227/techrxiv.173611620.02896776/v2",
+      "source_type": "paper",
+      "citation": "Raman Marozau (2025). Semantic-Driven Task Allocation: Elevating Multi-Agent Systems with Language Models. OpenAlex-indexed venue. https://doi.org/10.36227/techrxiv.173611620.02896776/v2",
+      "year": 2025,
+      "authors": [
+        "Raman Marozau"
+      ],
+      "summary": "Modern multi-agent systems (MAS) often rely on static task allocation methods, which are insufficient for dynamic environments requiring continuous task reassignment and optimization [1]. This paper introduces a theoretical framework that integrates fine-tuned large language models (LLMs) into MAS to enable semantic ta",
+      "contributions": [
+        "Modern multi-agent systems (MAS) often rely on static task allocation methods, which are insufficient for dynamic environments requiring continuous task reassignment and optimizati",
+        "Introduces semantic-driven assignment mechanisms for multi-agent collaboration."
+      ],
+      "claims": [
+        "Modern multi-agent systems (MAS) often rely on static task allocation methods, which are insufficient for dynamic environments requiring continuous task reassignment and optimizati"
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "Modern multi-agent systems (MAS) often rely on static task allocation methods, which are insufficient for dynamic environments requiring continuous task reassignment and optimizati"
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.14778/3750601.3750611",
+      "title": "SagaLLM: Context Management, Validation, and Transaction Guarantees for Multi-Agent LLM Planning",
+      "url": "https://doi.org/10.14778/3750601.3750611",
+      "source_type": "paper",
+      "citation": "Edward Yi Chang, Longling Geng (2025). SagaLLM: Context Management, Validation, and Transaction Guarantees for Multi-Agent LLM Planning. Proceedings of the VLDB Endowment. https://doi.org/10.14778/3750601.3750611",
+      "year": 2025,
+      "authors": [
+        "Edward Yi Chang",
+        "Longling Geng"
+      ],
+      "summary": "This paper introduces SagaLLM, a structured multi-agent architecture designed to address four foundational limitations of current LLM-based planning systems: unreliable self-validation, context loss, lack of transactional safeguards, and insufficient inter-agent coordination. While recent frameworks leverage LLMs for t",
+      "assumptions": [
+        "Long-horizon agent workflows benefit from transaction-like semantics."
+      ],
+      "contributions": [
+        "This paper introduces SagaLLM, a structured multi-agent architecture designed to address four foundational limitations of current LLM-based planning systems: unreliable self-valida",
+        "Defines transaction-oriented control for LLM-agent systems."
+      ],
+      "claims": [
+        "This paper introduces SagaLLM, a structured multi-agent architecture designed to address four foundational limitations of current LLM-based planning systems: unreliable self-valida",
+        "Transactional guarantees improve workflow recoverability and consistency."
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "assumption",
+          "locator": "metadata",
+          "content": "Transaction-like semantics improve long-horizon reliability."
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.3390/electronics14163320",
+      "title": "SCNOC-Agentic: A Network Operation and Control Agentic for Satellite Communication Systems",
+      "url": "https://doi.org/10.3390/electronics14163320",
+      "source_type": "paper",
+      "citation": "Wenyu Sun, Chenhua Sun, Yiduo Zhang, Zhan Yin, Zhifeng Kang (2025). SCNOC-Agentic: A Network Operation and Control Agentic for Satellite Communication Systems. Electronics. https://doi.org/10.3390/electronics14163320",
+      "year": 2025,
+      "authors": [
+        "Wenyu Sun",
+        "Chenhua Sun",
+        "Yiduo Zhang",
+        "Zhan Yin",
+        "Zhifeng Kang"
+      ],
+      "summary": "Large language models (LLMs) have demonstrated powerful capability to solve practical problems through complex step-by-step reasoning. Specifically designed LLMs have begun to be integrated into terrestrial communication networks. However, relevant research in the field of satellite communications remains exceedingly r",
+      "contributions": [
+        "Large language models (LLMs) have demonstrated powerful capability to solve practical problems through complex step-by-step reasoning. Specifically designed LLMs have begun to be i",
+        "Demonstrates agentic orchestration in network control domain."
+      ],
+      "claims": [
+        "Large language models (LLMs) have demonstrated powerful capability to solve practical problems through complex step-by-step reasoning. Specifically designed LLMs have begun to be i"
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "Large language models (LLMs) have demonstrated powerful capability to solve practical problems through complex step-by-step reasoning. Specifically designed LLMs have begun to be i"
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.1109/satrends66715.2025.00006",
+      "title": "SALLMA: A Software Architecture for LLM-Based Multi-Agent Systems",
+      "url": "https://doi.org/10.1109/satrends66715.2025.00006",
+      "source_type": "paper",
+      "citation": "Marco Becattini, Roberto Verdecchia, Enrico Vicario (2025). SALLMA: A Software Architecture for LLM-Based Multi-Agent Systems. OpenAlex-indexed venue. https://doi.org/10.1109/satrends66715.2025.00006",
+      "year": 2025,
+      "authors": [
+        "Marco Becattini",
+        "Roberto Verdecchia",
+        "Enrico Vicario"
+      ],
+      "summary": "As a new and disruptive technology, the introduction of large language models (LLMs) may be the first step into a paradigm shift of how we develop and deploy software-intensive systems. While the capabilities of LLM agents for software engineering and architecture tasks are currently explored, how to architect LLM-base",
+      "contributions": [
+        "As a new and disruptive technology, the introduction of large language models (LLMs) may be the first step into a paradigm shift of how we develop and deploy software-intensive sys",
+        "Defines architectural reference model for LLM multi-agent systems."
+      ],
+      "claims": [
+        "As a new and disruptive technology, the introduction of large language models (LLMs) may be the first step into a paradigm shift of how we develop and deploy software-intensive sys"
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "As a new and disruptive technology, the introduction of large language models (LLMs) may be the first step into a paradigm shift of how we develop and deploy software-intensive sys"
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.3390/app15020968",
+      "title": "Research and Application of a Multi-Agent-Based Intelligent Mine Gas State Decision-Making System",
+      "url": "https://doi.org/10.3390/app15020968",
+      "source_type": "paper",
+      "citation": "Yi Sun, Xinke Liu (2025). Research and Application of a Multi-Agent-Based Intelligent Mine Gas State Decision-Making System. Applied Sciences. https://doi.org/10.3390/app15020968",
+      "year": 2025,
+      "authors": [
+        "Yi Sun",
+        "Xinke Liu"
+      ],
+      "summary": "To address the issues of low efficiency in manual processing and lack of accuracy in judgment within traditional mine gas safety inspections, this paper designs and implements the Intelligent Mine Gas State Decision-Making System based on large language models (LLMs) and a multi-agent system. The system aims to enhance",
+      "contributions": [
+        "To address the issues of low efficiency in manual processing and lack of accuracy in judgment within traditional mine gas safety inspections, this paper designs and implements the",
+        "Applies multi-agent workflow architecture to safety-critical monitoring."
+      ],
+      "claims": [
+        "To address the issues of low efficiency in manual processing and lack of accuracy in judgment within traditional mine gas safety inspections, this paper designs and implements the"
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "To address the issues of low efficiency in manual processing and lack of accuracy in judgment within traditional mine gas safety inspections, this paper designs and implements the"
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.1016/j.crad.2025.107165",
+      "title": "Radiomics in clinical radiology: advances, challenges, and future directions",
+      "url": "https://doi.org/10.1016/j.crad.2025.107165",
+      "source_type": "paper",
+      "citation": "Kristofer Linton\u2010Reid, Mitchell Chen, Marc Boubnovski Martell, Joram M. Posma, Eric O. Aboagye (2025). Radiomics in clinical radiology: advances, challenges, and future directions. Clinical Radiology. https://doi.org/10.1016/j.crad.2025.107...",
+      "year": 2025,
+      "authors": [
+        "Kristofer Linton\u2010Reid",
+        "Mitchell Chen",
+        "Marc Boubnovski Martell",
+        "Joram M. Posma",
+        "Eric O. Aboagye"
+      ],
+      "summary": "High-throughput extraction of quantitative image features, known as radiomics, has the potential to improve clinical radiology by revealing hidden features in medical images. In this review, we discuss the convergence of radiomics with artificial intelligence (AI), specifically the development of large language models",
+      "contributions": [
+        "High-throughput extraction of quantitative image features, known as radiomics, has the potential to improve clinical radiology by revealing hidden features in medical images. In th",
+        "Provides deployment and validation challenge framing relevant to workflow reliability."
+      ],
+      "claims": [
+        "High-throughput extraction of quantitative image features, known as radiomics, has the potential to improve clinical radiology by revealing hidden features in medical images. In th"
+      ],
+      "future_work": [
+        "Highlights standardization and reproducibility needs."
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "High-throughput extraction of quantitative image features, known as radiomics, has the potential to improve clinical radiology by revealing hidden features in medical images. In th"
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.1101/2025.07.05.663295",
+      "title": "PromptBio: A Multi-Agent AI Platform for Bioinformatics Data Analysis",
+      "url": "https://doi.org/10.1101/2025.07.05.663295",
+      "source_type": "paper",
+      "citation": "(2025). PromptBio: A Multi-Agent AI Platform for Bioinformatics Data Analysis. https://doi.org/10.1101/2025.07.05.663295",
+      "year": 2025,
+      "authors": [
+        "Minzhe Zhang",
+        "Wenhao Gu",
+        "Bo\u2010Wei Han",
+        "Vincent Guo",
+        "Chintan Addoni",
+        "Jiayu Chen"
+      ],
+      "summary": "Abstract PromptBio is a modular AI platform for scalable, reproducible, and user-adaptable bioinformatics analysis, powered by generative AI and natural language interaction. It supports three complementary modes of analysis designed to meet diverse research needs. PromptGenie is a multi-agent system that enables stepw",
+      "contributions": [
+        "Abstract PromptBio is a modular AI platform for scalable, reproducible, and user-adaptable bioinformatics analysis, powered by generative AI and natural language interaction. It su",
+        "Introduces multi-agent platform structure for scientific analysis tasks."
+      ],
+      "claims": [
+        "Abstract PromptBio is a modular AI platform for scalable, reproducible, and user-adaptable bioinformatics analysis, powered by generative AI and natural language interaction. It su"
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "Abstract PromptBio is a modular AI platform for scalable, reproducible, and user-adaptable bioinformatics analysis, powered by generative AI and natural language interaction. It su"
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.4018/979-8-3373-2008-3.ch001",
+      "title": "Orchestrating Multi-Agent Applications With Langflow and Large Language Models (LLMs)",
+      "url": "https://doi.org/10.4018/979-8-3373-2008-3.ch001",
+      "source_type": "paper",
+      "citation": "Soly Mathew Biju, Sara Majeed, Pradnya Bhagwat (2025). Orchestrating Multi-Agent Applications With Langflow and Large Language Models (LLMs). Advances in computational intelligence and robotics book series. https://doi.org/10.4018/979-8-337...",
+      "year": 2025,
+      "authors": [
+        "Soly Mathew Biju",
+        "Sara Majeed",
+        "Pradnya Bhagwat"
+      ],
+      "summary": "This chapter will provide a comprehensive overview of multi agent systems, their architecture and of how Langflow can be employed to create, orchestrate, and manage a network of agents that communicate and collaborate using LLMs. We will demonstrate the power of this approach in scenarios such as automated decision-mak",
+      "contributions": [
+        "This chapter will provide a comprehensive overview of multi agent systems, their architecture and of how Langflow can be employed to create, orchestrate, and manage a network of ag",
+        "Presents practical orchestration integration patterns."
+      ],
+      "claims": [
+        "This chapter will provide a comprehensive overview of multi agent systems, their architecture and of how Langflow can be employed to create, orchestrate, and manage a network of ag"
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "This chapter will provide a comprehensive overview of multi agent systems, their architecture and of how Langflow can be employed to create, orchestrate, and manage a network of ag"
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.1101/2025.08.22.25334049",
+      "title": "Orchestrated multi agents sustain accuracy under clinical-scale workloads compared to a single agent",
+      "url": "https://doi.org/10.1101/2025.08.22.25334049",
+      "source_type": "paper",
+      "citation": "(2025). Orchestrated multi agents sustain accuracy under clinical-scale workload. https://doi.org/10.1101/2025.08.22.25334049",
+      "year": 2025,
+      "authors": [
+        "Eyal Klang",
+        "Mahmud Omar",
+        "Ganesh Raut",
+        "Reem Agbareia",
+        "Prem Timsina",
+        "Robert Freeman"
+      ],
+      "summary": "We tested state-of-the-art large language models (LLMs) in two configurations for clinical-scale workloads: a single agent handling heterogeneous tasks versus an orchestrated multi-agent system assigning each task to a dedicated worker. Across retrieval, extraction, and dosing calculations, we varied batch sizes from 5",
+      "contributions": [
+        "We tested state-of-the-art large language models (LLMs) in two configurations for clinical-scale workloads: a single agent handling heterogeneous tasks versus an orchestrated multi",
+        "Shows workload-scale evidence for orchestrated multi-agent systems."
+      ],
+      "claims": [
+        "We tested state-of-the-art large language models (LLMs) in two configurations for clinical-scale workloads: a single agent handling heterogeneous tasks versus an orchestrated multi"
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "We tested state-of-the-art large language models (LLMs) in two configurations for clinical-scale workloads: a single agent handling heterogeneous tasks versus an orchestrated multi"
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.69997/sct.156776",
+      "title": "Multi-Agent LLMs for Automating Sustainable Operational Decision-Making",
+      "url": "https://doi.org/10.69997/sct.156776",
+      "source_type": "paper",
+      "citation": "Emma Pajak, Abdullah Bahamdan, Klaus Hellgardt, Antonio\ufffddel R\ufffdo-Chanona (2025). Multi-Agent LLMs for Automating Sustainable Operational Decision-Making. Systems and Control Transactions. https://doi.org/10.69997/sct.156776",
+      "year": 2025,
+      "authors": [
+        "Emma Pajak",
+        "Abdullah Bahamdan",
+        "Klaus Hellgardt",
+        "Antonio\ufffddel R\ufffdo-Chanona"
+      ],
+      "summary": "Operational decision-making in Process Systems Engineering (PSE) has achieved high proficiency at specific levels, such as supply chain optimization and unit-operation optimization. However, a critical challenge remains: integrating these layers of optimization into a cohesive, hierarchical decision-making framework th",
+      "contributions": [
+        "Operational decision-making in Process Systems Engineering (PSE) has achieved high proficiency at specific levels, such as supply chain optimization and unit-operation optimization",
+        "Applies multi-agent orchestration to decision-process automation."
+      ],
+      "claims": [
+        "Operational decision-making in Process Systems Engineering (PSE) has achieved high proficiency at specific levels, such as supply chain optimization and unit-operation optimization"
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "Operational decision-making in Process Systems Engineering (PSE) has achieved high proficiency at specific levels, such as supply chain optimization and unit-operation optimization"
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.1039/d4me00174e",
+      "title": "Molecular analysis and design using generative artificial intelligence <i>via</i> multi-agent modeling",
+      "url": "https://doi.org/10.1039/d4me00174e",
+      "source_type": "paper",
+      "citation": "Isabella Stewart, Markus J. Buehler (2025). Molecular analysis and design using generative artificial intelligence <i>via</i> multi-agent modeling. Molecular Systems Design & Engineering. https://doi.org/10.1039/d4me00174e",
+      "year": 2025,
+      "authors": [
+        "Isabella Stewart",
+        "Markus J. Buehler"
+      ],
+      "summary": "We report the use of a multiagent generative artificial intelligence framework, the X-LoRA-Gemma large language model (LLM), to analyze, design and test molecular design. The X-LoRA-Gemma model, inspired by biological principles and featuring 7 billion parameters, dynamically reconfigures its structure through a dual-p",
+      "contributions": [
+        "We report the use of a multiagent generative artificial intelligence framework, the X-LoRA-Gemma large language model (LLM), to analyze, design and test molecular design. The X-LoR",
+        "Demonstrates agent-enabled scientific design pipelines."
+      ],
+      "claims": [
+        "We report the use of a multiagent generative artificial intelligence framework, the X-LoRA-Gemma large language model (LLM), to analyze, design and test molecular design. The X-LoR"
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "We report the use of a multiagent generative artificial intelligence framework, the X-LoRA-Gemma large language model (LLM), to analyze, design and test molecular design. The X-LoR"
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.1016/j.aei.2025.103527",
+      "title": "MASC: Large language model-based multi-agent scheduling chain for flexible job shop scheduling problem",
+      "url": "https://doi.org/10.1016/j.aei.2025.103527",
+      "source_type": "paper",
+      "citation": "(2025). MASC: Large language model-based multi-agent scheduling chain for flexible operations. https://doi.org/10.1016/j.aei.2025.103527",
+      "year": 2025,
+      "authors": [
+        "Zelong Wang",
+        "Chenhui Wan",
+        "Jie Liu",
+        "Xi Zhang",
+        "Haifeng Wang",
+        "Youmin Hu"
+      ],
+      "summary": "MASC: Large language model-based multi-agent scheduling chain for flexible job shop scheduling problem",
+      "contributions": [
+        "MASC: Large language model-based multi-agent scheduling chain for flexible job shop scheduling problem",
+        "Introduces scheduling-chain concept for multi-agent coordination."
+      ],
+      "claims": [
+        "MASC: Large language model-based multi-agent scheduling chain for flexible job shop scheduling problem"
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "MASC: Large language model-based multi-agent scheduling chain for flexible job shop scheduling problem"
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.1145/3718958.3750537",
+      "title": "Intent-Driven Network Management with Multi-Agent LLMs: The Confucius Framework",
+      "url": "https://doi.org/10.1145/3718958.3750537",
+      "source_type": "paper",
+      "citation": "(2025). Intent-Driven Network Management with Multi-Agent LLMs: The Confucius Approach. https://doi.org/10.1145/3718958.3750537",
+      "year": 2025,
+      "authors": [
+        "Zhaodong Wang",
+        "Samuel Lin",
+        "Guanqing Yan",
+        "Soudeh Ghorbani",
+        "Minlan Yu",
+        "Jiawei Zhou"
+      ],
+      "summary": "Advancements in Large Language Models (LLMs) are significantly transforming network management practices. In this paper, we present our experience developing Confucius, a multi-agent framework for network management at Meta. We model network management workflows as directed acyclic graphs (DAGs) to aid planning. Our fr",
+      "contributions": [
+        "Advancements in Large Language Models (LLMs) are significantly transforming network management practices. In this paper, we present our experience developing Confucius, a multi-age",
+        "Provides intent-to-action orchestration pattern with multi-agent language models."
+      ],
+      "claims": [
+        "Advancements in Large Language Models (LLMs) are significantly transforming network management practices. In this paper, we present our experience developing Confucius, a multi-age"
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "Advancements in Large Language Models (LLMs) are significantly transforming network management practices. In this paper, we present our experience developing Confucius, a multi-age"
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.48550/arxiv.2504.19678",
+      "title": "From LLM Reasoning to Autonomous AI Agents: A Comprehensive Review",
+      "url": "https://doi.org/10.48550/arxiv.2504.19678",
+      "source_type": "paper",
+      "citation": "Mohamed Amine Ferrag, Norbert Tihanyi, M\u00e9rouane Debbah (2025). From LLM Reasoning to Autonomous AI Agents: A Comprehensive Review. ArXiv.org. https://doi.org/10.48550/arxiv.2504.19678",
+      "year": 2025,
+      "authors": [
+        "Mohamed Amine Ferrag",
+        "Norbert Tihanyi",
+        "M\u00e9rouane Debbah"
+      ],
+      "summary": "Large language models and autonomous AI agents have evolved rapidly, resulting in a diverse array of evaluation benchmarks, frameworks, and collaboration protocols. Driven by the growing need for standardized evaluation and integration, we systematically consolidate these fragmented efforts into a unified framework. Ho",
+      "assumptions": [
+        "sidestep assumptions such as state reversals. Other strategies"
+      ],
+      "contributions": [
+        "we present a side-by-side comparison of benchmarks developed",
+        "across multiple domains. In addition, we propose a taxonomy of",
+        "Synthesizes architectural trends and reliability concerns for autonomous agents."
+      ],
+      "claims": [
+        "Large language models and autonomous AI agents have evolved rapidly, resulting in a diverse array of evaluation benchmarks, frameworks, and collaboration protocols. Driven by the g"
+      ],
+      "limitations": [
+        "hallucinated responses [8], [9], a limitation that RetrievalAugmented Generation (RAG) addresses by incorporating",
+        "limitations, specifically the issues of autonomy and selfimprovement that LLM-based agents aim to overcome. The"
+      ],
+      "future_work": [
+        "Calls for stronger formal guarantees and evaluation protocols."
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "Large language models and autonomous AI agents have evolved rapidly, resulting in a diverse array of evaluation benchmarks, frameworks, and collaboration protocols. Driven by the g"
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.2196/preprints.75421",
+      "title": "From Barriers to Tactics: Development Study of Behavioral Science-Informed Agentic Workflow for Personalized Nutrition Coaching (Preprint)",
+      "url": "https://doi.org/10.2196/preprints.75421",
+      "source_type": "paper",
+      "citation": "(2025). From Barriers to Tactics: Development Study of Behavioral Science-Informed Prompting and Agentic Workflows. https://doi.org/10.2196/preprints.75421",
+      "year": 2025,
+      "authors": [
+        "Eric Yang",
+        "Tom\u00e1s Garc\u00eda",
+        "Hannah Williams",
+        "Bhawesh Kumar",
+        "Martin Ram\u00e9",
+        "Eileen Rivera"
+      ],
+      "summary": "<sec> <title>BACKGROUND</title> Effective management of cardiometabolic conditions requires sustained positive nutrition habits, often hindered by complex and individualized barriers. Direct human management is simply not scalable, while deterministic automated approaches to nutrition coaching may lack the personalizat",
+      "contributions": [
+        "<sec> <title>BACKGROUND</title> Effective management of cardiometabolic conditions requires sustained positive nutrition habits, often hindered by complex and individualized barrie",
+        "Provides process-level tactics for robust agent workflow design."
+      ],
+      "claims": [
+        "<sec> <title>BACKGROUND</title> Effective management of cardiometabolic conditions requires sustained positive nutrition habits, often hindered by complex and individualized barrie"
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "<sec> <title>BACKGROUND</title> Effective management of cardiometabolic conditions requires sustained positive nutrition habits, often hindered by complex and individualized barrie"
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.48550/arxiv.2508.14111",
+      "title": "From AI for Science to Agentic Science: A Survey on Autonomous Scientific Discovery",
+      "url": "https://doi.org/10.48550/arxiv.2508.14111",
+      "source_type": "paper",
+      "citation": "(2025). From AI for Science to Agentic Science: A Survey on Autonomous Scientific Discovery. https://doi.org/10.48550/arxiv.2508.14111",
+      "year": 2025,
+      "authors": [
+        "Jiaqi Wei",
+        "Yue-Jin Yang",
+        "Xiang Zhang",
+        "Yuhan Chen",
+        "Xiang Zhuang",
+        "Zhangyang Gao"
+      ],
+      "summary": "Artificial intelligence (AI) is reshaping scientific discovery, evolving from specialized computational tools into autonomous research partners. We position Agentic Science as a pivotal stage within the broader AI for Science paradigm, where AI systems progress from partial assistance to full scientific agency. Enabled",
+      "contributions": [
+        "autonomous scientific discovery. We present a domain-oriented review of autonomous scientific discovery",
+        "Defines taxonomy and open challenges for autonomous scientific-agent systems."
+      ],
+      "claims": [
+        "Artificial intelligence (AI) is reshaping scientific discovery, evolving from specialized computational tools into autonomous research partners. We position Agentic Science as a pi"
+      ],
+      "future_work": [
+        "Highlights need for validated, auditable orchestration semantics."
+      ],
+      "key_equations": [
+        "Formally, a human scientist H selects a model class M and a dataset D = {( xi , yi )}iN=1 to train a model",
+        "M = arg min"
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "Artificial intelligence (AI) is reshaping scientific discovery, evolving from specialized computational tools into autonomous research partners. We position Agentic Science as a pi"
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.1016/j.taml.2025.100594",
+      "title": "Fine-tuning a large language model for automating computational fluid dynamics simulations",
+      "url": "https://doi.org/10.1016/j.taml.2025.100594",
+      "source_type": "paper",
+      "citation": "Zhehao Dong, Zhen Lu, Yang Yue (2025). Fine-tuning a large language model for automating computational fluid dynamics simulations. Theoretical and Applied Mechanics Letters. https://doi.org/10.1016/j.taml.2025.100594",
+      "year": 2025,
+      "authors": [
+        "Zhehao Dong",
+        "Zhen Lu",
+        "Yang Yue"
+      ],
+      "summary": "\u2022 We fine-tuned a domain-specific LLM, empowering a multi-agent system to automate CFD simulation from natural language input. \u2022 We developed NL2FOAM, a dataset containing 28716 cases designed for automated OpenFOAM simulation driven by natural language. \u2022 The system achieves an 82.6% first-attempt success rate on the",
+      "contributions": [
+        "\u2022 We fine-tuned a domain-specific LLM, empowering a multi-agent system to automate CFD simulation from natural language input. \u2022 We developed NL2FOAM, a dataset containing 28716 ca",
+        "Applies LLM automation to scientific workflow pipelines."
+      ],
+      "claims": [
+        "\u2022 We fine-tuned a domain-specific LLM, empowering a multi-agent system to automate CFD simulation from natural language input. \u2022 We developed NL2FOAM, a dataset containing 28716 ca"
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "\u2022 We fine-tuned a domain-specific LLM, empowering a multi-agent system to automate CFD simulation from natural language input. \u2022 We developed NL2FOAM, a dataset containing 28716 ca"
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.18653/v1/2025.findings-naacl.245",
+      "title": "Enhancing Text-to-SQL with Question Classification and Multi-Agent Collaboration",
+      "url": "https://doi.org/10.18653/v1/2025.findings-naacl.245",
+      "source_type": "paper",
+      "citation": "Zhihui Shao, Shubin Cai, Rongsheng Lin, Zhong Ming (2025). Enhancing Text-to-SQL with Question Classification and Multi-Agent Collaboration. OpenAlex-indexed venue. https://doi.org/10.18653/v1/2025.findings-naacl.245",
+      "year": 2025,
+      "authors": [
+        "Zhihui Shao",
+        "Shubin Cai",
+        "Rongsheng Lin",
+        "Zhong Ming"
+      ],
+      "summary": "Large Language Models (LLMs) have recently demonstrated remarkable performance in Textto-SQL tasks.However, existing research primarily focuses on the optimization of prompts and improvements in workflow, with few studies delving into the exploration of the questions.In this paper, we propose a Text-to-SQL framework ba",
+      "contributions": [
+        "Large Language Models (LLMs) have recently demonstrated remarkable performance in Textto-SQL tasks.However, existing research primarily focuses on the optimization of prompts and i",
+        "Demonstrates role-specialized collaboration for structured query generation."
+      ],
+      "claims": [
+        "Large Language Models (LLMs) have recently demonstrated remarkable performance in Textto-SQL tasks.However, existing research primarily focuses on the optimization of prompts and i"
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "Large Language Models (LLMs) have recently demonstrated remarkable performance in Textto-SQL tasks.However, existing research primarily focuses on the optimization of prompts and i"
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.2139/ssrn.5078120",
+      "title": "Dynamic Multi-Agent Orchestration and Retrieval for Multi-Source Question-Answer Systems using Large Language Models",
+      "url": "https://doi.org/10.2139/ssrn.5078120",
+      "source_type": "paper",
+      "citation": "Antony Medeiros, Claudio Cavalcante (2025). Dynamic Multi-Agent Orchestration and Retrieval for Multi-Source Question-Answer Systems using Large Language Models. SSRN Electronic Journal. https://doi.org/10.2139/ssrn.5078120",
+      "year": 2025,
+      "authors": [
+        "Antony Medeiros",
+        "Claudio Cavalcante"
+      ],
+      "summary": "Dynamic Multi-Agent Orchestration and Retrieval for Multi-Source Question-Answer Systems using Large Language Models",
+      "contributions": [
+        "Dynamic Multi-Agent Orchestration and Retrieval for Multi-Source Question-Answer Systems using Large Language Models",
+        "Proposes dynamic orchestration-and-retrieval coupling for multi-agent QA systems."
+      ],
+      "claims": [
+        "Dynamic Multi-Agent Orchestration and Retrieval for Multi-Source Question-Answer Systems using Large Language Models"
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "Dynamic Multi-Agent Orchestration and Retrieval for Multi-Source Question-Answer Systems using Large Language Models"
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.1109/lra.2025.3619807",
+      "title": "DriveAgent: Multi-Agent Structured Reasoning With LLM and Multimodal Sensor Fusion for Autonomous Driving",
+      "url": "https://doi.org/10.1109/lra.2025.3619807",
+      "source_type": "paper",
+      "citation": "(2025). DriveAgent: Multi-Agent Structured Reasoning With LLM and Multimodal Sensors. https://doi.org/10.1109/lra.2025.3619807",
+      "year": 2025,
+      "authors": [
+        "Xinmeng Hou",
+        "Wuqi Wang",
+        "Long Yang",
+        "Hao Lin",
+        "Jinglun Feng",
+        "Haigen Min"
+      ],
+      "summary": "We introduce DriveAgent, a modular multi-agent autonomous driving framework that leverages large language model (LLM) reasoning combined with multimodal sensor fusion for autonomous driving. DriveAgent orchestrates specialized agents operating on camera, Light Detection and Ranging (LiDAR), Inertial Measurement Unit (I",
+      "contributions": [
+        "We introduce DriveAgent, a modular multi-agent autonomous driving framework that leverages large language model (LLM) reasoning combined with multimodal sensor fusion for autonomou",
+        "Illustrates structured multi-agent reasoning with heterogeneous inputs."
+      ],
+      "claims": [
+        "We introduce DriveAgent, a modular multi-agent autonomous driving framework that leverages large language model (LLM) reasoning combined with multimodal sensor fusion for autonomou"
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "We introduce DriveAgent, a modular multi-agent autonomous driving framework that leverages large language model (LLM) reasoning combined with multimodal sensor fusion for autonomou"
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.54364/aaiml.2025.51187",
+      "title": "Development of a Large Language Model-based Multi-Agent Clinical Decision Support System for Korean Triage and Acuity Scale (KTAS)-Based Triage and Treatment Planning in Emergency Departments",
+      "url": "https://doi.org/10.54364/aaiml.2025.51187",
+      "source_type": "paper",
+      "citation": "Seungjun Han, Wongyung Choi (2025). Development of a Large Language Model-based Multi-Agent Clinical Decision Support System for Korean Triage and Acuity Scale (KTAS)-Based Triage and Treatment Planning in Emergency Departments. Advances in...",
+      "year": 2025,
+      "authors": [
+        "Seungjun Han",
+        "Wongyung Choi"
+      ],
+      "summary": "Emergency department (ED) overcrowding and the complexity of rapid decision-making in critical care settings pose significant challenges to healthcare systems worldwide. While clinical decision support systems (CDSS) have shown promise, the integration of large language models (LLMs) offers new possibilities for enhanc",
+      "contributions": [
+        "Emergency department (ED) overcrowding and the complexity of rapid decision-making in critical care settings pose significant challenges to healthcare systems worldwide. While clin",
+        "Documents multi-agent workflow design in high-stakes operational setting."
+      ],
+      "claims": [
+        "Emergency department (ED) overcrowding and the complexity of rapid decision-making in critical care settings pose significant challenges to healthcare systems worldwide. While clin"
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "Emergency department (ED) overcrowding and the complexity of rapid decision-making in critical care settings pose significant challenges to healthcare systems worldwide. While clin"
+        }
+      ]
+    },
+    {
+      "id": "url:https://doi.org/10.1109/eiecc67963.2025.11409558",
+      "title": "Contextual Trust Evaluation for Robust Coordination in Large Language Model Multi-Agent Systems",
+      "url": "https://doi.org/10.1109/eiecc67963.2025.11409558",
+      "source_type": "paper",
+      "citation": "(2025). Contextual Trust Evaluation for Robust Coordination in Large Language Model Agent Teams. https://doi.org/10.1109/eiecc67963.2025.11409558",
+      "year": 2025,
+      "authors": [
+        "Kangning Gao",
+        "Haotian Zhu",
+        "Rui Liu",
+        "Jinming Li",
+        "Xu Yan",
+        "Yi Hu"
+      ],
+      "summary": "Large Language Model (LLM)-based multi-agent systems have emerged as a promising paradigm for tackling complex tasks that exceed individual agent capabilities. However, existing approaches often suffer from coordination inefficiencies, a lack of trust mechanisms, and suboptimal role assignment strategies. This paper pr",
+      "contributions": [
+        "Large Language Model (LLM)-based multi-agent systems have emerged as a promising paradigm for tackling complex tasks that exceed individual agent capabilities. However, existing ap",
+        "Introduces contextual trust evaluation for robust multi-agent coordination."
+      ],
+      "claims": [
+        "Large Language Model (LLM)-based multi-agent systems have emerged as a promising paradigm for tackling complex tasks that exceed individual agent capabilities. However, existing ap"
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "claim",
+          "content": "Large Language Model (LLM)-based multi-agent systems have emerged as a promising paradigm for tackling complex tasks that exceed individual agent capabilities. However, existing ap"
+        }
+      ]
+    },
+    {
+      "id": "arxiv:2402.00854",
+      "title": "SymbolicAI: A framework for logic-based approaches combining generative models and solvers",
+      "url": "https://arxiv.org/abs/2402.00854",
+      "source_type": "paper",
+      "citation": "Marius-Constantin Dinu, Claudiu Leoveanu-Condrei, Markus Holzleitner, Werner Zellinger, Sepp Hochreiter (2024). SymbolicAI: A framework for logic-based approaches combining generative models and solvers. arXiv:2402.00854.",
+      "year": 2024,
+      "authors": [
+        "Marius-Constantin Dinu",
+        "Claudiu Leoveanu-Condrei",
+        "Markus Holzleitner",
+        "Werner Zellinger",
+        "Sepp Hochreiter"
+      ],
+      "summary": "We introduce SymbolicAI, a versatile and modular framework employing a logic-based approach to concept learning and flow management in generative processes. SymbolicAI enables the seamless integration of generative models with a diverse range of solvers by treating large language models (LLMs) as semantic parsers that...",
+      "assumptions": [
+        "Neural outputs can be constrained or post-validated by symbolic modules."
+      ],
+      "contributions": [
+        "We introduce SymbolicAI, a versatile and modular framework employing a logic-based approach to concept learning and flow management in generative processes. SymbolicAI enables the seamless integration of generative models with a diverse range of solvers by treating large language models (LLMs) as semantic parsers that...",
+        "Provides framework to integrate symbolic constraints with generative modeling."
+      ],
+      "claims": [
+        "We introduce SymbolicAI, a versatile and modular framework employing a logic-based approach to concept learning and flow management in generative processes. SymbolicAI enables the seamless integration of generative models with a diverse range of solvers by treating large language models (LLMs) as semantic parsers that...",
+        "Hybrid symbolic-neural workflows improve controllability and consistency."
+      ],
+      "limitations": [
+        "Integration overhead and solver scaling can constrain end-to-end latency."
+      ],
+      "future_work": [
+        "Expand solver integration patterns and richer symbolic abstractions."
+      ],
+      "key_equations": [
+        "as the set S = n\u22650 Ln formed by concatenating characters from a finite character set L, i.e. the vocabulary in an",
+        "L expression is defined as \u03c9 : i=1 Si \u2192 S from the set of all possible expressions \u03c9 \u2208 \u2126, where S \u2208 \u03a3, and",
+        "argmax_y p_theta(y|x) subject to C(y)=true"
+      ],
+      "notation_seeds": [
+        "as the set S = n\u22650 Ln formed by concatenating characters from a finite character set L, i.e. the vocabulary in an"
+      ],
+      "evidence_atoms": [
+        {
+          "atom_type": "equation",
+          "locator": "PDF pages 1-12",
+          "content": "argmax_y p_theta(y|x) subject to C(y)=true"
+        },
+        {
+          "atom_type": "assumption",
+          "locator": "abstract",
+          "content": "Neural outputs can be constrained by symbolic checks."
+        }
+      ]
+    }
+  ]
+}

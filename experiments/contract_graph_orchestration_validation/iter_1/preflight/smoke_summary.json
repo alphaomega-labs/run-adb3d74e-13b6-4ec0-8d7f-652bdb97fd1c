@@ -1,0 +1,7 @@
+{
+  "status": "completed",
+  "commands": [
+    "experiments/.venv/bin/python experiments/run_experiments.py --stage smoke --iteration-tag iter_1"
+  ],
+  "generated_at": "2026-04-22T18:08:10.684842+00:00"
+}

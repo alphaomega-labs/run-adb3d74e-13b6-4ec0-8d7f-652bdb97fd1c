@@ -1,0 +1,77 @@
+{
+  "stage": "full",
+  "dataset_resolution_log_path": "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/experiments/contract_graph_orchestration_validation/iter_1/dataset_resolution_log.json",
+  "figure_paths": [
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/figures/iter_1/fig_hm_th_01_unsafe_commit.pdf",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/figures/iter_1/fig_hm_th_02_recovery_bounds.pdf",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/figures/iter_1/fig_hm_th_03_far_frr_frontier.pdf"
+  ],
+  "table_paths": [
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/tables/iter_1/tab_hm_th_01_assumption_matrix.tex",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/tables/iter_1/tab_hm_th_02_regret_summary.tex",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/tables/iter_1/tab_hm_th_03_attack_coverage.tex",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/tables/iter_1/tab_theorem_audit_summary.tex"
+  ],
+  "data_paths": [
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/data/iter_1/full_hm_th_01_metrics.csv",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/data/iter_1/full_hm_th_02_metrics.csv",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/data/iter_1/full_hm_th_03_metrics.csv"
+  ],
+  "appendix_paths": [
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/appendix/APP-A1-counterexample-bundle.tex",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/appendix/APP-A2-recovery-boundary-audit.tex",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/appendix/APP-A3-adversarial-audit-bundle.tex"
+  ],
+  "sympy_report": "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/experiments/contract_graph_orchestration_validation/iter_1/theorem_audit/sympy_theorem_audit.json",
+  "figure_captions": {
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/figures/iter_1/fig_hm_th_01_unsafe_commit.pdf": "Single-panel bar chart of unsafe commit rates across validator modes and assumption toggles. X-axis: validator mode; Y-axis: unsafe commit proportion. Error bars show SD across seeds. Key takeaway: semantic+typed mode with A2_on remains at 0 while schema-only and A2_off degrade safety.",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/figures/iter_1/fig_hm_th_02_recovery_bounds.pdf": "Two-panel recovery diagnostics: left panel oscillation rate vs delta; right panel bound ratio vs delta. Both panels include baseline and B_max encodings with SD error bars. Interpretation: bounded policies show near-zero oscillation for delta>eta, while unbounded branching violates bounds.",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/figures/iter_1/fig_hm_th_03_far_frr_frontier.pdf": "Two-panel FAR/FRR frontier across guard composition and attack coverage classes. X-axis is trust threshold; Y-axes are FAR and FRR respectively, with SD bars over seeds. Composite guards reduce FAR on covered classes while uncovered classes remain an explicit boundary case."
+  },
+  "reports": {
+    "hm_th_01": {
+      "unsafe_commit_rate_summary": {
+        "mean": 0.9166666666666666,
+        "std": 0.2763853991962833
+      },
+      "unsafe_commit_rate_ci": {
+        "low": 0.048310982812896704,
+        "high": 0.14000948990925996
+      },
+      "counterexample_count": 48
+    },
+    "hm_th_02": {
+      "oscillation_rate_summary": {
+        "mean": 0.4166666666666667,
+        "std": 0.4930066485916347
+      },
+      "bound_violation_summary": {
+        "mean": 0.25,
+        "std": 0.4330127018922193
+      },
+      "regret_summary": {
+        "mean": 0.065,
+        "std": 0.008660254037844388
+      }
+    },
+    "hm_th_03": {
+      "far_summary": {
+        "mean": 0.1516,
+        "std": 0.06448676005369026
+      },
+      "frr_summary": {
+        "mean": 0.12533333333333332,
+        "std": 0.01597567595509568
+      },
+      "hash_integrity_summary": {
+        "mean": 0.3333333333333333,
+        "std": 0.4714045207910317
+      }
+    }
+  },
+  "confirmatory_analyses": [
+    "HM-TH-01 strictness-sensitivity and A2 toggle ablation",
+    "HM-TH-02 boundary stress with delta<=eta and unbounded branching",
+    "HM-TH-03 covered-vs-uncovered attack split with theta sweep"
+  ]
+}

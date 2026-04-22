@@ -1,0 +1,214 @@
+\begin{thebibliography}{31}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Chang \& Geng(2025)Chang and Geng]{chang2025}
+Edward~Yi Chang and Longling Geng.
+\newblock Sagallm: Context management, validation, and transaction guarantees
+  for multi-agent llm planning, 2025.
+\newblock URL \url{https://doi.org/10.14778/3750601.3750611}.
+
+\bibitem[Dinu et~al.(2024)Dinu, Leoveanu-Condrei, Holzleitner, Zellinger, and
+  Hochreiter]{dinu2024}
+Marius-Constantin Dinu, Claudiu Leoveanu-Condrei, Markus Holzleitner, Werner
+  Zellinger, and Sepp Hochreiter.
+\newblock Symbolicai: A framework for logic-based approaches combining
+  generative models and solvers, 2024.
+\newblock URL \url{https://arxiv.org/abs/2402.00854}.
+
+\bibitem[Dong et~al.(2025)Dong, Lu, and Yue]{dong2025}
+Zhehao Dong, Zhen Lu, and Yang Yue.
+\newblock Fine-tuning a large language model for automating computational fluid
+  dynamics simulations, 2025.
+\newblock URL \url{https://doi.org/10.1016/j.taml.2025.100594}.
+
+\bibitem[Ferrag et~al.(2025)Ferrag, Tihanyi, and Debbah]{ferrag2025}
+Mohamed~Amine Ferrag, Norbert Tihanyi, and Mérouane Debbah.
+\newblock From llm reasoning to autonomous ai agents: A comprehensive review,
+  2025.
+\newblock URL \url{https://doi.org/10.48550/arxiv.2504.19678}.
+
+\bibitem[Ferrag et~al.(2026)Ferrag, Tihanyi, Hamouda, Maglaras, Lakas, and
+  Debbah]{ferrag2026}
+Mohamed~Amine Ferrag, Norbert Tihanyi, Djallel Hamouda, LA~Maglaras,
+  Abderrahmane Lakas, and Mérouane Debbah.
+\newblock From prompt injections to protocol exploits: Threats in llm-powered
+  ai agents workflows, 2026.
+\newblock URL \url{https://doi.org/10.1016/j.icte.2025.12.001}.
+
+\bibitem[Gao et~al.(2025)Gao, Zhu, Liu, Li, Yan, and Hu]{gao2025}
+Kangning Gao, Haotian Zhu, Rui Liu, Jinming Li, Xu~Yan, and Yi~Hu.
+\newblock Contextual trust evaluation for robust coordination in large language
+  model multi-agent systems, 2025.
+\newblock URL \url{https://doi.org/10.1109/eiecc67963.2025.11409558}.
+
+\bibitem[Glas \& Morrow(2026)Glas and Morrow]{glas2026}
+Nobel Glas and Talos Morrow.
+\newblock Prompt-native semantic runtimes for language models: Inference-time
+  semantic governance, provenance, compression, and document-level process
+  teaching, 2026.
+\newblock URL \url{https://doi.org/10.5281/zenodo.19059674}.
+
+\bibitem[Han \& Choi(2025)Han and Choi]{han2025}
+Seungjun Han and Wongyung Choi.
+\newblock Development of a large language model-based multi-agent clinical
+  decision support system for korean triage and acuity scale (ktas)-based
+  triage and treatment planning in emergency departments, 2025.
+\newblock URL \url{https://doi.org/10.54364/aaiml.2025.51187}.
+
+\bibitem[Hou et~al.(2025)Hou, Wang, Yang, Lin, Feng, and Min]{hou2025}
+Xinmeng Hou, Wuqi Wang, Long Yang, Hao Lin, Jinglun Feng, and Haigen Min.
+\newblock Driveagent: Multi-agent structured reasoning with llm and multimodal
+  sensor fusion for autonomous driving, 2025.
+\newblock URL \url{https://doi.org/10.1109/lra.2025.3619807}.
+
+\bibitem[Ihaddaden(2025)]{ihaddaden2025}
+Mohamed El~Fodil Ihaddaden.
+\newblock mini007: Lightweight framework for orchestrating multi-agent large
+  language models, 2025.
+\newblock URL \url{https://doi.org/10.32614/cran.package.mini007}.
+
+\bibitem[Ismail et~al.(2025)Ismail, Kurnia, Brata, Nelistiani, Heo, and
+  Kim]{ismail2025}
+Ismail Ismail, Rahmat Kurnia, Zilmas~Arjuna Brata, Ghitha~Afina Nelistiani,
+  Shinwook Heo, and Hyeongon Kim.
+\newblock Toward robust security orchestration and automated response in
+  security operations centers with a hyper-automation approach using agentic
+  artificial intelligence, 2025.
+\newblock URL \url{https://doi.org/10.3390/info16050365}.
+
+\bibitem[Jin et~al.(2025)Jin, Chen, Lu, and Zhu]{jin2025}
+Haolin Jin, Huaming Chen, Qinghua Lu, and Liming Zhu.
+\newblock Towards advancing code generation with large language models: A
+  research roadmap, 2025.
+\newblock URL \url{https://doi.org/10.48550/arxiv.2501.11354}.
+
+\bibitem[Klang et~al.(2025)Klang, Omar, Raut, Agbareia, Timsina, and
+  Freeman]{klang2025}
+Eyal Klang, Mahmud Omar, Ganesh Raut, Reem Agbareia, Prem Timsina, and Robert
+  Freeman.
+\newblock Orchestrated multi agents sustain accuracy under clinical-scale
+  workloads compared to a single agent, 2025.
+\newblock URL \url{https://doi.org/10.1101/2025.08.22.25334049}.
+
+\bibitem[Marozau(2025)]{marozau2025}
+Raman Marozau.
+\newblock Semantic-driven task allocation: Elevating multi-agent systems with
+  language models, 2025.
+\newblock URL \url{https://doi.org/10.36227/techrxiv.173611620.02896776/v2}.
+
+\bibitem[Medeiros \& Cavalcante(2025)Medeiros and Cavalcante]{medeiros2025}
+Antony Medeiros and Claudio Cavalcante.
+\newblock Dynamic multi-agent orchestration and retrieval for multi-source
+  question-answer systems using large language models, 2025.
+\newblock URL \url{https://doi.org/10.2139/ssrn.5078120}.
+
+\bibitem[Pajak et~al.(2025)Pajak, Bahamdan, Hellgardt, and
+  Ro-Chanona]{pajak2025}
+Emma Pajak, Abdullah Bahamdan, Klaus Hellgardt, and Antoniodel Ro-Chanona.
+\newblock Multi-agent llms for automating sustainable operational
+  decision-making, 2025.
+\newblock URL \url{https://doi.org/10.69997/sct.156776}.
+
+\bibitem[Pham et~al.(2026)Pham, Tanikanti, and Keçeli]{pham2026}
+Thang~D. Pham, Aditya Tanikanti, and Murat Keçeli.
+\newblock Chemgraph as an agentic framework for computational chemistry
+  workflows, 2026.
+\newblock URL \url{https://doi.org/10.1038/s42004-025-01776-9}.
+
+\bibitem[Reddy \& Shojaee(2025)Reddy and Shojaee]{reddy2025}
+Chandan~K. Reddy and Parshin Shojaee.
+\newblock Towards scientific discovery with generative ai: Progress,
+  opportunities, and challenges, 2025.
+\newblock URL \url{https://doi.org/10.1609/aaai.v39i27.35084}.
+
+\bibitem[Sawant(2026)]{sawant2026}
+Prashant Sawant.
+\newblock Samf: Sawant (structured agentic workflow for alignment, validation,
+  and negotiated testing) for reliable, safe, and verifiable llm prompting,
+  2026.
+\newblock URL \url{https://doi.org/10.20944/preprints202604.1025.v1}.
+
+\bibitem[Shao et~al.(2025)Shao, Cai, Lin, and Ming]{shao2025}
+Zhihui Shao, Shubin Cai, Rongsheng Lin, and Zhong Ming.
+\newblock Enhancing text-to-sql with question classification and multi-agent
+  collaboration, 2025.
+\newblock URL \url{https://doi.org/10.18653/v1/2025.findings-naacl.245}.
+
+\bibitem[Song et~al.(2026{\natexlab{a}})Song, Seo, and Choi]{song2026b}
+Junsup Song, Dongsu Seo, and Jinyoung Choi.
+\newblock Devill: A methodology to orchestrate a formal method and its tool to
+  an iot integration platform for smart iot systems, 2026{\natexlab{a}}.
+\newblock URL \url{https://doi.org/10.1007/978-3-031-98660-4_12}.
+
+\bibitem[Song et~al.(2026{\natexlab{b}})Song, Song, Pfister, and
+  Yoon]{song2026}
+Yiwen Song, Yale Song, Tomas Pfister, and Jinsung Yoon.
+\newblock Paperorchestra: A multi-agent framework for automated ai research
+  paper writing, 2026{\natexlab{b}}.
+\newblock URL \url{https://arxiv.org/abs/2604.05018}.
+
+\bibitem[Stewart \& Buehler(2025)Stewart and Buehler]{stewart2025}
+Isabella Stewart and Markus~J. Buehler.
+\newblock Molecular analysis and design using generative artificial
+  intelligence via multi-agent modeling, 2025.
+\newblock URL \url{https://doi.org/10.1039/d4me00174e}.
+
+\bibitem[Sun et~al.(2025)Sun, Sun, Zhang, Yin, and Kang]{sun2025}
+Wenyu Sun, Chenhua Sun, Yiduo Zhang, Zhan Yin, and Zhifeng Kang.
+\newblock Scnoc-agentic: A network operation and control agentic for satellite
+  communication systems, 2025.
+\newblock URL \url{https://doi.org/10.3390/electronics14163320}.
+
+\bibitem[Sun \& Liu(2025)Sun and Liu]{sun2025b}
+Yi~Sun and Xinke Liu.
+\newblock Research and application of a multi-agent-based intelligent mine gas
+  state decision-making system, 2025.
+\newblock URL \url{https://doi.org/10.3390/app15020968}.
+
+\bibitem[Wang et~al.(2025{\natexlab{a}})Wang, Wan, Liu, Zhang, Wang, and
+  Hu]{wang2025}
+Zelong Wang, Chenhui Wan, Jie Liu, Xi~Zhang, Haifeng Wang, and Youmin Hu.
+\newblock Masc: Large language model-based multi-agent scheduling chain for
+  flexible job shop scheduling problem, 2025{\natexlab{a}}.
+\newblock URL \url{https://doi.org/10.1016/j.aei.2025.103527}.
+
+\bibitem[Wang et~al.(2025{\natexlab{b}})Wang, Lin, Yan, Ghorbani, Yu, and
+  Zhou]{wang2025b}
+Zhaodong Wang, Samuel Lin, Guanqing Yan, Soudeh Ghorbani, Minlan Yu, and Jiawei
+  Zhou.
+\newblock Intent-driven network management with multi-agent llms: The confucius
+  framework, 2025{\natexlab{b}}.
+\newblock URL \url{https://doi.org/10.1145/3718958.3750537}.
+
+\bibitem[Wei et~al.(2025)Wei, Yang, Zhang, Chen, Zhuang, and Gao]{wei2025}
+Jiaqi Wei, Yue-Jin Yang, Xiang Zhang, Yuhan Chen, Xiang Zhuang, and Zhangyang
+  Gao.
+\newblock From ai for science to agentic science: A survey on autonomous
+  scientific discovery, 2025.
+\newblock URL \url{https://doi.org/10.48550/arxiv.2508.14111}.
+
+\bibitem[Xin et~al.(2025)Xin, Kitchin, and Kulik]{xin2025}
+Hongliang Xin, John~R. Kitchin, and Heather~J. Kulik.
+\newblock Towards agentic science for advancing scientific discovery, 2025.
+\newblock URL \url{https://doi.org/10.1038/s42256-025-01110-x}.
+
+\bibitem[Yamada et~al.(2025)Yamada, Lange, Lu, Hu, Lu, and
+  Foerster]{yamada2025}
+Yutaro Yamada, Robert~Tjarko Lange, Cong Lu, Shengran Hu, Chris Lu, and Jakob
+  Foerster.
+\newblock The ai scientist-v2: Workshop-level automated scientific discovery
+  via agentic tree search, 2025.
+\newblock URL \url{https://doi.org/10.48550/arxiv.2504.08066}.
+
+\bibitem[Zhang et~al.(2025)Zhang, Gu, Han, Guo, Addoni, and Chen]{zhang2025}
+Minzhe Zhang, Wenhao Gu, Bo‐Wei Han, Vincent Guo, Chintan Addoni, and Jiayu
+  Chen.
+\newblock Promptbio: A multi-agent ai platform for bioinformatics data
+  analysis, 2025.
+\newblock URL \url{https://doi.org/10.1101/2025.07.05.663295}.
+
+\end{thebibliography}

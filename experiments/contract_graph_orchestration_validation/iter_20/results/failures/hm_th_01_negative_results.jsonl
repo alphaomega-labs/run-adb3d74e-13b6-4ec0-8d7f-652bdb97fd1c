@@ -1,0 +1,1 @@
+{"claim_id": "HM-TH-01", "finding": "Unsafe commits appear in weakened-assumption and non-compositional baseline regimes.", "unsafe_commit_rate_mean": 0.9166666666666666, "counterexample_count": 48, "action": "Constrain theorem statement to A2_on + compositional guard regime."}

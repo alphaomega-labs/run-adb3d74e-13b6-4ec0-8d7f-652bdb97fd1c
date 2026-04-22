@@ -1,0 +1,60 @@
+{
+  "abstract": null,
+  "ai_review": {
+    "confidence": "Low",
+    "improvements": "- Promote canonical trace completeness by mirroring per-claim evidence links from validation outputs into phase_outputs/research_trace.json.\n- Standardize proof-first metadata (methodology_emphasis=\"math_optimality\") across derive_math_methodology and validation_simulation payloads to reduce downstream schema drift.\n- Add a focused follow-up attack-family expansion for HM-TH-03 while preserving theorem-regime versus stress-regime reporting.",
+    "is_ai_generated": true,
+    "label": "omegaXiv AI Reviewer",
+    "questions": "- How far can HM-TH-03 be generalized from covered attack classes to broader protocol exploit families without unacceptable FRR inflation?\n- Do asynchronous scheduling and heterogeneous tool-latency effects require additional assumptions for the bounded-recovery theorem to remain practically tight?",
+    "recommendation": "Weak Reject",
+    "scores": {
+      "code": 2,
+      "math": 2,
+      "novelty": 2,
+      "reproducibility": 2,
+      "soundness": 2,
+      "writing": 1
+    },
+    "strengths": "- Proof-first modality fit is strong: formal definitions, assumptions, lemmas, theorems, and proof sketches are central rather than peripheral.\n- Claim-evidence closure is explicit in manuscript artifacts: each core claim is tied to theorem-audit outputs, tables/figures, and appendix boundary diagnostics.\n- Formal context is adequately documented for core claims via notation/theorem structure and scoped validity/non-applicability caveats.\n- Bibliography hygiene and provenance are sound: conference bibliography style is present, citation keys resolve, and BibTeX entries include DOI/URL fields.\n- Manuscript packaging quality is acceptable: no code listings, vector figure assets, captioned tables/figures, and main-body length exceeds minimum page budget.",
+    "summary": "Contribution-and-evidence summary: the manuscript aligns with the proof-first user intent and presents a coherent theorem chain (committed-prefix soundness, bounded recovery/non-oscillation, and conditional FAR contraction with provenance invariance), each tied to executed symbolic/runtime audits, claim-matched figures/tables, and appendix counterexample bundles. Substantive strengths: formal statements are assumption-scoped, equations are referenced and linked to method/evidence artifacts, bibliography and citation integrity are sound, and layout/caption quality is publication-ready. Substantive weaknesses: no blocker-level scientific weakness remains; residual concerns are cross-artifact trace/schema parity rather than claim correctness. Real open questions: scope expansion for HM-TH-03 beyond covered attack classes and robustness of guarantees under richer asynchronous scheduling assumptions. High-leverage improvement directions: synchronize canonical research-trace claim links and proof-first metadata fields, then extend adversarial coverage to test conditionality boundaries. Minor polish: optional readability refinements for dense figure legends at print scale and one-pass metadata consistency tightening.",
+    "weaknesses": "- RF-WARN-01 | affected_claim: cross-claim evidence traceability | missing_or_contradictory_evidence: phase_outputs/research_trace.json currently has empty claim_evidence_links while phase_outputs/validation_simulation.json has per-claim links | owning_phase: revision | acceptance_condition: research_trace mirrors HM-TH-01/02/03 links with evidence_refs and metric_alignment.\n- RF-WARN-02 | affected_claim: proof-first payload consistency | missing_or_contradictory_evidence: methodology_emphasis metadata is absent in canonical payloads despite proof-first execution | owning_phase: derive_math_methodology + validation_simulation | acceptance_condition: both payloads expose methodology_emphasis=\"math_optimality\" with unchanged scientific claims."
+  },
+  "artifacts": [
+    {
+      "kind": "github_repo",
+      "label": "GitHub Repo",
+      "uri": "https://github.com/alphaomega-labs/run-adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c"
+    },
+    {
+      "kind": "paper_pdf",
+      "label": "Paper PDF",
+      "uri": "https://raw.githubusercontent.com/alphaomega-labs/run-adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c/main/paper/main.pdf"
+    },
+    {
+      "kind": "paper_thumbnail",
+      "label": "Paper Thumbnail",
+      "uri": "https://raw.githubusercontent.com/alphaomega-labs/run-adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c/main/paper/thumbnail.png"
+    },
+    {
+      "kind": "latex_sources",
+      "label": "LaTeX Sources",
+      "uri": "https://github.com/alphaomega-labs/run-adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c/blob/main/paper/main.tex"
+    }
+  ],
+  "artifacts_summary": "Writing-presentation followup retry completed with policy-consistent manuscript budget metadata and canonical compile-backed manuscript exports preserved (`paper/main.tex`, `paper/references.bib`, `paper/main.pdf`, `paper/main.aux`). Figure/table references were reconciled to canonical `iter_1` validation artifacts, and typed artifact records now include a `manuscript` entry for validator compatibility.",
+  "context_id": "adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c",
+  "created_at": "2026-04-22 17:00:43.630514+00:00",
+  "paper_pdf_url": "https://raw.githubusercontent.com/alphaomega-labs/run-adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c/main/paper/main.pdf",
+  "paper_thumbnail_url": "https://raw.githubusercontent.com/alphaomega-labs/run-adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c/main/paper/thumbnail.png",
+  "parent_run_id": "c4cb4730-e8c6-44ec-b6f4-9235922d2682",
+  "pipeline_id": "adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c",
+  "preview_run_id": "5abf9e2f-bac7-4539-8eb1-473bbbf8e77e",
+  "published_run_id": "5abf9e2f-bac7-4539-8eb1-473bbbf8e77e",
+  "repo_url": "https://github.com/alphaomega-labs/run-adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c",
+  "request_text": null,
+  "root_run_id": "adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c",
+  "run_id": "5abf9e2f-bac7-4539-8eb1-473bbbf8e77e",
+  "session_id": "adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c",
+  "title": null,
+  "updated_at": "2026-04-22 19:27:43.017985+00:00"
+}

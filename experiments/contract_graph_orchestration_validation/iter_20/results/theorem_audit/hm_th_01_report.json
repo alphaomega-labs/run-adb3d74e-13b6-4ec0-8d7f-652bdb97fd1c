@@ -1,0 +1,11 @@
+{
+  "unsafe_commit_rate_summary": {
+    "mean": 0.9166666666666666,
+    "std": 0.2763853991962833
+  },
+  "unsafe_commit_rate_ci": {
+    "low": 0.048310982812896704,
+    "high": 0.14000948990925996
+  },
+  "counterexample_count": 48
+}

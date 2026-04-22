@@ -1,0 +1,2536 @@
+The Evolution of Tool Use in LLM Agents: From Single-Tool
+Call to Multi-Tool Orchestration
+
+arXiv:2603.22862v2 [cs.SE] 2 Apr 2026
+
+HAOYUAN XU∗ and CHANG LI∗ , Harbin Institute of Technology, China
+XINYAN MA∗ and XIANHAO OU∗ , Harbin Institute of Technology, China
+ZIHAN ZHANG, Harvard University, USA
+TAO HE, XIANGYU LIU, and ZIXIANG WANG, Harbin Institute of Technology, China
+JIAFENG LIANG, ZHENG CHU, RUNXUAN LIU, and RONGCHUAN MU, Harbin Institute of
+Technology, China
+DANDAN TU, Huawei Technologies Co., Ltd., China
+MING LIU† and BING QIN, Harbin Institute of Technology, China
+Tool use enables large language models (LLMs) to access external information, invoke software systems, and
+act in digital environments beyond what can be solved from model parameters alone. Early research mainly
+studied whether a model could select and execute a correct single tool call. As agent systems evolve, however,
+the central problem has shifted from isolated invocation to multi-tool orchestration over long trajectories with
+intermediate state, execution feedback, changing environments, and practical constraints such as safety, cost,
+and verifiability. We comprehensively review recent progress in multi-tool LLM agents and analyze the state
+of the art in this rapidly developing area. First, we unify task formulations and distinguish single-call tool use
+from long-horizon orchestration. Then, we organize the literature around six core dimensions: inference-time
+planning and execution, training and trajectory construction, safety and control, efficiency under resource
+constraints, capability completeness in open environments, and benchmark design and evaluation. We further
+summarize representative applications in software engineering, enterprise workflows, graphical user interfaces,
+and mobile systems. Finally, we discuss major challenges and outline future directions for building reliable,
+scalable, and verifiable multi-tool agents.
+ACM Reference Format:
+Haoyuan Xu, Chang Li, Xinyan Ma, Xianhao Ou, Zihan Zhang, Tao He, Xiangyu Liu, Zixiang Wang, Jiafeng
+Liang, Zheng Chu, Runxuan Liu, Rongchuan Mu, Dandan Tu, Ming Liu, and Bing Qin. 2026. The Evolution
+of Tool Use in LLM Agents: From Single-Tool Call to Multi-Tool Orchestration. In Proceedings of Make sure
+to enter the correct conference title from your rights confirmation email (Conference acronym ’XX). ACM, New
+York, NY, USA, 35 pages. https://doi.org/XXXXXXX.XXXXXXX
+∗ Equal contribution
+† Corresponding author
+
+Authors’ Contact Information: Haoyuan Xu, hyxu@ir.hit.edu.cn; Chang Li, cli@ir.hit.edu.cn, Harbin Institute of Technology,
+Harbin, Heilongjiang, China; Xinyan Ma, xyma@ir.hit.edu.cn; Xianhao Ou, 25S103427@hit.edu.cn, Harbin Institute of
+Technology, Harbin, Heilongjiang, China; Zihan Zhang, Zihan_zhang@hsph.harvard.edu, Harvard University, Cambridge,
+MA, USA; Tao He, the@ir.hit.edu.cn; Xiangyu Liu, 2022112441@stu.hit.edu.cn; Zixiang Wang, 2022112865@stu.hit.edu.cn,
+Harbin Institute of Technology, Harbin, Heilongjiang, China; Jiafeng Liang, jfliang@ir.hit.edu.cn; Zheng Chu, zchu@ir.
+hit.edu.cn; Runxuan Liu, rxliu@ir.hit.edu.cn; Rongchuan Mu, rcmu@ir.hit.edu.cn, Harbin Institute of Technology, Harbin,
+Heilongjiang, China; Dandan Tu, tudandan@huawei.com, Huawei Technologies Co., Ltd., China; Ming Liu, mliu@ir.hit.edu.
+cn; Bing Qin, qinb@ir.hit.edu.cn, Harbin Institute of Technology, Harbin, Heilongjiang, China.
+Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee
+provided that copies are not made or distributed for profit or commercial advantage and that copies bear this notice and the
+full citation on the first page. Copyrights for components of this work owned by others than the author(s) must be honored.
+Abstracting with credit is permitted. To copy otherwise, or republish, to post on servers or to redistribute to lists, requires
+prior specific permission and/or a fee. Request permissions from permissions@acm.org.
+Conference acronym ’XX, Woodstock, NY
+© 2026 Copyright held by the owner/author(s). Publication rights licensed to ACM.
+ACM ISBN 978-x-xxxx-xxxx-x/YYYY/MM
+https://doi.org/XXXXXXX.XXXXXXX
+
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+2
+
+1
+
+Xu, et al.
+
+Introduction
+
+While Large Language Models (LLMs) have demonstrated exceptional reasoning and generation
+capabilities in natural language processing [121], their ability to solve complex real-world problems
+remains constrained by static parametric knowledge, potential hallucination risks, and a lack of
+interaction with physical or digital environments. Tool learning addresses these limitations by
+enabling models to invoke external APIs (e.g., search engines, code interpreters), establishing
+a perception-action loop. Early works such as TALM [129], MRKL [76], Toolformer [144], and
+ReAct [205] laid the foundation for this field by teaching models to recognize single intents and
+correctly format API requests, effectively internalizing tool usage as an extended language capability.
+As task complexity escalates, the linear application of single tools becomes insufficient for
+real-world challenges. Multi-tool utilization represents an independent research problem that
+intersects with combinatorial optimization [103], programmatic semantic constraints, and system
+scheduling [65]. The decision space for an autonomous agent undergoes a qualitative shift from
+simple binary tool selection to solving a series of coupled decisions within a single task. This
+process includes dynamic tool subset selection, cross-tool dependency modeling, sequential and
+parallel scheduling, failure recovery, and re-planning. When tool usage extends to long-horizon
+chains involving state-mutating write operations, maintaining state consistency and managing
+race conditions under parallel execution emerge as core bottlenecks for system stability.
+The primary research objective in this domain has thus transitioned from the correctness of
+single-point calls to the end-to-end executability and robustness of multi-tool chains in complex
+environments. We begin by reviewing inference-time reasoning paradigms and architectures, highlighting the transition from serial chain reasoning to structured graph-based execution, alongside
+dual-system architectures designed to balance long-horizon planning complexity with execution
+efficiency. We then explore data synthesis and training paradigms, focusing on trajectory synthesis
+and closed-loop verification methods that address the combinatorial space of multi-tool usage and
+long-tail dependencies. Furthermore, we analyze safety and robustness, particularly concerning
+state safety under parallel execution, context drift in extended chains [142], and mitigation strategies
+for privacy risks. The discussion also encompasses operational efficiency, evaluating end-to-end
+agent latency, tool invocation costs, and inference budgets [127]. To address system completeness,
+we review adaptive strategies for incomplete environments where tools or information may be
+missing. Finally, we trace the evolution of benchmark evaluation standards from single-point
+functional verification to system-level topological orchestration and interactive closed-loops. Based
+on these existing challenges, we propose a future research agenda to provide theoretical references
+and technical pathways for building reliable, efficient, and scalable multi-tool agent systems.
+
+1.1
+
+Aims and Motivations
+
+Research on tool-augmented LLMs began with a relatively simple question: can a model select an
+appropriate tool and produce a valid call? That abstraction is no longer sufficient for agent systems.
+Many practical tasks require an agent to coordinate multiple tools over long trajectories, preserve
+intermediate state, recover from failures, and operate under constraints on latency, cost, and safety.
+In these settings, a key challenge lies not only in tool access, but also in orchestration.
+This survey is motivated by two gaps in the current literature. The first is conceptual: terms such
+as tool use, tool calling, tool retrieval, workflow execution, and orchestration are often used loosely,
+even though they refer to different capability levels. The second is structural: planning, training,
+safety, efficiency, benchmarking, and open-environment adaptation are often studied separately,
+while deployed agent systems depend on their interaction.
+
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+The Evolution of Tool Use in LLM Agents: From Single-Tool Call to Multi-Tool Orchestration
+
+1.2
+
+3
+
+Related Work
+
+A growing body of survey work has examined tool use in large language models and related
+agent topics, yet long-horizon multi-tool orchestration has less often been treated as a primary
+problem in its own right. Wang et al. [178] considered what should count as a tool from the
+perspective of language models and offered a unified view of external tools. Qu et al. [140] surveyed
+tool learning in LLMs, covering planning, tool selection, tool calling, and response generation.
+Shen [153] reviewed LLM tool use with attention to tool integration, training methods, and the
+shift from tool use to tool creation. Li [89] summarized major paradigms of LLM-based agents,
+including tool use, planning, and feedback learning. Luo et al. [116] provided a broader review
+of LLM agents spanning methodology, applications, and challenges. Chen et al. [27] focused on
+LLM-based multi-agent systems rather than multi-tool orchestration within a single agent. He et
+al. [56] surveyed security and privacy risks in LLM agents. Mohammadi et al. [123] reviewed the
+evaluation and benchmarking of LLM agents.
+Our survey differs from this literature in several ways. It takes multi-tool orchestration, rather
+than tool use in general or agent systems more broadly, as the main unit of analysis. It also organizes
+the field around six connected dimensions: inference, training and trajectory construction, safety and
+control, efficiency, capability completeness, and evaluation. In addition, it draws clearer boundaries
+among concepts that are often conflated in prior work, including tool invocation, tool retrieval,
+orchestration, and toolset expansion. Finally, it relates methodological progress to the recent shift
+from call-level correctness to system-level reliability in both benchmarks and applications.
+
+Input
+
+Simple intent
+Recognition
+
+STATIC
+LLM
+(Parametric
+Knowledge)
+
+Multi-Tool Agent System
+
+SYNTACTIC
+CORRECTNESS
+
+Result
+Thought
+Update
+Tool B Call
+(Code
+Interpreter)
+
+Result
+
+PARADIGM SHIFT:
+Complex System
+Scheduling &
+Combinational
+Optimization
+
+Complex
+RealWorld
+Task
+
+Graph
+Planning
+
+Dependency
+Modeling
+
+State-Space
+Search
+
+EFFICIENCY
+
+Tool Evolution
+
+SelfCorrection
+
+Tool Call Cost
+BENCHMARKS
+System-Level
+Topological
+Orchestration
+
+TUNING PARADIGMS & TRAJECTORY SYNTHESIS
+Trajectory
+Data
+Synthesis
+
+Supervised
+Fine-Tuning
+(SFT)
+
+Failure Recovery
+& Re-Planning
+
+Final Answer
+Interactive Closed-Loop
+Verification
+
+Linear Reasoning (Past works)
+
+Context Drift
+Mitigation
+
+Agent Latency
+Memory
+
+Semantic
+Constraints
+
+SINGLE-POINT
+FUNCTIONAL
+VERIFICATION
+
+State Safety In
+Parallel Execution
+
+Inference-Time Paradigm
+
+Tool A Call
+(API Search)
+LINEAR
+EXECUTION
+
+SAFETY & ROBUSTNESS
+
+Reinforcement
+Learning (RL)
+
+Agent SelfImprovement
+
+EXTERNAL ENVIRONMENTS
+(APIs, Databases, Software)
+
+Temporal Scale
+Interactive
+Closed-Loops
+
+TOOLSET EXPANSION
+(OPEN ENVIRONMENTS)
+
+Multi-Tool Orchestration (Present & Future)
+
+Fig. 1. Paradigm Shift in LLM Tool Use: From Single-Tool Call to Multi-Tool Orchestration
+
+2
+
+Problem formulation
+
+Notation. A multi-tool learning instance contains: (i) a query/task 𝑞 ∈ Q; (ii) an interactive
+environment with latent state 𝑠𝑡 ∈ S and observation 𝑜𝑡 ∈ O at step 𝑡; (iii) a tool inventory
+𝑁 , where each tool 𝑑 is described by a schema/signature Σ (e.g., name, description,
+D = {𝑑𝑖 }𝑖=1
+𝑑
+constraints, return format). A tool execution interface is
+Exec(𝑑, 𝑢; 𝑠) → (𝑓 , 𝑠 ′ ),
+where 𝑢 ∈ U𝑑 is a valid argument/parameter object for tool 𝑑, 𝑓 ∈ F is tool feedback (e.g.,
+JSON/text/error code), and 𝑠 ′ ∈ S is the post-call environment state . Let 𝜋𝜃 denote the model/policy
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+4
+
+Xu, et al.
+
+Inference-Time Paradigms
+(§ 3)
+
+Topological Planning
+(§ 3.1)
+
+ReAct [205], GAP [184], ToolNet [106],
+Smurfs [23], AgentPro [32]
+
+Long-Horizon Orchestration
+(§ 3.2)
+
+MARS [22], CodeTool [113], HuggingGPT [151],
+COMPASS [163], MIRIX [175]
+
+Agent Self-Improvement
+(§ 3.3)
+
+Reflexion [154], SPIRAL [224], SAGE [97],
+MetaAgent [135], DRAFT [139]
+
+Training-free Methods
+(§ 4.1)
+
+Toolformer [144], ToolLLM [138], MCP-Zero [44],
+Pre-Act [143], PLAY2PROMPT [43]
+
+Trajectory Data Synthesis
+(§ 4.2)
+
+Seal-Tools [185], BUTTON [25], APIGen [107],
+StableToolBench [51], ToolACE-R [213]
+
+Supervised Fine-Tuning
+(§ 4.3)
+
+Gorilla [130], ToolLLM [138], Hammer [100],
+Chain-of-Abstraction [46], ToolGen [173]
+
+Reinforcement Learning
+(§ 4.4)
+
+PORTool [183], ToolRL [133], DeepAgent [91],
+RAGEN [179], Agent-R1 [29]
+
+Safety issues in
+parallel execution
+(§ 5.1)
+
+AARM [41], SagaLLM [21], Atomix [122],
+CRITIC [48], DVR [223]
+
+Safety issues in
+chain execution
+(§ 5.2)
+
+MINJA [37], Butterfly Effects [190], LATS [231],
+AgentDoG [102], TRICE [136]
+
+Latency in multi-tool
+chains
+(§ 6.1)
+
+SoT [125], LLMCompiler [80], MACI [20],
+ReWoo [193], DSPy [78]
+
+Tool call cost and
+inference budget
+(§ 6.2)
+
+ToolLLM [138], AnyTool [39], ToolkenGPT [55],
+FrugalGPT [24], MemGPT [128]
+
+Capability boundary
+perception
+(§ 7.1)
+
+FAIL-TALMS [161], ToolHaystack [82], AskToAct [222]
+
+Autonomous tool
+expansion
+(§ 7.2)
+
+LATM [18], CREATOR [134], RestGPT [158],
+ToolMaker [181]
+
+Open environment
+adaptation
+(§ 7.3)
+
+Voyager [164], ExpeL [227], ToolkenGPT [55],
+AppAgent [216]
+
+Topological Complexity
+(§ 8.1)
+
+NESTFUL [14], ToolHop [206], Seal-Tools [185],
+TaskBench [152], M3 -Bench [233]
+
+Temporal Scale
+(§ 8.2)
+
+Tool Decathlon [87], AgentLongBench [42], UltraHorizon [115],
+TRIP-Bench [150], DeepPlanning [225]
+
+Dynamic Environments
+(§ 8.3)
+
+𝜏 -bench [203], Windows Agent Arena [17]
+
+Tuning Paradigms
+(§ 4)
+
+The Evolution
+of Tool Use
+in LLM Agents
+
+Safety
+(§ 5)
+
+Efficiency of
+Multi-Tool Agents
+(§ 6)
+
+Completeness
+(§ 7)
+
+Benchmarks
+(§ 8)
+
+State Persistence and
+Self-Correction
+(§ 8.4)
+
+ToolSandbox [109], AppWorld [162], OSWorld [188],
+
+OdysseyBench [174], MemAgentBench [64], CRITICTOOL [67],
+RoTBench [208], ToolSword [207]
+
+Fig. 2. The main structure of this paper.
+
+with parameters 𝜃 . Let 𝜏 denote a tool-use trajectory (defined below), and Cost(𝜏) any cost functional
+(number of calls, latency, API fees, risk, etc.).
+We define the interaction history up to time 𝑡 as
+ℎ𝑡 := (𝑞, 𝑜 0, 𝑎 0, 𝑓0, 𝑜 1, 𝑎 1, 𝑓1, . . . , 𝑜𝑡 ),
+where 𝑎𝑘 is the action taken at step 𝑘 and 𝑓𝑘 is the feedback returned by Exec. Let 𝑚𝑡 denote the
+model’s internal memory/state at step 𝑡 (e.g., a scratchpad summary or retrieved records), which
+can be updated as a function of (𝑚𝑡 −1, ℎ𝑡 ).
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+The Evolution of Tool Use in LLM Agents: From Single-Tool Call to Multi-Tool Orchestration
+
+5
+
+Multi-tool orchestration. At each step 𝑡, the model selects an action
+
+𝑎𝑡 ∈ A := D × U ∪ {Finish(𝑦)},
+where a tool-call action is 𝑎𝑡 = (𝑑𝑡 , 𝑢𝑡 ) with 𝑑𝑡 ∈ D and 𝑢𝑡 ∈ U𝑑𝑡 , and Finish(𝑦) terminates with
+final answer 𝑦 ∈ Y. The policy acts conditioned on history and memory:
+𝑎𝑡 ∼ 𝜋𝜃 (· | ℎ𝑡 , 𝑚𝑡 ).
+If 𝑎𝑡 = (𝑑𝑡 , 𝑢𝑡 ), the environment returns feedback and transitions:
+(𝑓𝑡 , 𝑠𝑡 +1 ) ← Exec(𝑑𝑡 , 𝑢𝑡 ; 𝑠𝑡 ),
+
+ℎ𝑡 +1 = ℎ𝑡 ⊕ (𝑎𝑡 , 𝑓𝑡 , 𝑜𝑡 +1 ),
+
+where ⊕ appends new interaction records and 𝑜𝑡 +1 is the next observation derived from 𝑠𝑡 +1 . A
+trajectory is
+
+𝜏 := (𝑎 0, 𝑓0 ), (𝑎 1, 𝑓1 ), . . . , (𝑎𝑇 −1, 𝑓𝑇 −1 ), Finish(𝑦) ,
+with variable horizon 𝑇 . A generic cost-aware objective is
+h
+i
+max E 𝑅task (𝑞, 𝜏, 𝑦) − 𝜆 · Cost(𝜏) ,
+𝜃
+
+where 𝜆 ≥ 0 trades off success vs cost. This captures long-horizon scheduling, failure recovery, and
+re-planning under tool/environment feedback.
+3
+
+Multi-Tool Agent Inference-Time Paradigms
+
+Multi-tool calling constitutes a fundamental shift in agent planning and reasoning. As the tool
+space expands to encompass thousands of APIs and non-linear dependencies, traditional autoregressive generation models struggle with context limits and cascading errors. This shift motivates
+a substantial rethinking of agent inference-time paradigms. Recent research focuses on task topological planning, explicit search algorithms, reflection and self-improvement, and system-level
+orchestration with persistent memory. This section systematically reviews representative works
+along these key areas.
+3.1
+
+Topological Planning
+
+Traditional paradigms such as ReAct [205] organize tool usage into sequential traces. This structure
+implicitly assumes that tasks are linearly decomposable. While highly effective for simple single-step
+retrievals, this linear approach exhibits severe structural mismatches when applied to nested calls,
+parallel I/O operations, or long-horizon goals. Linear constraints inherently limit the representation
+of data flow dependencies, preclude the parallel execution of independent operations, and force
+early decision errors to accumulate throughout the trajectory. Consequently, the field has rapidly
+moved toward topology-aware planning that utilizes structures with significantly higher expressive
+power.
+As tool spaces expand into the tens of thousands, the primary challenge shifts from binary
+selection to dependence-aware combinatorial decision-making. One line of work represents tool
+use as an explicit dependency structure, allowing the agent to reason over asynchronous or partially
+parallelizable subproblems [99, 184]. Related systems such as ToolNet and StructuredAgent encode
+reusable transition structure through directed graphs or AND/OR decompositions, reducing the
+effective search space while preserving non-linear task dependencies [106, 108]. AutoTool further
+shows that historical regularities in tool transitions can be used to bypass unnecessary inference
+for predictable parts of the workflow [72]. Taken together, these approaches treat tool use as
+graph-structured execution rather than a flat token sequence.
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+6
+
+Xu, et al.
+
+To address goal drift in long-horizon tasks, monolithic planning algorithms are increasingly
+being replaced by hierarchical delegation. HIPLAN proposes a bi-level architecture where an upperlevel planner generates a macroscopic milestone space, leaving a lower-level executor to resolve
+specific state gaps [94]. ADaPT introduces a recursive representation that defaults to flat execution,
+invoking high-level graph decomposition only upon encountering localized failures [132]. Pushing
+abstraction further, AFlow represents the reasoning process as executable node configurations
+and control flow edges [219]. Dynamic planners like D-PoT [221], DyFlow [176], and ReCAP [226]
+further allow real-time subgoal reorganization.
+As autoregressive decoding is inherently short-sighted, recent methods cast multi-step tool
+execution as a state-space search problem. Traditional tree search often suffers from context contamination in language domains. Smurfs introduces context-efficient rollback and branch isolation,
+reducing contamination from failed trajectories [23]. AB-MCTS explores adaptive branching under
+external feedback, while ARTIS separates exploration from commitment through an internal simulator for high-risk actions [70, 214]. Closely related approaches, including Plan-and-Act, MPO,
+and AgentPro, also separate abstract planning from execution or use learned evaluators to prune
+low-quality branches during inference [32, 40, 191]. These methods reflect a broader shift from
+"generate once and execute" to "search, verify, and then commit".
+3.2
+
+Long-Horizon Orchestration
+
+When task complexity exceeds the cognitive limitations of a single model, reasoning shifts to systemlevel architecture. This axis emphasizes cognitive division of labor, standardized semantic routing,
+and long-term dynamic memory to ensure robust performance across open-ended environments.
+Inspired by dual-process reasoning, MARS separates fast parsing of large tool outputs from
+slower deliberative reasoning [22]. In domains with strict execution requirements, CodeTool introduces structured intermediate representations that make progress easier to verify [113]. Other
+systems externalize durable skills or workflows into procedural memory. DeepAgent integrates tool
+discovery into a continuous reasoning stream [91], while MACLA and HiAgent explicitly maintain
+reusable procedural abstractions across long tasks and repeated sessions [45, 63]. The common
+goal is to avoid placing the full burden of orchestration inside a single transient context window.
+A related challenge is dynamic scheduling over large tool ecosystems. Early frameworks such
+as HuggingGPT illustrated the value of centralized planning and semantic routing across heterogeneous expert models [151]. Subsequent work showed that decomposing the workflow into
+planner, caller, and summarizer roles can allow smaller models to compete effectively with larger
+monolithic agents [149]. As tool access becomes more standardized, schedulers such as Gradientsys
+coordinate multiple specialized executors under capacity and observability constraints [156]. Toolto-Agent Retrieval extends this idea by jointly indexing tools and their parent agents, preserving
+both invocation granularity and execution context during retrieval [114]. These systems suggest
+that long-horizon competence depends not only on reasoning quality, but also on how execution
+responsibilities are routed and monitored.
+Memory is the third core component of long-horizon orchestration. Raw trajectories are too
+large and noisy to remain fully useful over extended interaction, so practical systems compress,
+structure, or externalize execution history. COMPASS and Acon summarize completed subtasks
+into compact progress representations to maintain alignment with the global objective [75, 163].
+Other approaches use graph-structured or typed memory to support retrieval and update over
+longer timescales. A-Mem builds semantic links among historical states [196], MIRIX decomposes
+memory into multiple specialized stores for persistent multimodal interaction [175], and SEDM
+treats memory as a shared resource for multi-agent collaboration [194]. Across these systems, the
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+The Evolution of Tool Use in LLM Agents: From Single-Tool Call to Multi-Tool Orchestration
+
+7
+
+main design question is not whether to store more history, but how to retain the parts that remain
+relevant for decisions while suppressing noise and outdated branches.
+3.3
+
+Agent Self-Improvement
+
+Inference-time capability is increasingly shaped not only by planning and memory, but also by
+mechanisms for self-improvement. In multi-tool settings, errors often arise from misbound parameters, invalid assumptions, or ineffective recovery strategies. As a result, many recent systems
+explicitly learn to diagnose and revise their own trajectories during or after execution.
+A first family of methods focuses on self-correction. Reflexion stores verbalized lessons from
+prior failures and uses them to guide later attempts [154]. The Failure Makes the Agent Stronger
+framework turns diagnosis and repair into explicit actions trained with reward-based optimization
+over perturbed trajectories [159]. SPIRAL and PreFlect further constrain or anticipate reflective
+behavior to reduce unproductive loops and catch likely failures before execution [165, 224]. SAGE
+and Plan2Evolve extend this idea toward continual improvement by combining reflection with
+memory and planning repair [66, 97].
+A second family of methods treats improvement as capability evolution rather than isolated
+correction. MetaAgent distills accumulated experience into reusable tools and internal knowledge,
+enabling the agent to improve its future reasoning and tool-use strategies without additional
+model training [135]. Test-Time Tool Evolution pushes this direction further by synthesizing and
+validating new executable tools during inference [110]. DRAFT and SWE-Adept similarly revise
+tool descriptions or tool-memory interfaces in response to execution feedback [59, 139]. This line
+of work suggests that inference is increasingly becoming an adaptive loop in which the agent not
+only uses a tool ecosystem, but also reorganizes and improves that ecosystem while solving tasks.
+4
+
+Multi-Tool Agent Tuning Paradigms
+
+Despite the remarkable generalization capabilities exhibited by LLMs across broad natural language
+tasks, deploying them as reliable agents in multi-tool orchestration scenarios remains a formidable
+challenge. Vanilla pre-trained models or general-purpose models frequently exhibit deficiencies
+in schema compliance, parameter precision, and long-horizon planning, which can easily lead to
+execution failures or hallucinations in complex multi-tool tasks. To bridge the gap between generalpurpose models and specialized multi-tool agents, various adaptation strategies have been proposed
+to bolster the model’s proficiency in tool perception, selection, and precise execution. As shown
+in Figure 3, this chapter provides a systematic taxonomy of methodologies for Multi-tool Agent
+Tuning, organized in an ascending order of computational overhead and data dependency: we first
+investigate Training-free Methods that activate tool-calling capabilities without parameter updates;
+then introduce multi-tool trajectory data synthesis as the essential data foundation; followed by
+supervised fine-tuning (SFT) to align models with specific tool-calling syntaxes and planning
+patterns; and finally discuss reinforcement learning (RL) frameworks that exploit environmental
+feedback to improve agent self-evolution and decision-making robustness.
+4.1
+
+Training-free Methods
+
+Training-free methods enhance multi-tool agents without updating LLM parameters, offering low
+deployment overhead and strong adaptability to newly introduced tools. Rather than altering
+the agent’s internal reasoning mechanism, these methods improve tool use through external
+augmentation, primarily along three directions: tool retrieval and discovery, prompt engineering,
+and non-parametric memory augmentation.
+A major line of work studies tool retrieval and discovery. As the number of available APIs grows,
+exhaustively including tool documentation in the prompt becomes impractical. To address this
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+8
+
+Xu, et al.
+
+Training-free Methods
+
+Multi-tool Trajectory
+Data Synthesis
+
+Supervised Fine-Tuning
+
+Tool Retrieval
+
+Data Synthesis
+Mechanisms
+
+Scalability and
+robustness
+
+Reward
+Modeling
+
+Cognitive
+Architectures
+
+Data Validation
+Quality Control
+
+Modeling
+paradigms
+
+Policy
+Optimization
+
+Execution
+Robustness
+
+Coverage
+Generalization
+Expansion
+
+Execution
+control
+
+End-to-End
+Frameworks
+
+Reinforcement Learning
+
+Organized in an ascending order of computational overhead and data dependency
+
+Fig. 3. Taxonomy of Methodologies for Multi-tool Agent Tuning Paradigms
+
+issue, ToolLLM [138] and AnyTool [39] employ retrieval-based mechanisms to dynamically select
+relevant tool descriptions from large tool repositories. ToolDreamer [145] further improves retrieval
+quality by generating idealized tool descriptions as search queries, thereby better aligning user
+intents with real-world APIs. MCP-Zero [44] extends passive retrieval to active discovery, enabling
+agents to request tool schemas on demand and thus reducing context redundancy. Re-Invoke [28]
+similarly improves zero-shot tool selection through multi-perspective query rewriting. Another
+line of work focuses on prompt and exemplar construction for tool use. PLAY2PROMPT [43] allows
+agents to autonomously explore tool behavior and synthesize usage instructions together with
+few-shot exemplars, thereby improving tool invocation without SFT. Finally, some methods enhance
+robustness through non-parametric memory augmentation. Memento [232] equips agents with
+episodic memory by retrieving successful historical trajectories to support current decision-making.
+GenTool [58] improves robustness through simulation under diverse conditions, such as missing or
+updated tools, thereby helping agents generalize to dynamic tool environments.
+4.2
+
+Multi-tool trajectory Data Synthesis
+
+High-quality training data serves as the cornerstone for constructing robust multi-tool agents.
+However, the acquisition of real-world tool execution logs is constrained by privacy regulations,
+access permissions, and the scarcity of diverse scenarios, making large-scale manual annotation
+impractical. Consequently, synthetic data generation has emerged as the dominant paradigm. Recent
+literature reveals a systematic evolution toward a "Synthesis-Validation-Expansion" framework,
+marking a strategic shift in research focus from basic data usability to the comprehensive coverage
+of the multi-tool composition space. This paradigm aims to synthesize training trajectories that
+encompass long-horizon interactions, cross-tool dependencies, and error recovery mechanisms in
+complex scenarios, thereby bolstering the agent’s capability to navigate intricate tasks.
+Regarding data synthesis mechanisms, Early self-bootstrapping methods such as Seal-Tools [185]
+and Luo et al. [117] show that LLMs can generate large amounts of tool-use data without expert
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+The Evolution of Tool Use in LLM Agents: From Single-Tool Call to Multi-Tool Orchestration
+
+9
+
+demonstrations. More recent approaches improve structure and compositionality rather than
+scale alone. BUTTON [25] combines bottom-up instruction construction with top-down trajectory
+generation to synthesize compositional interaction traces, while ASTRA [160] uses tool-call graph
+topology to generate structurally grounded trajectories in rule-verifiable environments.
+In terms of data validation and quality control, recent advancements focus on execution-based
+iterative verification. As synthetic data grows in size, filtering by format alone becomes insufficient.
+APIGen [107] therefore verifies data through staged checking that includes syntax, actual execution,
+and semantic validation. StableToolBench [51] reduces instability from volatile APIs through
+simulators and caching. ToolACE-DEV [68] and ToolACE-R [213] move further toward iterative
+repair, using self-improvement and model-aware refinement to adapt synthetic data to the learner’s
+evolving capability.
+Concerning coverage and generalization expansion, numerous approaches aim to push the boundaries of the tool compositional space to tackle real-world complexity. ToolMind [199] advances
+data engineering for compositional space coverage by constructing large-scale, reasoning-intensive
+datasets. To enhance robustness against execution errors, LoopTool [220] institutionalizes failuredriven synthesis, creating a data closed-loop that mirrors real-world failure distributions. For
+complex orchestration, OrchDAG [112] models tool execution as Directed Acyclic Graphs (DAGs)
+with controllable complexity, providing structured benchmarks for multi-turn interactions. Collectively, these advancements reflect a new consensus: the critical metric for synthetic data is no
+longer mere quantity, but the systematic coverage of long-tail effects, complex interaction effects,
+and multi-step error patterns.
+4.3
+
+Supervised Fine-Tuning
+
+Supervised Fine-Tuning (SFT) represents the foundational alignment phase for endowing Large Language Models with tool-use capabilities. Amidst the paradigm shift from atomic tool invocation to
+multi-tool orchestration, the objectives of SFT have undergone a fundamental transformation. Early
+methodologies primarily emphasized syntax alignment—ensuring the structural integrity of outputs (e.g., JSON schema compliance). Pioneering works such as Gorilla [130] and GPT4Tools [202]
+demonstrated that fine-tuning on high-quality (Instruction, API Call) pairs enables models to effectively acquire API semantic matching and parameter filling skills. However, mere data accumulation
+is no longer sufficient to address complex orchestration tasks. Consequently, recent advancements
+have pivoted toward more specialized objectives, such as tool selection from massive repositories
+and inter-tool dependency planning.
+To address large-scale and noisy tool selection, ToolLLM [138] extends SFT to massive toolsets
+by training on Depth-First Search decision trajectories, enabling the model to internalize exploration and trial-and-error strategies for unresolvable scenarios. Hammer [100] introduces Function
+Masking during fine-tuning to penalize hallucinations and heighten sensitivity to irrelevant tools,
+establishing a new benchmark for robust on-device function calling. To optimize the interplay
+between reasoning and action, Chain-of-Abstraction [46] proposes a dual-stage decoding strategy;
+it trains the model to first generate abstract reasoning chains with placeholders and subsequently
+populate them with concrete tool outputs, effectively decoupling general reasoning from domainspecific knowledge retrieval. ToolGen [173] unifies tool retrieval and parameter generation into a
+sequence of generative virtual tokens, restructuring the SFT objective to allow the simultaneous
+learning of tool semantics and parameter structures in a single autoregressive pass, which significantly mitigates cascading errors. Finally, addressing task granularity, the Granite-Function Calling
+Model [5] adopts a multi-task learning framework that decomposes tool usage into fine-grained
+subtasks—such as tool detection, parameter generation, and response formatting—thereby achieving
+precise control over the entire execution lifecycle. Collectively, these developments signify that
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+10
+
+Xu, et al.
+
+SFT has evolved beyond simple pattern imitation toward the construction of autonomous systems
+capable of high-level decision-making and rigorous execution.
+
+4.4
+
+Reinforcement Learning
+
+Although SFT effectively aligns models with fundamental tool-use syntax, it remains inherently
+constrained by the Behavioral Cloning paradigm. Models trained via SFT are often limited to myopic
+imitation of training trajectories, struggling to self-correct during long-horizon tasks or to explore
+novel paths within open-ended tool spaces. Consequently, the research focus is shifting toward
+Reinforcement Learning and environmental feedback to optimize high-level decision-making. As
+the field transitions from single-tool triggering to multi-tool orchestration, RL encounters formidable challenges: sparse reward signals, difficult credit assignment, and training instability. Thus,
+recent advances have transcended standard algorithms like PPO or GRPO, developing specialized
+paradigms centered on process reward design, turn-level policy optimization, and end-to-end agent
+frameworks. These innovations aim to evolve agents from passive executors into adaptive planners
+capable of robust error recovery and strategic exploration.
+Regarding Reward Modeling and Credit Assignment, to bridge the gap between sparse outcome
+rewards and complex multi-step reasoning, the community has established a comprehensive rewardoptimization closed loop. Addressing the sparsity of success signals in long chains, PORTool [183]
+integrates quality signals generated by tree search into policy gradient updates, while Tool-Star [34]
+designs hierarchical reward mechanisms to resolve credit assignment issues in multi-step reasoning.
+Moving toward systematic reward engineering, ToolRL [133] conducts a comprehensive study on
+reward granularity, proposing principled reward designs that surpass simple pass/fail metrics to
+stabilize training. Similarly, ToolRM [8] trains a dedicated Outcome Reward Model to evaluate
+tool-based reasoning, outperforming general-purpose verifiers in complex scenarios. To reinforce
+intermediate steps, Wei et al. [180] introduce verifiable turn-level rewards, extending RL algorithms
+to handle fine-grained credit assignment in multi-turn search tasks.
+In terms of Policy Optimization and Algorithm Adaptation, standard RL algorithms often struggle
+to adapt to drastic dynamic shifts in agent tasks. DeepAgent [91] explores ToolPO (Tool Policy
+Optimization), which addresses the high cost and instability of training with real APIs by utilizing
+an LLM-simulated API environment for low-cost exploration. It simultaneously introduces Finegrained Advantage Attribution, precisely allocating reward signals to the specific tokens triggering
+tool invocations, thereby significantly enhancing stability in open-set tool retrieval. Addressing the
+limitations of trajectory-level rewards in GRPO, GTPO [33] innovatively adopts turn-level reward
+distribution and return-based advantage estimation, effectively preventing training stagnation
+during iterative reasoning. Furthermore, to mitigate Entropy Spikes following tool interactions,
+ARPO [35] incorporates an entropy-based adaptive rollback mechanism to dynamically balance
+global exploration and local exploitation. RAGEN [179] identifies the Echo Trap phenomenon
+specific to agent training and proposes the StarPO algorithm to stabilize the learning process
+through trajectory-level optimization.
+Concerning End-to-End Frameworks, ToRL [92] demonstrates that RL can directly extend tooluse capabilities from a Base Model without a prerequisite SFT phase, unlocking emergent behaviors
+such as self-regulation. Finally, Agent-R1 [29] comprehensively defines LLM Agents by extending
+the Markov Decision Process (MDP) framework, providing a modular and scalable system for
+end-to-end reinforcement learning.
+
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+The Evolution of Tool Use in LLM Agents: From Single-Tool Call to Multi-Tool Orchestration
+
+5
+
+11
+
+Safety of Multi-Tool Agents
+
+The security landscape of tool-augmented agents has shifted from mere malicious text generation to
+the execution of harmful actions within digital or physical environments. While single-tool vulnerabilities—such as indirect prompt injection [49], unauthorized execution and privilege escalation [79],
+privacy leakage, and tool-assisted attacks [15, 56, 147]—are well-documented, the transition to
+multi-tool orchestration significantly expands the system’s attack surface. In multi-tool systems,
+security is no longer determined by the legitimacy of isolated API calls but by complex, cross-tool,
+and cross-timestep execution structures. These interactions breach traditional trust boundaries,
+where localized malicious inputs or model hallucinations are rarely isolated incidents. Instead, they
+often induce "state pollution" through the tool-chain context, leading to cascading propagation of
+attacks. This chapter investigates the novel security challenges and defense mechanisms inherent
+in multi-tool orchestration. Based on the topological execution logic of tool chains, we categorize
+multi-tool security risks into two distinct yet interrelated dimensions: (1) security risks in parallel
+execution, and (2) security risks in long-horizon tool chains.
+5.1
+
+Security Risks in Parallel Execution
+
+In multi-tool orchestration architectures, parallel execution significantly enhances agent efficiency
+in complex task processing; however, it introduces latent security vulnerabilities. While parallelization is relatively safe for side-effect-free read operations (e.g., web retrieval, information queries),
+the integration of write operations (e.g., database updates, transaction commits) within tool chains
+risks race conditions, leading to system state inconsistencies. Consequently, the central challenge
+of multi-tool parallelization lies in maintaining state integrity within concurrent environments.
+Recent work shows that this risk is not merely an implementation detail. Les Dissonances
+demonstrates that when LLMs invoke interdependent tools concurrently, malicious payloads can
+propagate across tool boundaries and contaminate later execution [95]. Related analysis of stateful
+tool use in multi-turn dialogue finds that reliability failures often follow a recognizable path from
+parameter drift to state contamination and then to irrecoverable downstream calls [166]. SagaLLM
+makes this issue explicit by modeling tool use as bounded workflows with transactional semantics
+and rollback logic [21]. Taken together, these studies suggest that safe parallelism requires more
+than better prompting; it requires explicit control over side effects and execution scope.
+To address these challenges, recent studies have begun to introduce transaction management
+paradigms from distributed systems and software engineering into LLM orchestration frameworks.
+Current solutions demonstrate an evolutionary trajectory from "pre-execution static constraints" to
+"in-execution transaction management", and ultimately to "post-execution dynamic verification":
+Pre-execution Static Constraints: Intercepting potentially conflicting actions before tools are concurrently triggered serves as the first line of defense. At the system implementation level, the AARM
+specification [41] and AgentSpec [167] propose interception-based runtime enforcement mechanisms. These approaches block illegal concurrent requests by deeply injecting intent alignment
+and security policies prior to execution. For complex environments, Self-Verification Sampling [50]
+preemptively filters out high-risk write operations through pre-execution self-verification, thereby
+mitigating the catastrophic probability of irreversible post-write scenarios.
+In-execution Transaction Management: Since concurrent errors are inherently difficult to eradicate
+entirely during execution, researchers have begun endowing agents with transaction semantics.
+SagaLLM [21] and the recent Atomix framework have made breakthroughs by treating tool invocations as bounded workflows. Atomix introduces epoch-based concurrency isolation and resource
+frontier tracking [122], allowing harmless side effects to undergo a delayed commit while enabling
+secure rollbacks via compensation logic in the event of an abort. This design mirrors the localized
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+12
+
+Xu, et al.
+
+Table 1. Representative safety risks and defense mechanisms for multi-tool agents.
+Risk
+
+Failure Mode
+
+Defense
+
+Concurrent Conflict
+
+Race conditions, write
+interference, and corrupted
+shared states.
+
+Dependency-aware scheduling, policy gating, and pre-dispatch
+verification [41, 95, 167].
+
+Partial Commit
+
+Irreversible side effects leave
+globally inconsistent states.
+
+Transaction-style isolation, delayed commit, compensation, and
+rollback [21, 90, 122].
+
+Post-Execution
+Anomaly
+
+Safety violations emerge only
+after tool execution.
+
+Critic/verifier-based auditing and execution-time checking
+[48, 54, 223].
+
+Memory/Plan
+Poisoning
+
+Malicious context persists across
+steps and reactivates later.
+
+Trajectory-level verification, meta-verification, and
+evidence-based rejection [37, 119, 136].
+
+Long-Horizon Drift
+
+Error accumulation, state
+pollution, and confused-deputy
+behavior.
+
+Lookahead search, rollback, and trace diagnosis [102, 190, 231].
+
+checkpoint mechanism in the Generator-Assistant framework [90], which strictly confines the
+impact of errors to localized scopes.
+Post-execution Dynamic Verification: To address anomalous scenarios beyond the reach of static
+constraints, post-execution verification logic must be integrated into the system to form a closedloop feedback mechanism. CRITIC [48] achieves self-correction through interactive critiquing;
+VerifiAgent [54] engineers verification logic into a collaborative Verifier-Executor component
+architecture; meanwhile, DVR [223] approaches the issue from a graph-structured scheduling
+perspective, seamlessly embedding verification subgraphs into the primary execution graph. This
+provides a universal template for the security auditing of parallel execution.
+5.2
+
+Security Risks in Long-Horizon Tool Chains
+
+In long-horizon tool chains, security threats manifest as stealthy propagation and cascading amplification across temporal dimensions. As agents extend multi-step invocation sequences, the
+continuous introduction of intermediate variables and parameter bindings renders the system
+susceptible to Agent Drift [142]. Here, the pollution of the context window and the accumulation
+of autoregressive errors cause behavioral patterns to deviate from established safety baselines. In
+adversarial settings, this "contextual drift" evolves into destructive Cross-Tool State Contamination.
+Once malicious data are introduced into intermediate results, its indiscriminate reuse in subsequent
+steps triggers a cascading failure that eventually collapses the trust boundaries of the system.
+Centering on this temporal vulnerability, recent literature identifies novel attack modes unique to
+long-horizon orchestration. Attacks have evolved beyond single-step manipulation to sophisticated
+memory poisoning and plan injection. For instance, MINJA-style attacks inject malicious content
+through apparently benign read operations and allow it to persist in memory until it influences later
+actions [37]. Plan Injection attacks instead manipulate the structure of multi-step reasoning itself,
+steering the agent around guardrails without requiring an obviously malicious final command [26].
+Butterfly Effects in Toolchains further shows how small upstream deviations can be amplified
+through variable binding and parameter reuse, turning downstream tools into confused deputies
+whose unsafe behavior is rooted in much earlier steps [190].
+To mitigate malicious accumulation and state hijacking during long-horizon execution, defense
+mechanisms are transitioning from single-step result filtering to trajectory-level dynamic intervention and closed-loop auditing. Reflexion provides an early form of revision through verbal
+feedback memory, but later work places greater emphasis on execution-grounded verification [154].
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+The Evolution of Tool Use in LLM Agents: From Single-Tool Call to Multi-Tool Orchestration
+
+13
+
+TRICE, Tool-MVR, and ToolReflection use execution evidence, multi-agent verification, or structured returns to identify and correct errors over longer trajectories [119, 131, 136]. LATS combines
+search with rollback and circuit-breaking behavior when downstream risks become visible [231].
+Other systems focus on diagnosis rather than rejection alone: AgentDoG emphasizes root-cause
+attribution across the full execution chain [102], while Thought-Aligner intervenes earlier by
+correcting risky internal reasoning before unsafe actions are produced [73]. The overall direction
+is toward making long-horizon execution inspectable, interruptible, and repairable.
+In addition to introducing dynamic auditing during the inference phase, specialized training
+methodologies tailored for long-horizon multi-tool security are crucial for raising the upper bound
+of defense from the foundational model level. Because traditional RLHF based on single-turn
+dialogues struggles to cover the complex state space of long-horizon tool chains, model alignment
+is evolving toward encompassing the entire multi-step invocation trajectory. The latest agent
+security alignment frameworks introduce customized Sandbox environments for reinforcement
+learning [146], compelling models to execute a "perform-reject-verify" confirmation mechanism
+when confronted with ambiguous or malicious inputs. Concurrently, to combat memory pollution
+induced by long-horizon interactions, Episodic Memory Consolidation mechanisms [142] are being
+employed to periodically compress interaction histories and purge potential malicious payloads. By
+integrating adversarial tool chains generated via automated red teaming as negative samples for
+alignment fine-tuning, the underlying LLMs’ resilience against interference and the robustness of
+their parameter extraction—especially when facing unreliable memories and malicious intermediate
+states—are fundamentally enhanced.
+6
+
+Efficiency of Multi-Tool Agents
+
+The integration of external tools has substantially enhanced the capability of agents to address
+complex tasks. Nevertheless, the reliance on multi-step inference and sequential tool invocation
+introduces significant efficiency bottlenecks. This chapter reviews emerging optimization strategies
+from two primary perspectives: mitigating latency in multi-tool chains (§6.1) and managing tool
+call cost and inference budget (§6.2).
+6.1
+
+Latency in multi-tool chains
+
+The strict dependency of LLM inference on the completion and return of previous tool results leads
+to a linear or even exponential accumulation of end-to-end system latency with the number of task
+steps [80]. To address this efficiency bottleneck, recent research has focused on refactoring the
+execution mechanism, evolving into three core optimization paradigms: parallel execution (§6.1.1),
+asynchronous decoupling (§6.1.2), and speculative reasoning (§6.1.3).
+6.1.1 Parallel execution. To address the cumulative delays and inefficiencies caused by sequential
+execution in long-chain multi-tool calls, parallel execution [234] has become a key optimization
+direction. Its core idea is to decompose tasks, identify subtasks with no interdependencies, and
+execute them simultaneously. SoT [125] accelerates inference by expanding multiple skeleton
+branches in parallel instead of following a fully sequential decoding pattern. At the tool level, LLMCompiler [80] explicitly plans task dependencies so that independent tool calls can run concurrently.
+For longer workflows, M1-Parallel [217] further decomposes sequential tasks into independent
+subtasks coordinated by multiple agents. Parallelized planning-acting [93] extend the same idea
+by overlapping planning and execution, allowing later steps to be prepared while current actions
+are still running. Taken together, these approaches show that parallel execution is most effective
+when dependency structure is explicit and side effects are sufficiently controlled to avoid invalid
+concurrent actions.
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+14
+
+Xu, et al.
+
+6.1.2 Asynchronous decoupling. Traditional agent architectures generally follow a synchronous
+observation-thinking-action loop. LLMs must block and wait for I/O results after calling external
+tools. This coupling of computation and execution leads to severe latency accumulation [205]. To
+break this serial bottleneck, recent studies have proposed asynchronously decoupling the planning
+and acting of agents. To overcome the I/O blocking limitations and strict serial dependencies
+faced by traditional agents during long toolchain calls, asynchronous decoupling significantly
+improves concurrent throughput by separating computationally intensive inference planning from
+I/O-intensive tool execution at the system architecture level. In recent years, as models have been
+increasingly applied in dynamic environments, this decoupling has gradually evolved into the
+core foundation for environment-aware task planning and multi-node decentralized inference. For
+example, [93] is proposed that completely decouples macro-level environment-aware planning
+from low-level action execution, and uses a centralized agent memory system for asynchronous
+state synchronization, thoroughly mitigating inference latency caused by dynamic environmental
+changes. When dealing with complex constraint logic, MACI [20] has demonstrated that separating
+task planning from external tool verification effectively prevents attention shift and constraint drift
+in large models during long-term calls. This decoupling paradigm, also applied in cybersecurity
+attack and defense and GUI, Incalmo [155] reveals that decoupling macro-level strategic intent
+from low-level shell script execution is key to preventing agents from getting stuck in local optima.
+Temac [101] specifically designed a Planner-Actor heterogeneous mechanism, using independent
+executors to asynchronously call interface probing tools.
+6.1.3 Speculative reasoning. Unlike asynchronous decoupling, which optimizes from the system
+architecture perspective, Speculative Execution borrows the branch prediction concept from computer architecture, aiming to mask waiting latency in long toolchains through algorithmic forward
+prediction. This mechanism is underpinned by speculative decoding [85], which allows the model
+to speculatively generate subsequent action identifiers without waiting for a complete autoregressive loop. In the tool invocation domain, ReWoo [193] is a typical example of this approach.
+By decoupling inference from observation, it speculatively generates a complete execution graph
+containing expected tool outputs, committing execution only when the speculation is correct, thus
+significantly reducing redundant latency when interacting with external tool environments. To
+improve the accuracy of speculation, LATS [231] introduces a speculative simulation mechanism
+based on lookahead search. Before actually invoking an irreversible API, the agent infers and
+evaluates multiple possible tool interaction trajectories. Similarly, ToT [204] utilizes speculative
+branch exploration to predict the final benefits of different tool combinations, significantly reducing the backtracking time cost caused by tool invocation failures in complex tasks. For retrieval
+tools that suffer from particularly high latency, REST [62] proposes a retrieval-based speculative
+decoding framework that can predict the subsequent generated content of a large model in advance
+based on cached results from an external knowledge base. At the engineering implementation and
+pipeline optimization level, the DSPy [78] framework uses a compile-level declarative pipeline
+to speculatively route and merge multiple tool call requests, minimizing runtime latency across
+multiple toolchains without sacrificing task success rate.
+6.2
+
+Tool call cost and inference budget
+
+Besides time latency, multi-tool agent invocation also faces high inference costs and limited context budgets. Frequent invocation of large-parameter models to process simple tools or filling
+massive tool descriptions into the context all at once leads to wasted resources and performance
+degradation [218]. To address these pain points, existing research mainly focuses on optimization
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+The Evolution of Tool Use in LLM Agents: From Single-Tool Call to Multi-Tool Orchestration
+
+15
+
+along three core dimensions: dynamic tool retrieval (§6.2.1), adaptive model routing (§6.2.2), and
+intelligent caching and memory (§6.2.3).
+6.2.1 Dynamic tool search. Faced with hundreds or thousands of external tool libraries, hardcoding
+all API descriptions into prompts at once not only consumes a huge input token budget but also
+easily leads to the Lost in the Middle phenomenon caused by long texts [104]. To efficiently organize
+tools within a limited context window, the current mainstream paradigm has shifted to query-based
+dynamic retrieval and representation compression. For example, the ToolLLM [138] framework
+introduces a neural API retrieval engine. Before executing a task, the agent retrieves the Top-K
+most relevant tool descriptions based on the user’s instructions, thus avoiding irrelevant tools
+crowding out the context space. For ultra-large API libraries with tens of thousands of entries,
+AnyTool [39] further designs a hierarchical API retrieval mechanism, using a categorized directory
+tree for progressive filtering, significantly reducing the retrieval cost and context overhead of a
+single call. Furthermore, at the representation compression level, ToolkenGPT [55] proposes an
+innovative vocabulary expansion strategy that compresses and maps the lengthy tool invocation
+logic and its parameter descriptions into a single special term. This method allows the agent to
+trigger the tool simply by predicting the corresponding Toolken at the output, fundamentally
+bypassing the rigid limitation of using lengthy descriptions as input prompts.
+6.2.2 Adaptive Model Routing. To control computational costs, multi-agent architectures have gradually abandoned the crude approach of a single giant model scheduling everything, shifting towards
+a computational allocation strategy that dynamically matches model size to task difficulty [169].
+Model cascading mechanisms, exemplified by FrugalGPT [24], prioritize low-cost models, only
+routing to expensive large models when confidence is insufficient, significantly reducing budget
+without sacrificing accuracy. With further refinement, RouteLLM [127] trained a dedicated network
+that adaptively distributes requests among models of different sizes based on task complexity.
+In multi-step tasks, SwiftSage [98] borrows from the human dual-system approach, layering its
+architecture into lightweight edge modules handling routine operations and a central large model
+responsible for complex inference, achieving globally optimal allocation of computational resources.
+6.2.3 Intelligent caching and memory. In complex environments with high-frequency interactions,
+repeated erroneous attempts and highly similar API requests are the core factors consuming
+inference budgets, while building a structured Agent Memory and caching layer provides key
+support for breaking this bottleneck. Firstly, regarding reducing trial-and-error costs, Reflexion [154]
+framework proposes an efficient alternative that does not require updating model weights. Through
+Verbal Reinforcement Learning, it allows the agent to reflect on its failures and persistently store
+the resulting improvement strategies in Episodic Memory. In subsequent attempts, the agent can
+accurately avoid historical errors by calling this structured memory, significantly reducing the
+number of interaction rounds and total computational overhead required to reach a successful task
+state. To address the memory capacity bottleneck in long-cycle tasks, MemGPT [128] introduces the
+concept of virtual memory management from operating systems into large models. By autonomously
+paging and swapping memory between the fast context and external database, the agent can
+maintain an infinite memory length with an extremely low token budget. Furthermore, at the
+level of API call result reuse, semantic caching systems such as GPTCache [12] perform vectorized
+comparison of input queries and tool parameters. When semantically similar duplicate requests
+are detected, historical results are directly returned from the local machine, completely blocking
+redundant LLM inference and external network request billing.
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+16
+
+Xu, et al.
+
+Fig. 4. Overview of the completeness evolution in multi-tool agents. The framework characterizes functional
+completeness as a continual process with three sequential yet interrelated stages: capability boundary
+perception, which identifies missing tools, ambiguous intents, and parameter anomalies through clarification
+and safe termination; autonomous tool expansion, which compensates for capability gaps via tool creation,
+tool synthesis, API integration, and composite skill construction; and open environment adaptation, which
+consolidates successful tools and interaction traces into reusable experience memory to support dynamic
+updating and long-term evolution in changing environments.
+
+7
+
+Completeness
+
+In complex open-domain scenarios, multi-tool agents are gradually transitioning from closed, static
+API executions to dynamic interactions within real-world environments [96]. However, the inherent
+unpredictability of these environments frequently leads to functional incompleteness, wherein
+predefined toolkits fail to fully satisfy emerging task requirements [18]. This chapter systematically
+reviews the challenges and corresponding solutions regarding the tool completeness of multi-tool
+agents. These solutions are conceptualized as a continuous cognitive loop comprising problem
+diagnosis, dynamic compensation, and long-term evolution. Specifically, this loop progresses
+sequentially through three core phases. The first phase is capability boundary perception (§7.1),
+designed to identify tool deficiencies and operational failures. The second phase is autonomous
+tool expansion (§7.2) is achieved through code generation and tool synthesis. Ultimately, the
+process culminates in open environment adaptation (§7.3), which leverages experience and memory
+mechanisms for sustained operation.
+7.1
+
+Capability boundary perception
+
+The logical starting point for the completeness of a multi-tool agent lies in its ability to accurately
+identify intent denial and detect anomalies, that is, to perceive its own capability boundaries.
+Traditional language models, when faced with tasks beyond the capabilities of the toolkit, are
+prone to hallucinate tools, creating fictitious API nodes or parameter formats. Therefore, accurately
+identifying incomplete conditions is the core of ensuring system robustness. Several studies have
+already quantified the limitations of models in terms of the boundaries of perception capabilities. The
+FAIL-TALMS [161] demonstrates that large language models frequently lack boundary awareness
+when dealing with ambiguous intentions or missing tools, rendering them prone to blind trial and
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+The Evolution of Tool Use in LLM Agents: From Single-Tool Call to Multi-Tool Orchestration
+
+17
+
+error. Furthermore, ToolHaystack [82] reveals that during extended complex interactions involving
+critical information deficits, models are highly susceptible to parameter hallucinations induced by
+historical noise. To compensate for these deficiencies, the design paradigm of multi-tool systems is
+shifting from passive execution toward active intervention through two primary approaches. The
+first approach involves proactive clarification. Frameworks such as AskToAct [222] exemplify this
+by dynamically triggering multi-turn clarification mechanisms upon detecting missing parameters.
+This strategy prevents error accumulation via self-correction and substantially improves both the
+accuracy and efficiency of tool invocations. The second approach relies on proactive termination to
+counteract the inherent action compulsion observed in large models. By equipping agents with
+safety mechanisms to identify uncertainty and autonomously abort execution in high-risk or highly
+ambiguous environments, systems can achieve substantial security improvements with minimal
+task completion overhead.
+7.2
+
+Autonomous tool expansion
+
+When an agent successfully perceives that the existing toolset cannot meet its current needs, the
+system needs to undergo a paradigm shift from tool user to tool creator. Autonomous tool extension
+leverages the low-level code generation capabilities or multi-step planning capabilities of large
+language models to dynamically construct temporary tools or composite skills at runtime, thereby
+filling capability gaps. A breakthrough in this field lies in decoupling abstract reasoning from
+concrete execution. The LATM [18] framework innovatively divides agents into tool creators and
+tool users. Faced with new tasks, creators generate customized tools by writing Python functions and
+automatically generate test cases for verification. Once verified, the tools are executed by the user,
+achieving zero-sample tool creation. The CREATOR [134] follows the same logic, transforming
+abstract problems such as mathematical reasoning and table processing into concrete Python
+scripts, enabling agents to bypass the limitations of static APIs and autonomously build dynamic
+computation tools. Besides creating tools from scratch, assembling fine-grained basic tools into
+high-level composite skills is also an effective path for capability extension. RestGPT [158] explores
+how to use large models to plan and connect multiple real RESTful APIs to complete complex longrange tasks, combining isolated network interfaces into super tools with macroscopic semantics.
+ToolMaker [181] further enhances this process. Agents can not only dynamically synthesize tool
+code to solve specific subtasks, but also reuse these newly created tools within the current context,
+greatly improving invocation efficiency in multi-round interactions. By using the code interpreter
+as a Meta-tool, Agents break free from the constraints of predefined interfaces, enabling on-demand
+dynamic scaling of capabilities.
+7.3
+
+Open environment adaptation
+
+If boundary awareness and tool expansion address the lack of completeness in a single task, then
+open environment adaptation aims to solve the evolution problem of multi-tool agents over time.
+With the iterative updates of external environment API versions, the continuous integration of
+new tools, and the obsolescence of older tools, agents must possess memory mechanisms and
+lifelong learning capabilities to accumulate temporarily generated tools or successful call traces
+into long-term experience [229].
+In this field, deeply integrating the agent’s memory architecture with tool calling has become
+a mainstream trend. Voyager [164] first demonstrated this in an open environment. Through
+continuous exploration and feedback, the agent stores successfully executed code into an everexpanding skill library, which functions as an external memory based on a vector database. When
+faced with new challenges, the agent can retrieve and combine historical skills, achieving a leapfrog
+evolution in tool usage capabilities. The ExpeL [227] framework systematizes the experience
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+18
+
+Xu, et al.
+
+learning process. The agent autonomously collects successful or failed tool call traces during training
+tasks and extracts cross-task insights using natural language, solidifying them into experience
+memory to effectively avoid repeating mistakes in subsequent API pitfalls.
+In the dynamic addition and deletion adaptation of massive tools, ToolkenGPT [55] represents
+each newly added tool as a special tool token. When facing a new environment, the model only
+needs to optimize the embedding of these tool tokens, without needing to fine-tune the huge base
+model, achieving plug-and-play and lightweight adaptation of the tool library. AppAgent [216]
+demonstrates how, in the highly dynamic graphical interaction environment of smartphones, the
+agent updates its interaction memory for different apps through continuous exploration and clicks
+to adapt to UI or application version updates. In summary, by introducing long-term and shortterm experience pools and dynamic skill memory, the agent can transform the instantaneous tool
+creation of an individual into the system’s experience inheritance, ultimately maintaining true
+functional completeness in an ever-evolving external environment.
+8
+
+Benchmarks
+
+The evaluation paradigm for multi-tool agents has undergone a decisive shift: from measuring isolated API invocation correctness to assessing system-level intelligence in sustaining, adapting, and
+repairing extended tool-use trajectories under structural, temporal, and environmental constraints.
+This evolution reflects a fundamental recognition—long-horizon tool orchestration is not merely
+the linear accumulation of atomic calls, but a holistic capability demanding topological reasoning, persistent state management, and dynamic adaptation. Early benchmarks like API-Bank [88],
+MetaTool [69] and ToolBench [138] established foundational capabilities in intent detection and
+tool retrieval; however, contemporary research prioritizes four interdependent dimensions that
+define long-horizon intelligence of agents: (1) topological complexity of tool dependencies, (2)
+temporal scale of execution trajectories, (3) environmental dynamism during interaction, and
+(4) state persistence with self-correction mechanisms.
+8.1
+
+Topological Complexity
+
+One line of work examines whether agents can reason over non-linear tool dependencies rather
+than simply follow sequential scripts. The main challenge is that the correct execution order is
+determined by latent causal structure: intermediate outputs must be produced, preserved, and
+passed to later calls under branching, nesting, or multi-hop dependencies. In this setting, failure
+often arises not from choosing the wrong tool in isolation, but from constructing the wrong
+dependency graph.
+Recent benchmarks expose this issue in several ways. Some emphasize nested and compositional
+structure, where the output of one call must be embedded into another, sometimes under strict
+parameter constraints [14, 185, 230]. Others evaluate graph-shaped execution, including branching
+decisions and parallel paths, and require agents to determine which calls can proceed concurrently
+and which must remain causally ordered [60, 74, 152]. A further group focuses on distributed
+information dependencies, where the parameters required for correct execution are scattered across
+stages, modalities, or speakers [71, 84, 118]. Related benchmarks such as M3 -Bench, MMAU, and
+FuncBenchGen further isolate graph reasoning, multimodal dependency tracking, and robustness
+to structurally valid distractors [120, 210, 233].
+Taken together, these benchmarks suggest that long-horizon tool use should be evaluated as
+graph-structured reasoning under execution constraints, rather than as a longer version of singlestep tool selection.
+
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+The Evolution of Tool Use in LLM Agents: From Single-Tool Call to Multi-Tool Orchestration
+
+19
+
+Table 2. Taxonomy of Long-Horizon Multi-Tool Benchmarks (2023–2026). Benchmarks are categorized by four core dimensions defining long-horizon intelligence. Key metrics include tool space size (Number of Tools), evaluation scale (Number of Instances). Env Type: S=Static Dataset, I=Interactive Simulator,
+H=Human/Dual-Control, R=Real-World OS/Web.
+Benchmark
+
+# Tools
+
+# Instances
+
+Year
+
+Link
+
+Env Type
+
+NESTFUL [14]
+ToolHop [206]
+TRAJECT-Bench [60]
+ELT-Bench [74]
+Toolcomp [124]
+ComplexFuncBench [230]
+ToolBench [138]
+TaskBench [152]
+Seal-Tools [185]
+m&m’s [118]
+FuncBenchGen [120]
+M3 -Bench [233]
+MSCoRe [84]
+MMAU [210]
+DICE-BENCH [71]
+Tool Decathlon [87]
+TRIP-Bench [150]
+UltraHorizon [115]
+AgentLongBench [42]
+DeepPlanning [225]
+ShortcutsBench [148]
+HammerBench [170]
+𝜏 -bench [203]
+𝜏 2 -bench [13]
+ToolSandbox [109]
+ToolGym [186]
+VitaBench [61]
+OSWorld [188]
+AppWorld [162]
+GTA [168]
+COMPASS [137]
+T1 [19]
+MTU-Bench [172]
+WildToolBench [212]
+Windows Agent Arena [17]
+Mobile-Bench [31]
+RealWebAssist [209]
+StableToolBench [51]
+CRITICTOOL [67]
+OdysseyBench [174]
+MemAgentBench [64]
+ColorBench [157]
+ASTRA [192]
+RoTBench [208]
+ToolSword [207]
+
+900+
+3,912
+1,228
+200
+11
+43
+3,451
+103
+4,076
+33
+Varies
+231
+Varies
+Varies
+124
+604
+18
+400+
+Varies
+24
+1,414
+1,063
+28
+68
+34
+5,571
+66
+Varies
+457
+14
+18
+14
+136
+1,600
+Varies
+103
+Varies
+16k+
+87
+Office
+289
+21
+Varies
+568
+100
+
+1,800+
+995
+5,670
+100
+493
+1,000
+126,486
+28,271
+14,076
+4,427
+Varies
+208
+126k+
+3k+
+1607
+108
+40+
+168
+Varies
+240
+7,627
+6,531
+165
+279
+1,032
+1,170
+400
+369
+750
+229
+281
+13,500
+159k
+1,024
+150+
+832
+1,885
+126k+
+2,740
+602
+6,340
+175
+2,413
+105
+440
+
+2024
+2025
+2025
+2025
+2025
+2025
+2023
+2023
+2024
+2024
+2025
+2025
+2025
+2024
+2025
+2025
+2026
+2025
+2026
+2026
+2024
+2024
+2024
+2025
+2024
+2026
+2025
+2024
+2024
+2024
+2025
+2025
+2024
+2026
+2024
+2024
+2025
+2024
+2025
+2025
+2025
+2025
+2026
+2024
+2024
+
+Ñ
+Ñ
+Ñ
+§
+§
+Ñ
+§
+§
+§
+Ñ
+§
+§
+Ñ
+§
+Ñ
+§
+Ñ
+§
+§
+Ñ
+Ñ
+§
+§
+§
+§
+Ñ
+§
+Ñ
+Ñ
+§
+§
+§
+§
+§
+Ñ
+§
+Ñ
+Ñ
+Ñ
+§
+Ñ
+§
+Ñ
+§
+§
+
+S
+S
+I
+I
+S
+S
+R/I
+S
+S
+I
+S
+I
+S
+S
+S
+R
+R
+I
+I
+I
+R
+I
+H
+H
+I
+I
+I
+R
+I
+R
+I
+S
+S
+S/H
+R
+R
+R
+I
+S
+I
+I
+I
+I
+I
+I
+
+8.2
+
+Temporal Scale
+
+A second dimension concerns how performance changes as trajectories grow longer. Recent work
+has moved beyond vague references to long-horizon tasks and instead defines horizon length
+through approximate step counts, token budgets, or accumulated constraints. These settings reveal
+a distinct class of failures, including memory decay, context saturation, and the way small local
+errors can accumulate into global task failure.
+The Tool Decathlon [87] establishes a baseline for long-horizon evaluation with tasks averaging
+20 interactive rounds across diverse domains. ShortcutsBench [148] tests real-world sequences by
+mapping multi-stage OS workflows directly to complex parameter loops, bridging the gap between
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+20
+
+Xu, et al.
+
+natural language prompts and executable low-code horizons. HammerBench [170] evaluates multiturn conversation across 10,000 instances, while AgentLongBench [42] scales the temporal horizon
+dramatically, executing dynamic environment rollouts up to 4 million tokens, demonstrating that
+models fail precipitously at dynamic information synthesis across extreme horizons.
+UltraHorizon [115] defines the ultra-long-horizon frontier with trajectories averaging 400+
+tool calls and 200K+ tokens, rigorously testing context window saturation and memory decay.
+TRIP-Bench [150] constructs travel planning dialogues exceeding 150 tool invocations with hard
+constraints (budget, time), exposing planning fragility—where single constraint violations cascade
+into total failure. This is expanded upon by DeepPlanning [225], which forces verifiable global
+constraint optimization across multiple simulated days of execution, providing controlled evidence
+that modern agents degrade rapidly when localized reasoning conflicts with long-term budgeting.
+Critically, these benchmarks show steep degradation as horizon length and global constraints
+increase, suggesting that temporal scale is a major bottleneck.
+8.3
+
+Dynamic Environments
+
+Real-world tool use occurs in environments that evolve independently of agent actions. Contemporary benchmarks immerse agents in progressively dynamic settings—from stateful simulators
+to human-in-the-loop systems—testing adaptation to execution feedback, user corrections, and
+environmental perturbations.
+Stateful Interactive Environments. ToolSandbox [109] provides a stateful conversational
+environment where intermediate tool outputs alter subsequent state space, requiring agents to track
+evolving context. AppWorld [162] fundamentally shifts the verification paradigm from matching
+syntactic trajectories to evaluating persistent database state changes across nine heavily interconnected applications, requiring complex interactive coding to mutate a persistent digital world.
+ToolGym [186] injects runtime interruptions to simulate real-world uncertainty, evaluating robustness to environmental volatility. StableToolBench [51] addresses evaluation reproducibility by
+virtualizing APIs with caching layers, isolating agent performance from external API instability.
+Human-in-the-Loop Environments. 𝜏-bench [203] and 𝜏 2 -bench [13] construct high-fidelity
+user simulators that issue constraint changes, ambiguity requests, and corrections during multi-turn
+interactions. Critically, 𝜏 2 -bench formalizes a dual-control paradigm where agent and user jointly
+manipulate a shared world state through tools, requiring agents to negotiate action space and
+manage user expectations—a capability where even advanced models exhibit >40% performance
+degradation versus single-agent settings. MTU-Bench [172] extends this to multi-turn user guidance
+scenarios with evolving task specifications. T1 [19] evaluates multi-turn conversational agents
+with a focus on inter-tool dependencies and replanning, utilizing an integrated caching mechanism
+for short and long-term memory. COMPASS [137] assesses strategic tool use and user preference
+optimization in multi-turn travel-planning interactions. Crucially, WildToolBench [212] grounds
+evaluation in the nature of human behavior, testing agents against implicit intent, instruction
+transitions, and messy conversational data.
+Real-World OS and Web Environments. OSWorld [188] provides a state-of-the-art interactive
+computer environment supporting hundreds of open-domain tasks, revealing massive deficiencies
+in visual GUI grounding. GTA [168] deploys human-written queries requiring perception and logic
+tools across real-world multimodal contexts. Windows Agent Arena [17] and Mobile-Bench [31]
+evaluate cross-application operations within native GUI environments, where visual noise and UI
+variability challenge perception-action loops. RealWebAssist [209] uses authentic human-recorded
+web navigation trajectories to assess agents’ ability to interpret implicit user intent from sequential
+actions. VitaBench [61] targets diverse real-world applications with heterogeneous tool interfaces,
+emphasizing adaptation to domain-specific interaction patterns.
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+The Evolution of Tool Use in LLM Agents: From Single-Tool Call to Multi-Tool Orchestration
+
+8.4
+
+21
+
+State Persistence and Self-Correction
+
+Sustaining extended trajectories demands not only planning but also mechanisms for state persistence and error recovery. In many practical workflows, success depends on maintaining intermediate
+artifacts, remembering prior commitments, and detecting when the current trajectory has drifted
+away from task requirements. Benchmarks along this axis therefore examine not only final success,
+but also whether the agent can recover from partial failure.
+Some benchmarks focus on persistent state management, asking agents to maintain intermediate
+resources or task variables across extended execution traces [109, 162, 233]. Others explicitly target
+self-correction and recovery, where agents must identify inconsistencies, revise previous actions,
+and continue toward task completion rather than restart from scratch [13, 19, 212]. Closely related
+evaluations also treat process supervision as a first-class target, measuring whether the agent
+followed a valid path even when the final outcome appears acceptable [124, 230].
+This line of work highlights an important methodological point: long-horizon evaluation should
+not rely solely on endpoint success. For multi-tool systems, the more informative question is often
+whether a benchmark isolates a specific failure mode, exposes the relevant intermediate signals,
+and distinguishes between accidental success and genuinely robust orchestration.
+9
+
+Application
+
+Following the analysis of reasoning, training, and core system properties, this chapter examines
+multi-tool LLM agent deployment in industrial settings. The primary challenge extends beyond
+basic tool invocation to achieving end-to-end objectives under practical engineering constraints.
+Since real-world workloads feature heterogeneous components and evolving states, execution
+strategies must seamlessly manage tool errors and distribution shifts. Consequently, effective
+deployment demands closed-loop orchestration based on continuous iterative execution, coupled
+with strict verification of all intermediate and final outcomes.
+This approach builds upon neuro-symbolic architectures that enhance language models with
+external knowledge and discrete reasoning. Recent research integrating reasoning with actions
+highlights the necessity of interactive execution and systematic exception handling, while scalable
+tool-use learning has driven protocols that better reflect complex industrial realities. Consequently,
+rather than providing a domain-centric inventory, this chapter analyzes diverse applications as
+concrete instances of multi-tool orchestration. By characterizing specific tool ecosystems and
+abstracting their orchestration patterns, we examine methodologies for selecting, composing, and
+validating tool invocations. This approach highlights trade-offs among reliability, safety, and cost,
+establishing a unified framework to compare industrial practices.
+9.1
+
+A Unified Abstraction for Application-Side Multi-Tool Orchestration
+
+A unified abstraction for multi-tool orchestration frames tasks as executable processes driving
+an external system toward a target state. As summarized in Figure 5, this perspective organizes
+application-side orchestration into execution environments, topologies, closed-loop control, and
+operational constraints. Within real operating systems and web environments, tool use and low-level
+interface operations are subsumed into a unified sequential decision-making problem. Orchestrating
+these applications necessitates explicitly modeling the observation-action-state transition loop to
+capture the tight coupling of visual cues and actions in multimodal contexts [81, 188]. Concurrently,
+growing evidence suggests that action grounding, rather than high-level planning, is the primary
+execution bottleneck. Robust performance in vision-language models relies on accurately mapping
+natural language intents to actionable interface elements and pixel-level regions to maintain stable
+tool pipelines [200]. Advancing this direction, general-purpose visual grounding solutions such
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+22
+
+Xu, et al.
+
+TOOL GOVERNANCE
+
+WEB/GUI
+
+Serial
+B
+A
+Branch
+
+Dependency
+C
+
+Catalog Version
+
+Policy/Budget
+
+B1
+A
+
+CODE/SE
+
+VERITY
+
+Fork/Join
+
+C
+
+State Diff Artifact Tests
+
+B2
+Parallel
+A
+
+ENTERPRISE
+
+MOBILE
+
+B
+
+C
+
+D
+
+E
+
+F
+
+Fan-Out
+
+？
+Policy Gate
+
+Key
+
+Output-Input
+
+Nested
+Sub
+
+M
+
+A
+
+B
+
+C
+
+A
+
+N
+
+COST
+
+Retry
+EMBODIED
+
+SAFETY
+Functional
+Correctness
+
+B
+
+C
+
+Fail-Rollback
+Budget Bar Latency Clock
+
+Fig. 5. A unified abstraction of application-side multi-tool orchestration. Real-world agent systems operate
+over heterogeneous environments, instantiate different orchestration topologies, and rely on iterative planact-observe-revise loops under verification, safety, and cost constraints.
+
+as UGround [47] improve graphical user interface agent accuracy across varying resolutions and
+heterogeneous elements.
+Beyond individual action grounding, orchestrating these operations into extended tool chains
+introduces strict systems-level engineering constraints. As workflows scale, critical vulnerabilities
+emerge in state management, parameter binding, and variable passing across pipeline topologies [14, 206]. Maintaining stable execution under these implicit constraints requires integrating
+rigorous process supervision, treating invocation path correctness as a primary objective rather
+than a mere byproduct of terminal success [124, 230]. Furthermore, real-world deployments must
+manage highly heterogeneous ecosystems via standardized protocols to process continuous online
+feedback [177]. Crucially, as agents utilize powerful read and write primitives, security transitions
+into a foundational requirement; orchestration frameworks must proactively prevent unauthorized
+access and mitigate high-risk operations without compromising task completion [86].
+Motivated by these dynamics, the remainder of this chapter analyzes representative domains by
+focusing on the sources of dominant operational constraints, such as state verification, rollback
+mechanisms, and access control. Rather than re-evaluating previously established structural configurations, the subsequent analysis investigates how these strict operational boundaries directly dictate
+application-side orchestration strategies and necessitate robust engineering implementations across
+diverse industrial ecosystems. Ultimately, this chapter conceptualizes application orchestration
+through two complementary abstractions: executable tasks within interactive environments and
+execution workflows governed by explicit control flow. Building upon this framework, Section 9.2
+categorizes application scenarios by their deployment environments to compare operational demands across tool sets, verification mechanisms, and stringent safety constraints, translating tool
+integration from a theoretical algorithmic capability into actionable workflow design.
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+The Evolution of Tool Use in LLM Agents: From Single-Tool Call to Multi-Tool Orchestration
+
+9.2
+
+23
+
+Orchestration Paradigms in Representative Interactive Environments
+
+This section analyzes multi-tool orchestration across diverse interactive environments, focusing on
+how stringent system constraints dictate execution policies. In graphical environments, managing
+non-stationary interfaces and visual grounding poses a significantly greater bottleneck than highlevel planning [57, 126]. Orchestrating these multimodal loops requires prioritizing engineered
+representations and stable state transitions to handle user interface volatility and operational
+latency effectively [6, 7, 111, 201, 228].
+Conversely, software engineering demands rigorous execution loops where success is strictly
+grounded in deterministic tests [30, 211]. The primary deployment bottleneck shifts from isolated
+code synthesis to the complex coupling of context retrieval, patch generation, and computationally
+expensive test verification [11, 105, 141, 187]. To mitigate these high verification costs, systems-level
+optimizations including tool parallelization, intelligent caching, and overlapping language model
+decoding with partial tool execution become critical for maximizing throughput and minimizing
+end-to-end latency [197].
+Enterprise orchestration manifests as continuous transactional workflows encompassing retrieval, analysis, execution, and write-back operations across distributed systems [16, 38]. The
+primary engineering bottlenecks are state maintenance and transactional consistency under longcontext constraints [83]. Consequently, enterprise deployment necessitates rigorous constraint
+systematization, elevating auditing, permission boundaries, and cost budgets to primary design
+variables. Agents must justify invocations, log execution trajectories for compliance, and utilize
+audit logs as verifiable completion signals [53, 182].
+Conversely, mobile environments represent extreme open ecosystems requiring complex crossapplication coordination under severe physical and system-level interference [171, 189, 198]. Given
+the high risks of destructive misoperations in these dynamic multimodal settings, orchestration
+inherently demands explicit user confirmation points, continuous final state validation, and highly
+conservative recovery strategies rather than autonomous retries [9, 195].
+Across these diverse environments, domain distinctions arise primarily from unique operational
+bottlenecks rather than structural topologies. Engineering challenges range from high verification
+costs in software development and interface drift in mobile ecosystems to strict regulatory compliance in enterprise workflows. Grounded in this unified operational perspective, the subsequent
+section investigates essential industrial deployment factors including tool governance, continuous
+observability, and strict cost-latency budget management.
+9.3
+
+Engineering Essentials and Governance for Industrial-Grade Multi-Tool
+Orchestration
+
+Industrial deployment necessitates rigorous tool ecosystem governance, as unstable API availability often causes irreproducible pipeline drift, making virtualization and regression validation
+architectural imperatives [52]. To manage heterogeneous access, standardized protocols mitigate
+integration costs [2, 3], demanding fully auditable systems with strict semantic contracts and
+graceful degradation [177]. Concurrently, mitigating critical vulnerabilities like indirect prompt
+injections [215] requires externalizing safety to dedicated policy layers that enforce input/output
+sanitization [86]. Aligning with standards such as the OWASP Top 10 [4] and NIST guidelines [1],
+architectures must embed least-privilege access, environment partitioning, and comprehensive
+logging within the execution loop to guarantee non-repudiable auditability and secure invocations.
+Beyond security, arresting error cascades during execution demands intermediate checkpoints for
+decidable verification [188] and comprehensive observability that evaluates process-level constraint
+satisfaction rather than mere terminal completion [10, 36]. Post-deployment, these pipelines must
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+24
+
+Xu, et al.
+
+adhere to strict service level agreements and budgets. Because end-to-end latency is heavily
+dominated by planning cycles [6], robust orchestration requires the joint optimization of quality,
+time, and cost. Current research addresses this through interface compression to reduce token
+overhead [77, 201], decoupling reasoning from execution [193], and budget-aware routing to
+dynamically allocate resources to high-uncertainty tasks [24].
+Ultimately, industrial orchestration requires comprehensive systems-level remodeling rather
+than merely scaling research prototypes. The fundamental challenge lies in directly embedding
+these operational constraints—spanning governance, safety, verification, and efficiency—into the
+underlying infrastructure. Because industrial competitiveness heavily relies on capabilities like
+automated regression and executable acceptance testing, the subsequent section explores open
+research problems specifically targeting robust interface evolution, verifiability boundaries, and
+cost-effective long-horizon planning.
+9.4
+
+Open Problems and Future Directions
+
+Although multi-tool LLM agents demonstrate encouraging generality, transitioning them from
+usable prototypes to trusted production systems requires addressing several critical application-side
+gaps: mitigating behavioral drift caused by continuous interface evolution via adaptive regression mechanisms; establishing process-level verifiability and replayable audits for long-horizon
+orchestration without prohibitive efficiency loss; developing systematic methodologies to jointly
+optimize cost, latency, and quality under strict budget constraints; and replacing heuristic failure
+recovery with composable, adversarial-resistant recovery frameworks. Ultimately, addressing these
+challenges demands a unified research agenda centered on evolvable tool governance, verifiable
+closed-loop execution, and adaptive orchestration to ensure these agents can be safely and reliably
+deployed in demanding professional environments.
+10
+
+Conclusion
+
+The development of tool use in LLM agents reflects a broader shift in the field, from isolated function
+invocation to sustained interaction with complex external systems. Once agents must coordinate
+multiple tools over long horizons, the problem is no longer only about prompting or API formatting.
+It also involves planning under dependencies, managing mutable state, controlling execution, and
+preserving correctness under uncertainty, latency, and safety constraints. This is why progress depends not only on stronger base models, but also on advances in memory, orchestration, verification,
+and benchmark design. This survey has reviewed work on multi-tool agents across inference-time
+planning, training, safety, efficiency, capability completeness, benchmarks, and applications. A
+central observation is that these dimensions are tightly connected. Planning interacts with state
+management and verifiability. Safety depends on execution control and isolation. Efficiency depends on decomposition, routing, and reuse. Looking ahead, the field needs better abstractions for
+stateful orchestration, stronger evaluation protocols for dynamic and long-horizon settings, and
+closer integration between model-level reasoning and system-level guarantees. Progress on these
+fronts will be necessary if multi-tool agents are to move from promising prototypes to dependable,
+auditable, and scalable systems for real-world use.
+References
+[1] 2024. Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile. Technical Report
+NIST AI 600-1. National Institute of Standards and Technology. https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf
+[2] 2024. Introducing the Model Context Protocol. https://www.anthropic.com/news/model-context-protocol
+[3] 2025. Model Context Protocol (MCP) Specification. https://modelcontextprotocol.io/specification/2025-06-18
+[4] 2025. OWASP Top 10 for Large Language Model Applications (v2025). https://owasp.org/www-project-top-10-forlarge-language-model-applications/assets/PDF/OWASP-Top-10-for-LLMs-v2025.pdf
+
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+The Evolution of Tool Use in LLM Agents: From Single-Tool Call to Multi-Tool Orchestration
+
+25
+
+[5] Ibrahim Abdelaziz, Kinjal Basu, Mayank Agarwal, Sadhana Kumaravel, Matthew Stallone, Rameswar Panda, Yara Rizk,
+GP Shrivatsa Bhargav, Maxwell Crouse, Chulaka Gunasekara, et al. 2024. Granite-function calling model: Introducing
+function calling abilities via multi-task learning of granular tasks. In Proceedings of the 2024 Conference on Empirical
+Methods in Natural Language Processing: Industry Track. 1131–1139.
+[6] Reyna Abhyankar, Qi Qi, and Yiying Zhang. 2025. OSWorld-Human: Benchmarking the Efficiency of Computer-Use
+Agents. arXiv preprint arXiv:2506.16042 (2025). https://arxiv.org/abs/2506.16042
+[7] Tamer Abuelsaad, Deepak Akkil, Prasenjit Dey, Ashish Jagmohan, Aditya Vempaty, Ravi Kokku, and Ruhana Azam.
+2024. Agent-E: From Autonomous Web Navigation to Foundational Design Principles in Agentic Systems. arXiv
+preprint arXiv:2407.13032 (2024). https://arxiv.org/abs/2407.13032
+[8] Mayank Agarwal, Ibrahim Abdelaziz, Kinjal Basu, Merve Unuvar, Luis A Lastras, Yara Rizk, and Pavan Kapanipathi.
+2025. Toolrm: Outcome reward models for tool-calling large language models. arXiv preprint arXiv:2509.11963 (2025).
+[9] Harsh Agrawal, Eldon Schoop, Xinlei Pan, Anuj Mahajan, Ari Seff, Di Feng, Ruijia Cheng, Andres Romero Mier Y
+Teran, Esteban Gomez, Abhishek Sundararajan, et al. 2025. UINavBench: A Framework for Comprehensive Evaluation
+of Interactive Digital Agents. In Proceedings of the IEEE/CVF International Conference on Computer Vision. 23353–23363.
+[10] Sreemaee Akshathala, Bassam Adnan, Mahisha Ramesh, Karthik Vaidhyanathan, Basil Muhammed, and Kannan
+Parthasarathy. 2025. Beyond Task Completion: An Assessment Framework for Evaluating Agentic AI Systems. arXiv
+preprint arXiv:2512.12791 (2025). https://arxiv.org/abs/2512.12791
+[11] Leonhard Applis, Yuntong Zhang, Shanchao Liang, Nan Jiang, Lin Tan, and Abhik Roychoudhury. 2025. Unified
+Software Engineering Agent as AI Software Engineer. arXiv preprint arXiv:2506.14683 (2025). https://arxiv.org/abs/
+2506.14683
+[12] Fu Bang. 2023. Gptcache: An open-source semantic cache for llm applications enabling faster answers and cost
+savings. In Proceedings of the 3rd Workshop for Natural Language Processing Open Source Software (NLP-OSS 2023).
+212–218.
+[13] Victor Barres, Honghua Dong, Soham Ray, Xujie Si, and Karthik Narasimhan. 2025. 𝜏 2 -Bench: Evaluating Conversational Agents in a Dual-Control Environment. CoRR abs/2506.07982 (2025). arXiv:2506.07982 doi:10.48550/ARXIV.
+2506.07982
+[14] Kinjal Basu, Ibrahim Abdelaziz, Kiran Kate, Mayank Agarwal, Maxwell Crouse, Yara Rizk, Kelsey Bradford, Asim
+Munawar, Sadhana Kumaravel, Saurabh Goyal, et al. 2025. Nestful: A benchmark for evaluating llms on nested
+sequences of api calls. In Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing.
+33526–33535.
+[15] Luca Beurer-Kellner, Beat Buesser, Ana-Maria Creţu, Edoardo Debenedetti, Daniel Dobos, Daniel Fabian, Marc Fischer,
+David Froelicher, Kathrin Grosse, Daniel Naeff, et al. 2025. Design patterns for securing llm agents against prompt
+injections. arXiv preprint arXiv:2506.08837 (2025).
+[16] Léo Boisvert, Megh Thakkar, Maxime Gasse, Massimo Caccia, Thibault L De Chezelles, Quentin Cappart, Nicolas
+Chapados, Alexandre Lacoste, and Alexandre Drouin. 2024. Workarena++: Towards compositional planning and
+reasoning-based common knowledge work tasks. Advances in Neural Information Processing Systems 37 (2024),
+5996–6051.
+[17] Rogerio Bonatti, Dan Zhao, Francesco Bonacci, Dillon Dupont, Sara Abdali, Yinheng Li, Yadong Lu, Justin Wagle,
+Kazuhito Koishida, Arthur Bucker, et al. 2024. Windows agent arena: Evaluating multi-modal os agents at scale. arXiv
+preprint arXiv:2409.08264 (2024).
+[18] Tianle Cai, Xuezhi Wang, Tengyu Ma, Xinyun Chen, and Denny Zhou. 2023. Large language models as tool makers.
+arXiv preprint arXiv:2305.17126 (2023).
+[19] Amartya Chakraborty, Paresh Dashore, Nadia Bathaee, Anmol Jain, Anirban Das, Shi-Xiong Zhang, Sambit Sahu,
+Milind Naphade, and Genta Indra Winata. 2025. T1: A Tool-Oriented Conversational Dataset for Multi-Turn Agentic
+Planning. Advances in Neural Information Processing Systems (2025).
+[20] Edward Y Chang. 2025. Maci: Multi-agent collaborative intelligence for adaptive reasoning and temporal planning.
+arXiv preprint arXiv:2501.16689 (2025).
+[21] Edward Y Chang and Longling Geng. 2025. SagaLLM: context management, validation, and transaction guarantees
+for multi-agent LLM planning. arXiv preprint arXiv:2503.11951 (2025).
+[22] Guoxin Chen, Zile Qiao, Wenqing Wang, Donglei Yu, Xuanzhong Chen, Hao Sun, Minpeng Liao, Kai Fan, Yong Jiang,
+Penguin Xie, Wayne Xin Zhao, Ruihua Song, and Fei Huang. 2026. MARS: Co-evolving Dual-System Deep Research
+via Multi-Agent Reinforcement Learning. arXiv:2510.04935 [cs.AI] https://arxiv.org/abs/2510.04935
+[23] Junzhi Chen, Juhao Liang, and Benyou Wang. 2025. Smurfs: Multi-agent system using context-efficient DFSDT
+for tool planning. In Proceedings of the 2025 Conference of the Nations of the Americas Chapter of the Association for
+Computational Linguistics: Human Language Technologies (Volume 1: Long Papers). 3281–3298.
+[24] Lingjiao Chen, Matei Zaharia, and James Zou. 2023. Frugalgpt: How to use large language models while reducing
+cost and improving performance. arXiv preprint arXiv:2305.05176 (2023).
+
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+26
+
+Xu, et al.
+
+[25] Mingyang Chen, Haoze Sun, Tianpeng Li, Fan Yang, Hao Liang, Keer Lu, Bin Cui, Wentao Zhang, Zenan Zhou, and
+Weipeng Chen. 2024. Facilitating multi-turn function calling for llms via compositional instruction tuning. arXiv
+preprint arXiv:2410.12952 (2024).
+[26] Shuo Chen, Zonggen Li, Zhen Han, Bailan He, Tong Liu, Haokun Chen, Georg Groh, Philip Torr, Volker Tresp, and
+Jindong Gu. 2025. Deep Research Brings Deeper Harm. arXiv preprint arXiv:2510.11851 (2025).
+[27] Shuaihang Chen, Yuanxing Liu, Wei Han, Weinan Zhang, and Ting Liu. 2024. A survey on llm-based multi-agent
+system: Recent advances and new frontiers in application. arXiv preprint arXiv:2412.17481 (2024).
+[28] Yanfei Chen, Jinsung Yoon, Devendra Singh Sachan, Qingze Wang, Vincent Cohen-Addad, Mohammadhossein Bateni,
+Chen-Yu Lee, and Tomas Pfister. 2024. Re-invoke: Tool invocation rewriting for zero-shot tool retrieval. In Findings of
+the Association for Computational Linguistics: EMNLP 2024. 4705–4726.
+[29] Mingyue Cheng, Jie Ouyang, Shuo Yu, Ruiran Yan, Yucong Luo, Zirui Liu, Daoyu Wang, Qi Liu, and Enhong Chen.
+2025. Agent-r1: Training powerful llm agents with end-to-end reinforcement learning. arXiv preprint arXiv:2511.14460
+(2025).
+[30] Neil Chowdhury, James Aung, Chan Jun Shern, Oliver Jaffe, Dane Sherburn, Giulio Starace, Evan Mays, Rachel Dias,
+Marwan Aljubeh, Mia Glaese, Carlos E. Jimenez, John Yang, Leyton Ho, Tejal Patwardhan, Kevin Liu, and Aleksander
+Madry. 2024. Introducing SWE-bench Verified. https://openai.com/index/introducing-swe-bench-verified/
+[31] Shihan Deng, Weikai Xu, Hongda Sun, Wei Liu, Tao Tan, Liujianfeng Liujianfeng, Ang Li, Jian Luan, Bin Wang, Rui
+Yan, et al. 2024. Mobile-bench: An evaluation benchmark for llm-based mobile agents. In Proceedings of the 62nd
+Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers). 8813–8831.
+[32] Yuchen Deng, Shichen Fan, Naibo Wang, Xinkui Zhao, and See Kiong Ng. 2025. AgentPro: Enhancing LLM Agents
+with Automated Process Supervision. In Proceedings of the 2025 Conference on Empirical Methods in Natural Language
+Processing. 9992–10017.
+[33] Yifeng Ding, Hung Le, Songyang Han, Kangrui Ruan, Zhenghui Jin, Varun Kumar, Zijian Wang, and Anoop Deoras.
+2025. Empowering Multi-Turn Tool-Integrated Reasoning with Group Turn Policy Optimization. arXiv preprint
+arXiv:2511.14846 (2025).
+[34] Guanting Dong, Yifei Chen, Xiaoxi Li, Jiajie Jin, Hongjin Qian, Yutao Zhu, Hangyu Mao, Guorui Zhou, Zhicheng Dou,
+and Ji-Rong Wen. 2025. Tool-star: Empowering llm-brained multi-tool reasoner via reinforcement learning. arXiv
+preprint arXiv:2505.16410 (2025).
+[35] Guanting Dong, Hangyu Mao, Kai Ma, Licheng Bao, Yifei Chen, Zhongyuan Wang, Zhongxia Chen, Jiazhen Du,
+Huiyang Wang, Fuzheng Zhang, et al. 2025. Agentic reinforced policy optimization. arXiv preprint arXiv:2507.19849
+(2025).
+[36] Liming Dong, Qinghua Lu, and Liming Zhu. 2024. AgentOps: Enabling Observability of LLM Agents. arXiv preprint
+arXiv:2411.05285 (2024). https://arxiv.org/abs/2411.05285
+[37] Shen Dong, Shaochen Xu, Pengfei He, Yige Li, Jiliang Tang, Tianming Liu, Hui Liu, and Zhen Xiang. 2025. Memory
+Injection Attacks on LLM Agents via Query-Only Interaction. arXiv preprint arXiv:2503.03704 (2025).
+[38] Alexandre Drouin, Maxime Gasse, Massimo Caccia, Issam H Laradji, Manuel Del Verme, Tom Marty, Léo Boisvert,
+Megh Thakkar, Quentin Cappart, David Vazquez, et al. 2024. Workarena: How capable are web agents at solving
+common knowledge work tasks? arXiv preprint arXiv:2403.07718 (2024).
+[39] Yu Du, Fangyun Wei, and Hongyang Zhang. 2024. Anytool: Self-reflective, hierarchical agents for large-scale api
+calls. arXiv preprint arXiv:2402.04253 (2024).
+[40] Lutfi Eren Erdogan, Nicholas Lee, Sehoon Kim, Suhong Moon, Hiroki Furuta, Gopala Anumanchipalli, Kurt Keutzer,
+and Amir Gholami. 2025. Plan-and-act: Improving planning of agents for long-horizon tasks. arXiv preprint
+arXiv:2503.09572 (2025).
+[41] Herman Errico. 2026. Autonomous Action Runtime Management (AARM): A System Specification for Securing
+AI-Driven Actions at Runtime. arXiv preprint arXiv:2602.09433 (2026).
+[42] Shicheng Fang, Yuxin Wang, Xiaoran Liu, Jiahao Lu, Chuanyuan Tan, Xinchi Chen, Yining Zheng, Xuanjing Huang,
+and Xipeng Qiu. 2026. AgentLongBench: A Controllable Long Benchmark For Long-Contexts Agents via Environment
+Rollouts. arXiv preprint arXiv:2601.20730 (2026).
+[43] Wei Fang, Yang Zhang, Kaizhi Qian, James Glass, and Yada Zhu. 2025. Play2prompt: Zero-shot tool instruction
+optimization for llm agents via tool play. In Findings of the Association for Computational Linguistics: ACL 2025.
+26274–26290.
+[44] Xiang Fei, Xiawu Zheng, and Hao Feng. 2025. Mcp-zero: Active tool discovery for autonomous llm agents. arXiv
+preprint arXiv:2506.01056 (2025).
+[45] Saman Forouzandeh, Wei Peng, Parham Moradi, Xinghuo Yu, and Mahdi Jalili. 2025. Learning Hierarchical Procedural
+Memory for LLM Agents through Bayesian Selection and Contrastive Refinement. arXiv preprint arXiv:2512.18950
+(2025).
+
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+The Evolution of Tool Use in LLM Agents: From Single-Tool Call to Multi-Tool Orchestration
+
+27
+
+[46] Silin Gao, Jane Dwivedi-Yu, Ping Yu, Xiaoqing Ellen Tan, Ramakanth Pasunuru, Olga Golovneva, Koustuv Sinha, Asli
+Celikyilmaz, Antoine Bosselut, and Tianlu Wang. 2025. Efficient tool use with chain-of-abstraction reasoning. In
+Proceedings of the 31st International Conference on Computational Linguistics. 2727–2743.
+[47] Boyu Gou, Ruohan Wang, Boyuan Zheng, Yanan Xie, Cheng Chang, Yiheng Shu, Huan Sun, and Yu Su. 2025.
+Navigating the Digital World as Humans Do: Universal Visual Grounding for GUI Agents. In International Conference
+on Learning Representations. https://openreview.net/forum?id=kxnoqaisCT
+[48] Zhibin Gou, Zhihong Shao, Yeyun Gong, Yelong Shen, Yujiu Yang, Nan Duan, and Weizhu Chen. 2023. Critic: Large
+language models can self-correct with tool-interactive critiquing. arXiv preprint arXiv:2305.11738 (2023).
+[49] Kai Greshake, Sahar Abdelnabi, Shailesh Mishra, Christoph Endres, Thorsten Holz, and Mario Fritz. 2023. Not
+what you’ve signed up for: Compromising real-world llm-integrated applications with indirect prompt injection. In
+Proceedings of the 16th ACM workshop on artificial intelligence and security. 79–90.
+[50] Shangmin Guo, Omar Darwiche Domingues, Raphaël Avalos, Aaron Courville, and Florian Strub. 2025. Sample,
+Predict, then Proceed: Self-Verification Sampling for Tool Use of LLMs. (2025).
+[51] Zhicheng Guo, Sijie Cheng, Yuchen Niu, Hao Wang, Sicheng Zhou, Wenbing Huang, and Yang Liu. 2025.
+Stabletoolbench-mirrorapi: Modeling tool environments as mirrors of 7,000+ real-world apis. In Findings of the
+Association for Computational Linguistics: ACL 2025. 5247–5270.
+[52] Zhicheng Guo, Sijie Cheng, Hao Wang, Shihao Liang, Yujia Qin, Peng Li, Zhiyuan Liu, Maosong Sun, and Yang
+Liu. 2024. Stabletoolbench: Towards stable large-scale benchmarking on tool learning of large language models. In
+Findings of the Association for Computational Linguistics: ACL 2024. 11143–11156.
+[53] Lakshya Gupta, Litao Li, Yizhe Liu, Sriram Ganapathi Subramanian, Kaheer Suleman, Zichen Zhang, Haoye Lu, and
+Sumit Pasupalak. 2026. World of Workflows: A Benchmark for Bringing World Models to Enterprise Systems. arXiv
+preprint arXiv:2601.22130 (2026). https://arxiv.org/abs/2601.22130
+[54] Jiuzhou Han, Wray Buntine, and Ehsan Shareghi. 2025. Verifiagent: a unified verification agent in language model
+reasoning. ArXiv preprint, abs/2504.00406 (2025).
+[55] Shibo Hao, Tianyang Liu, Zhen Wang, and Zhiting Hu. 2023. Toolkengpt: Augmenting frozen language models with
+massive tools via tool embeddings. Advances in neural information processing systems 36 (2023), 45870–45894.
+[56] Feng He, Tianqing Zhu, Dayong Ye, Bo Liu, Wanlei Zhou, and Philip S Yu. 2025. The emerged security and privacy of
+llm agent: A survey with case studies. Comput. Surveys 58, 6 (2025), 1–36.
+[57] Hongliang He, Wenlin Yao, Kaixin Ma, Wenhao Yu, Yong Dai, Hongming Zhang, Zhenzhong Lan, and Dong Yu. 2024.
+Webvoyager: Building an end-to-end web agent with large multimodal models. In Proceedings of the 62nd Annual
+Meeting of the Association for Computational Linguistics (Volume 1: Long Papers). 6864–6890.
+[58] Jie He, Jennifer Neville, Mengting Wan, Longqi Yang, Hui Liu, Xiaofeng Xu, Xia Song, Jeff Z Pan, and Pei Zhou. 2025.
+GenTool: Enhancing Tool Generalization in Language Models through Zero-to-One and Weak-to-Strong Simulation.
+In Findings of the Association for Computational Linguistics: ACL 2025. 1097–1122.
+[59] Kang He and Kaushik Roy. 2026. SWE-Adept: An LLM-Based Agentic Framework for Deep Codebase Analysis and
+Structured Issue Resolution. arXiv preprint arXiv:2603.01327 (2026).
+[60] Pengfei He, Zhenwei Dai, Bing He, Hui Liu, Xianfeng Tang, Hanqing Lu, Juanhui Li, Jiayuan Ding, Subhabrata
+Mukherjee, Suhang Wang, et al. 2025. TRAJECT-Bench: A Trajectory-Aware Benchmark for Evaluating Agentic Tool
+Use. arXiv preprint arXiv:2510.04550 (2025).
+[61] Wei He, Yueqing Sun, Hongyan Hao, Xueyuan Hao, Zhikang Xia, Qi Gu, Chengcheng Han, Dengchang Zhao, Hui
+Su, Kefeng Zhang, et al. 2025. Vitabench: Benchmarking llm agents with versatile interactive tasks in real-world
+applications. arXiv preprint arXiv:2509.26490 (2025).
+[62] Zhenyu He, Zexuan Zhong, Tianle Cai, Jason Lee, and Di He. 2024. Rest: Retrieval-based speculative decoding. In
+Proceedings of the 2024 Conference of the North American Chapter of the Association for Computational Linguistics:
+Human Language Technologies (Volume 1: Long Papers). 1582–1595.
+[63] Mengkang Hu, Tianxing Chen, Qiguang Chen, Yao Mu, Wenqi Shao, and Ping Luo. 2025. Hiagent: Hierarchical
+working memory management for solving long-horizon agent tasks with large language model. In Proceedings of the
+63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers). 32779–32798.
+[64] Yuanzhe Hu, Yu Wang, and Julian McAuley. 2025. Evaluating memory in llm agents via incremental multi-turn
+interactions. arXiv preprint arXiv:2507.05257 (2025).
+[65] Wenyue Hua, Dujian Ding, Yile Gu, Yujie Ren, Kai Mei, Minghua Ma, and William Yang Wang. 2025. Semantic
+Scheduling for LLM Inference. arXiv preprint arXiv:2506.12204 (2025).
+[66] Jinbang Huang, Zhiyuan Li, Zhanguang Zhang, Xingyue Quan, Jianye Hao, and Yingxue Zhang. 2025. Plan2Evolve:
+LLM Self-Evolution for Improved Planning Capability via Automated Domain Generation. arXiv preprint
+arXiv:2509.21543 (2025).
+[67] Shiting Huang, Zhen Fang, Zehui Chen, Siyu Yuan, Junjie Ye, Yu Zeng, Lin Chen, Qi Mao, and Feng Zhao. 2025.
+Critictool: Evaluating self-critique capabilities of large language models in tool-calling error scenarios. In Proceedings
+
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+28
+
+Xu, et al.
+
+of the 2025 Conference on Empirical Methods in Natural Language Processing. 26683–26692.
+[68] Xu Huang, Weiwen Liu, Xingshan Zeng, Yuefeng Huang, Xinlong Hao, Yuxian Wang, Yirong Zeng, Chuhan Wu,
+Yasheng Wang, Ruiming Tang, et al. 2025. Toolace-dev: Self-improving tool learning via decomposition and evolution.
+arXiv preprint arXiv:2505.07512 (2025).
+[69] Yue Huang, Jiawen Shi, Yuan Li, Chenrui Fan, Siyuan Wu, Qihui Zhang, Yixin Liu, Pan Zhou, Yao Wan, Neil Zhenqiang
+Gong, et al. 2023. Metatool benchmark for large language models: Deciding whether to use tools and which to use.
+arXiv preprint arXiv:2310.03128 (2023).
+[70] Yuichi Inoue, Kou Misaki, Yuki Imajuku, So Kuroki, Taishi Nakamura, and Takuya Akiba. 2025. Wider or deeper?
+scaling llm inference-time compute with adaptive branching tree search. arXiv preprint arXiv:2503.04412 (2025).
+[71] Kyochul Jang, Donghyeon Lee, Kyusik Kim, Dongseok Heo, Taewhoo Lee, Woojeong Kim, and Bongwon Suh. 2025.
+DICE-BENCH: Evaluating the Tool-Use Capabilities of Large Language Models in Multi-Round, Multi-Party Dialogues.
+In Findings of the Association for Computational Linguistics: ACL 2025. 26822–26846.
+[72] Jingyi Jia and Qinbin Li. 2026. AutoTool: Efficient tool selection for large language model agents. In Proceedings of the
+AAAI Conference on Artificial Intelligence, Vol. 40. 31265–31273.
+[73] Changyue Jiang, Xudong Pan, and Min Yang. 2025. Think twice before you act: Enhancing agent behavioral safety
+with thought correction. arXiv preprint arXiv:2505.11063 (2025).
+[74] Tengjun Jin, Yuxuan Zhu, and Daniel Kang. 2025. Elt-bench: An end-to-end benchmark for evaluating ai agents on
+elt pipelines. Proceedings of the VLDB Endowment 19, 2 (2025), 84–98.
+[75] Minki Kang, Wei-Ning Chen, Dongge Han, Huseyin A Inan, Lukas Wutschitz, Yanzhi Chen, Robert Sim, and Saravan
+Rajmohan. 2025. Acon: Optimizing context compression for long-horizon llm agents. arXiv preprint arXiv:2510.00615
+(2025).
+[76] Ehud Karpas, Omri Abend, Yonatan Belinkov, Barak Lenz, Opher Lieber, Nir Ratner, Yoav Shoham, Hofit Bata, Yoav
+Levine, Kevin Leyton-Brown, et al. 2022. MRKL Systems: A modular, neuro-symbolic architecture that combines
+large language models, external knowledge sources and discrete reasoning. arXiv preprint arXiv:2205.00445 (2022).
+[77] Imene Kerboua, Sahar Omidi Shayegan, Megh Thakkar, Xing Han Lù, Léo Boisvert, Massimo Caccia, Jérémy Espinas,
+Alexandre Aussem, Véronique Eglin, and Alexandre Lacoste. 2025. FocusAgent: Simple Yet Effective Ways of Trimming
+the Large Context of Web Agents. arXiv preprint arXiv:2510.03204 (2025). https://arxiv.org/abs/2510.03204
+[78] Omar Khattab, Arnav Singhvi, Paridhi Maheshwari, Zhiyuan Zhang, Keshav Santhanam, Sri Vardhamanan, Saiful
+Haq, Ashutosh Sharma, Thomas T Joshi, Hanna Moazam, et al. 2023. Dspy: Compiling declarative language model
+calls into self-improving pipelines. arXiv preprint arXiv:2310.03714 (2023).
+[79] Juhee Kim, Woohyuk Choi, and Byoungyoung Lee. 2025. Prompt flow integrity to prevent privilege escalation in llm
+agents. arXiv preprint arXiv:2503.15547 (2025).
+[80] Sehoon Kim, Suhong Moon, Ryan Tabrizi, Nicholas Lee, Michael W. Mahoney, Kurt Keutzer, and Amir Gholami.
+2024. An LLM Compiler for Parallel Function Calling. In Proceedings of the 41st International Conference on Machine
+Learning.
+[81] Jing Yu Koh, Robert Lo, Lawrence Jang, Vikram Duvvur, Ming Lim, Po-Yu Huang, Graham Neubig, Shuyan Zhou,
+Russ Salakhutdinov, and Daniel Fried. 2024. Visualwebarena: Evaluating multimodal agents on realistic visual web
+tasks. In Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long
+Papers). 881–905.
+[82] Beong-woo Kwak, Minju Kim, Dongha Lim, Hyungjoo Chae, Dongjin Kang, Sunghwan Kim, Dongil Yang, and
+Jinyoung Yeo. 2025. Toolhaystack: Stress-testing tool-augmented language models in realistic long-term interactions.
+arXiv preprint arXiv:2505.23662 (2025).
+[83] Fangyu Lei, Jixuan Chen, Yuxiao Ye, Ruisheng Cao, Dongchan Shin, Hongjin Su, Zhaoqing Suo, Hongcheng Gao,
+Wenjing Hu, Pengcheng Yin, Victor Zhong, Caiming Xiong, Ruoxi Sun, Qian Liu, Sida Wang, and Tao Yu. 2025. Spider
+2.0: Evaluating Language Models on Real-World Enterprise Text-to-SQL Workflows. In International Conference on
+Learning Representations. https://openreview.net/forum?id=XmProj9cPs
+[84] Yuzhen Lei, Hongbin Xie, Jiaxing Zhao, Shuangxue Liu, and Xuan Song. 2025. MSCoRe: A Benchmark for Multi-Stage
+Collaborative Reasoning in LLM Agents. arXiv preprint arXiv:2509.17628 (2025).
+[85] Yaniv Leviathan, Matan Kalman, and Yossi Matias. 2023. Fast inference from transformers via speculative decoding.
+In International Conference on Machine Learning. PMLR, 19274–19286.
+[86] Ido Levy, Ben Wiesel, Sami Marreed, Alon Oved, Avi Yaeli, and Segev Shlomov. 2024. ST-WebAgentBench: A
+Benchmark for Evaluating Safety and Trustworthiness in Web Agents. arXiv preprint arXiv:2410.06703 (2024).
+https://arxiv.org/abs/2410.06703
+[87] Junlong Li, Wenshuo Zhao, Jian Zhao, Weihao Zeng, Haoze Wu, Xiaochen Wang, Rui Ge, Yuxuan Cao, Yuzhen Huang,
+Wei Liu, et al. 2025. The tool decathlon: Benchmarking language agents for diverse, realistic, and long-horizon task
+execution. arXiv preprint arXiv:2510.25726 (2025).
+
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+The Evolution of Tool Use in LLM Agents: From Single-Tool Call to Multi-Tool Orchestration
+
+29
+
+[88] Minghao Li, Yingxiu Zhao, Bowen Yu, Feifan Song, Hangyu Li, Haiyang Yu, Zhoujun Li, Fei Huang, and Yongbin
+Li. 2023. Api-bank: A comprehensive benchmark for tool-augmented llms. In Proceedings of the 2023 conference on
+empirical methods in natural language processing. 3102–3116.
+[89] Xinzhe Li. 2025. A review of prominent paradigms for llm-based agents: Tool use, planning (including rag), and
+feedback learning. In Proceedings of the 31st international conference on computational linguistics. 9760–9779.
+[90] Xingzuo Li, Kehai Chen, Yunfei Long, Xuefeng Bai, Yong Xu, and Min Zhang. 2025. Generator-assistant stepwise
+rollback framework for large language model agent. In Proceedings of the 2025 Conference on Empirical Methods in
+Natural Language Processing. 17694–17711.
+[91] Xiaoxi Li, Wenxiang Jiao, Jiarui Jin, Guanting Dong, Jiajie Jin, Yinuo Wang, Hao Wang, Yutao Zhu, Ji-Rong Wen, Yuan
+Lu, et al. 2025. Deepagent: A general reasoning agent with scalable toolsets. arXiv preprint arXiv:2510.21618 (2025).
+[92] Xuefeng Li, Haoyang Zou, and Pengfei Liu. 2025. Torl: Scaling tool-integrated rl. arXiv preprint arXiv:2503.23383
+(2025).
+[93] Yaoru Li, Shunyu Liu, Tongya Zheng, and Mingli Song. 2025. Parallelized planning-acting for efficient LLM-based
+multi-agent systems. arXiv preprint arXiv:2503.03505 (2025).
+[94] Ziyue Li, Yuan Chang, Gaihong Yu, and Xiaoqiu Le. 2025. Hiplan: Hierarchical planning for llm-based agents with
+adaptive global-local guidance. arXiv preprint arXiv:2508.19076 (2025).
+[95] Zichuan Li, Jian Cui, Xiaojing Liao, and Luyi Xing. 2025. Les dissonances: Cross-tool harvesting and polluting in
+multi-tool empowered llm agents. arXiv e-prints (2025), arXiv–2504.
+[96] Jiafeng Liang, Hao Li, Chang Li, Jiaqi Zhou, Shixin Jiang, Zekun Wang, Changkai Ji, Zhihao Zhu, Runxuan Liu, Tao
+Ren, et al. 2025. Ai meets brain: Memory systems from cognitive neuroscience to autonomous agents. arXiv preprint
+arXiv:2512.23343 (2025).
+[97] Xuechen Liang, Meiling Tao, Yinghui Xia, Jianhui Wang, Kun Li, Yijin Wang, Yangfan He, Jingsong Yang, Tianyu Shi,
+Yuantao Wang, et al. 2025. Sage: Self-evolving agents with reflective and memory-augmented abilities. Neurocomputing
+647 (2025), 130470.
+[98] Bill Yuchen Lin, Yicheng Fu, Karina Yang, Faeze Brahman, Shiyu Huang, Chandra Bhagavatula, Prithviraj Ammanabrolu, Yejin Choi, and Xiang Ren. 2023. Swiftsage: A generative agent with fast and slow thinking for complex
+interactive tasks. Advances in Neural Information Processing Systems 36 (2023), 23813–23825.
+[99] Fangru Lin, Emanuele La Malfa, Valentin Hofmann, Elle Michelle Yang, Anthony Cohn, and Janet B Pierrehumbert.
+2024. Graph-enhanced large language models in asynchronous plan reasoning. arXiv preprint arXiv:2402.02805 (2024).
+[100] Qiqiang Lin, Muning Wen, Qiuying Peng, Guanyu Nie, Junwei Liao, Jun Wang, Xiaoyun Mo, Jiamu Zhou, Cheng
+Cheng, Yin Zhao, et al. 2024. Hammer: Robust function-calling for on-device language models via function masking.
+arXiv preprint arXiv:2410.04587 (2024).
+[101] Chenxu Liu, Zhiyu Gu, Guoquan Wu, Ying Zhang, Jun Wei, and Tao Xie. 2025. Temac: Multi-agent collaboration for
+automated web gui testing. arXiv preprint arXiv:2506.00520 (2025).
+[102] Dongrui Liu, Qihan Ren, Chen Qian, Shuai Shao, Yuejin Xie, Yu Li, Zhonghao Yang, Haoyu Luo, Peng Wang, Qingyu
+Liu, et al. 2026. AgentDoG: A Diagnostic Guardrail Framework for AI Agent Safety and Security. arXiv preprint
+arXiv:2601.18491 (2026).
+[103] Fei Liu, Yiming Yao, Ping Guo, Zhiyuan Yang, Xi Lin, Zhe Zhao, Xialiang Tong, Kun Mao, Zhichao Lu, Zhenkun Wang,
+et al. 2026. A systematic survey on large language models for algorithm design. Comput. Surveys 58, 8 (2026), 1–32.
+[104] Nelson F Liu, Kevin Lin, John Hewitt, Ashwin Paranjape, Michele Bevilacqua, Fabio Petroni, and Percy Liang. 2024.
+Lost in the middle: How language models use long contexts. Transactions of the association for computational linguistics
+12 (2024), 157–173.
+[105] Tianyang Liu, Canwen Xu, and Julian McAuley. 2023. RepoBench: Benchmarking Repository-Level Code AutoCompletion Systems. arXiv preprint arXiv:2306.03091 (2023). https://arxiv.org/abs/2306.03091
+[106] Xukun Liu, Zhiyuan Peng, Xiaoyuan Yi, Xing Xie, Lirong Xiang, Yuchen Liu, and Dongkuan Xu. 2024. Toolnet:
+Connecting large language models with massive tools via tool graph. arXiv preprint arXiv:2403.00839 (2024).
+[107] Zuxin Liu, Thai Hoang, Jianguo Zhang, Ming Zhu, Tian Lan, Shirley Kokane, Juntao Tan, Weiran Yao, Zhiwei Liu,
+Yihao Feng, et al. 2024. Apigen: Automated pipeline for generating verifiable and diverse function-calling datasets.
+Advances in Neural Information Processing Systems 37 (2024), 54463–54482.
+[108] ELita Lobo, Xu Chen, Jingjing Meng, Nan Xi, Yang Jiao, Chirag Agarwal, Yair Zick, and Yan Gao. 2026. STRUCTUREDAGENT: Planning with AND/OR Trees for Long-Horizon Web Tasks. arXiv preprint arXiv:2603.05294 (2026).
+[109] Jiarui Lu, Thomas Holleis, Yizhe Zhang, Bernhard Aumayer, Feng Nan, Haoping Bai, Shuang Ma, Shen Ma, Mengyu
+Li, Guoli Yin, et al. 2025. Toolsandbox: A stateful, conversational, interactive evaluation benchmark for llm tool use
+capabilities. In Findings of the Association for Computational Linguistics: NAACL 2025. 1160–1183.
+[110] Jiaxuan Lu, Ziyu Kong, Yemin Wang, Rong Fu, Haiyuan Wan, Cheng Yang, Wenjie Lou, Haoran Sun, Lilong Wang,
+Yankai Jiang, et al. 2026. Beyond Static Tools: Test-Time Tool Evolution for Scientific Reasoning. arXiv preprint
+arXiv:2601.07641 (2026).
+
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+30
+
+Xu, et al.
+
+[111] Xing Han Lu, Zdenek Kasner, and Siva Reddy. 2024. WebLINX: Real-World Website Navigation with Multi-Turn
+Dialogue. In Proceedings of the 41st International Conference on Machine Learning. 33007–33056. https://proceedings.
+mlr.press/v235/lu24e.html
+[112] Yifu Lu, Shengjie Liu, and Li Dong. 2025. OrchDAG: Complex tool orchestration in multi-turn interactions with plan
+DAGs. arXiv preprint arXiv:2510.24663 (2025).
+[113] Yifei Lu, Fanghua Ye, Jian Li, Qiang Gao, Cheng Liu, Haibo Luo, Nan Du, Xiaolong Li, and Feiliang Ren. 2025. Codetool:
+Enhancing programmatic tool invocation of llms via process supervision. arXiv preprint arXiv:2503.20840 (2025).
+[114] Elias Lumer, Faheem Nizar, Anmol Gulati, Pradeep Honaganahalli Basavaraju, and Vamse Kumar Subbiah. 2025.
+Tool-to-agent retrieval: Bridging tools and agents for scalable llm multi-agent systems. arXiv preprint arXiv:2511.01854
+(2025).
+[115] Haotian Luo, Huaisong Zhang, Xuelin Zhang, Haoyu Wang, Zeyu Qin, Wenjie Lu, Guozheng Ma, Haiying He, Yingsha
+Xie, Qiyang Zhou, et al. 2025. Ultrahorizon: Benchmarking agent capabilities in ultra long-horizon scenarios. arXiv
+preprint arXiv:2509.21766 (2025).
+[116] Junyu Luo, Weizhi Zhang, Ye Yuan, Yusheng Zhao, Junwei Yang, Yiyang Gu, Bohan Wu, Binqi Chen, Ziyue Qiao,
+Qingqing Long, et al. 2025. Large language model agent: A survey on methodology, applications and challenges.
+arXiv preprint arXiv:2503.21460 (2025).
+[117] Ne Luo, Aryo Pradipta Gema, Xuanli He, Emile Van Krieken, Pietro Lesci, and Pasquale Minervini. 2025. Self-training
+large language models for tool-use without demonstrations. In Findings of the Association for Computational Linguistics:
+NAACL 2025. 1253–1271.
+[118] Zixian Ma, Weikai Huang, Jieyu Zhang, Tanmay Gupta, and Ranjay Krishna. 2024. m & m’s: A benchmark to evaluate
+tool-use for m ulti-step m ulti-modal tasks. In European Conference on Computer Vision. Springer, 18–34.
+[119] Zhiyuan Ma, Jiayu Liu, Xianzhen Luo, Zhenya Huang, Qingfu Zhu, and Wanxiang Che. 2025. Advancing toolaugmented large language models via meta-verification and reflection learning. In Proceedings of the 31st ACM
+SIGKDD Conference on Knowledge Discovery and Data Mining V. 2. 2078–2089.
+[120] Seiji Maekawa, Jackson Hassell, Pouya Pezeshkpour, Tom Mitchell, and Estevam Hruschka. 2025. Towards Reliable
+Benchmarking: A Contamination Free, Controllable Evaluation Framework for Multi-step LLM Function Calling.
+arXiv preprint arXiv:2509.26553 (2025).
+[121] Shervin Minaee, Tomas Mikolov, Narjes Nikzad, Meysam Chenaghlu, Richard Socher, Xavier Amatriain, and Jianfeng
+Gao. 2024. Large language models: A survey. arXiv preprint arXiv:2402.06196 (2024).
+[122] Bardia Mohammadi, Nearchos Potamitis, Lars Klein, Akhil Arora, and Laurent Bindschaedler. 2026. Atomix: Timely,
+Transactional Tool Use for Reliable Agentic Workflows. arXiv preprint arXiv:2602.14849 (2026).
+[123] Mahmoud Mohammadi, Yipeng Li, Jane Lo, and Wendy Yip. 2025. Evaluation and benchmarking of llm agents: A
+survey. In Proceedings of the 31st ACM SIGKDD Conference on Knowledge Discovery and Data Mining V. 2. 6129–6139.
+[124] Vaskar Nath, Pranav Raja, Claire Yoon, and Sean Hendryx. 2025. Toolcomp: A multi-tool reasoning & process
+supervision benchmark. arXiv preprint arXiv:2501.01290 (2025).
+[125] Xuefei Ning, Zinan Lin, Zixuan Zhou, Zifu Wang, Huazhong Yang, and Yu Wang. 2023. Skeleton-of-thought: Prompting
+LLMs for efficient parallel generation. arXiv preprint arXiv:2307.15337 (2023).
+[126] Runliang Niu, Jindong Li, Shiqi Wang, Yali Fu, Xiyu Hu, Xueyuan Leng, He Kong, Yi Chang, and Qi Wang. 2024.
+ScreenAgent: A Vision Language Model-driven Computer Control Agent. In Proceedings of the Thirty-Third International Joint Conference on Artificial Intelligence. 6433–6441. https://www.ijcai.org/proceedings/2024/711
+[127] Isaac Ong, Amjad Almahairi, Vincent Wu, Wei-Lin Chiang, Tianhao Wu, Joseph E Gonzalez, M Waleed Kadous, and
+Ion Stoica. 2024. Routellm: Learning to route llms with preference data. arXiv preprint arXiv:2406.18665 (2024).
+[128] Charles Packer, Vivian Fang, Shishir_G Patil, Kevin Lin, Sarah Wooders, and Joseph_E Gonzalez. 2023. MemGPT:
+towards LLMs as operating systems. (2023).
+[129] Aaron Parisi, Yao Zhao, and Noah Fiedel. 2022. Talm: Tool augmented language models. arXiv preprint arXiv:2205.12255
+(2022).
+[130] Shishir G Patil, Tianjun Zhang, Xin Wang, and Joseph E Gonzalez. 2024. Gorilla: Large language model connected
+with massive apis. Advances in Neural Information Processing Systems 37 (2024), 126544–126565.
+[131] Gregory Polyakov, Ilseyar Alimova, Dmitry Abulkhanov, Ivan Sedykh, Andrey Bout, Sergey Nikolenko, and Irina
+Piontkovskaya. 2025. ToolReflection: Improving Large Language Models for Real-World API Calls with Self-Generated
+Data. In Proceedings of the 1st Workshop for Research on Agent Language Models (REALM 2025). 184–199.
+[132] Archiki Prasad, Alexander Koller, Mareike Hartmann, Peter Clark, Ashish Sabharwal, Mohit Bansal, and Tushar
+Khot. 2024. Adapt: As-needed decomposition and planning with language models. In Findings of the Association for
+Computational Linguistics: NAACL 2024. 4226–4252.
+[133] Cheng Qian, Emre Can Acikgoz, Qi He, Hongru Wang, Xiusi Chen, Dilek Hakkani-Tür, Gokhan Tur, and Heng Ji.
+2025. Toolrl: Reward is all tool learning needs. arXiv preprint arXiv:2504.13958 (2025).
+
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+The Evolution of Tool Use in LLM Agents: From Single-Tool Call to Multi-Tool Orchestration
+
+31
+
+[134] Cheng Qian, Chi Han, Yi Fung, Yujia Qin, Zhiyuan Liu, and Heng Ji. 2023. Creator: Tool creation for disentangling
+abstract and concrete reasoning of large language models. In Findings of the Association for Computational Linguistics:
+EMNLP 2023. 6922–6939.
+[135] Hongjin Qian and Zheng Liu. 2025. MetaAgent: Toward Self-Evolving Agent via Tool Meta-Learning. arXiv preprint
+arXiv:2508.00271 (2025).
+[136] Shuofei Qiao, Honghao Gui, Chengfei Lv, Qianghuai Jia, Huajun Chen, and Ningyu Zhang. 2024. Making language
+models better tool learners with execution feedback. In Proceedings of the 2024 Conference of the North American
+Chapter of the Association for Computational Linguistics: Human Language Technologies (Volume 1: Long Papers).
+3550–3568.
+[137] Tian Qin, Felix Bai, Ting-Yao Hu, Raviteja Vemulapalli, Hema Swetha Koppula, Zhiyang Xu, Bowen Jin, Mert Cemri,
+Jiarui Lu, Zirui Wang, et al. 2025. COMPASS: A Multi-Turn Benchmark for Tool-Mediated Planning & Preference
+Optimization. arXiv preprint arXiv:2510.07043 (2025).
+[138] Yujia Qin, Shihao Liang, Yining Ye, Kunlun Zhu, Lan Yan, Yaxi Lu, Yankai Lin, Xin Cong, Xiangru Tang, Bill Qian, et al.
+2023. Toolllm: Facilitating large language models to master 16000+ real-world apis. arXiv preprint arXiv:2307.16789
+(2023).
+[139] Changle Qu, Sunhao Dai, Xiaochi Wei, Hengyi Cai, Shuaiqiang Wang, Dawei Yin, Jun Xu, and Ji-Rong Wen. 2024.
+From exploration to mastery: Enabling llms to master tools via self-driven interactions. arXiv preprint arXiv:2410.08197
+(2024).
+[140] Changle Qu, Sunhao Dai, Xiaochi Wei, Hengyi Cai, Shuaiqiang Wang, Dawei Yin, Jun Xu, and Ji-Rong Wen. 2025.
+Tool learning with large language models: A survey. Frontiers of Computer Science 19, 8 (2025), 198343.
+[141] Muhammad Shihab Rashid, Christian Bock, Yuan Zhuang, Alexander Buchholz, Tim Esler, Simon Valentin, Luca
+Franceschi, Martin Wistuba, Prabhu Teja Sivaprasad, Woo Jung Kim, et al. 2025. Swe-polybench: A multi-language
+benchmark for repository level evaluation of coding agents. arXiv preprint arXiv:2504.08703 (2025).
+[142] Abhishek Rath. 2026. Agent Drift: Quantifying Behavioral Degradation in Multi-Agent LLM Systems Over Extended
+Interactions. arXiv preprint arXiv:2601.04170 (2026).
+[143] Mrinal Rawat, Ambuje Gupta, Rushil Goomer, Alessandro Di Bari, Neha Gupta, and Roberto Pieraccini. 2025. Pre-act:
+Multi-step planning and reasoning improves acting in llm agents. arXiv preprint arXiv:2505.09970 (2025).
+[144] Timo Schick, Jane Dwivedi-Yu, Roberto Dessì, Roberta Raileanu, Maria Lomeli, Eric Hambro, Luke Zettlemoyer, Nicola
+Cancedda, and Thomas Scialom. 2023. Toolformer: Language models can teach themselves to use tools. Advances in
+neural information processing systems 36 (2023), 68539–68551.
+[145] Saptarshi Sengupta, Zhengyu Zhou, Jun Araki, Xingbo Wang, Bingqing Wang, Suhang Wang, and Zhe Feng. 2026.
+Tooldreamer: Instilling llm reasoning into tool retrievers. In Proceedings of the 19th Conference of the European Chapter
+of the Association for Computational Linguistics (Volume 1: Long Papers). 5465–5482.
+[146] Zeyang Sha, Hanling Tian, Zhuoer Xu, Shiwen Cui, Changhua Meng, and Weiqiang Wang. 2025. Agent Safety
+Alignment via Reinforcement Learning. arXiv preprint arXiv:2507.08270 (2025).
+[147] Asif Shahriar, Md Nafiu Rahman, Sadif Ahmed, Farig Sadeque, and Md Rizwan Parvez. 2025. A Survey on Agentic
+Security: Applications, Threats and Defenses. arXiv preprint arXiv:2510.06445 (2025).
+[148] Haiyang Shen, Yue Li, Desong Meng, Dongqi Cai, Sheng Qi, Li Zhang, Mengwei Xu, and Yun Ma. 2025. ShortcutsBench:
+A Large-Scale Real-world Benchmark for API-based Agents. In The Thirteenth International Conference on Learning Representations, ICLR 2025, Singapore, April 24-28, 2025. OpenReview.net. https://openreview.net/forum?id=kKILfPkhSz
+[149] Weizhou Shen, Chenliang Li, Hongzhan Chen, Ming Yan, Xiaojun Quan, Hehong Chen, Ji Zhang, and Fei Huang.
+2024. Small llms are weak tool learners: A multi-llm agent. In Proceedings of the 2024 conference on empirical methods
+in natural language processing. 16658–16680.
+[150] Yuanzhe Shen, Zisu Huang, Zhengyuan Wang, Muzhao Tian, Zhengkang Guo, Chenyang Zhang, Shuaiyu Zhou,
+Zengjie Hu, Dailin Li, Jingwen Xu, et al. 2026. TRIP-Bench: A Benchmark for Long-Horizon Interactive Agents in
+Real-World Scenarios. arXiv preprint arXiv:2602.01675 (2026).
+[151] Yongliang Shen, Kaitao Song, Xu Tan, Dongsheng Li, Weiming Lu, and Yueting Zhuang. 2023. Hugginggpt: Solving
+ai tasks with chatgpt and its friends in hugging face. Advances in Neural Information Processing Systems 36 (2023),
+38154–38180.
+[152] Yongliang Shen, Kaitao Song, Xu Tan, Wenqi Zhang, Kan Ren, Siyu Yuan, Weiming Lu, Dongsheng Li, and Yueting
+Zhuang. 2024. Taskbench: Benchmarking large language models for task automation. Advances in Neural Information
+Processing Systems 37 (2024), 4540–4574.
+[153] Zhuocheng Shen. 2024. Llm with tools: A survey. arXiv preprint arXiv:2409.18807 (2024).
+[154] Noah Shinn, Federico Cassano, Ashwin Gopinath, Karthik Narasimhan, and Shunyu Yao. 2023. Reflexion: Language
+agents with verbal reinforcement learning. Advances in neural information processing systems 36 (2023), 8634–8652.
+[155] Brian Singer, Keane Lucas, Lakshmi Adiga, Meghna Jain, Lujo Bauer, and Vyas Sekar. 2025. Incalmo: An Autonomous
+LLM-assisted System for Red Teaming Multi-Host Networks. arXiv preprint arXiv:2501.16466 (2025).
+
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+32
+
+Xu, et al.
+
+[156] Xinyuan Song, Zeyu Wang, Siyi Wu, Tianyu Shi, and Lynn Ai. 2025. Gradientsys: A Multi-Agent LLM Scheduler with
+ReAct Orchestration. arXiv preprint arXiv:2507.06520 (2025).
+[157] Yuanyi Song, Heyuan Huang, Qiqiang Lin, Yin Zhao, Xiangmou Qu, Jun Wang, Xingyu Lou, Weiwen Liu, Zhuosheng
+Zhang, Yong Yu, et al. 2025. ColorBench: Benchmarking Mobile Agents with Graph-Structured Framework for
+Complex Long-Horizon Tasks. arXiv preprint arXiv:2510.14621 (2025).
+[158] Yifan Song, Weimin Xiong, Dawei Zhu, Cheng Li, Ke Wang, Ye Tian, and Sujian Li. 2023. Restgpt: Connecting large
+language models with real-world applications via restful apis. CoRR, abs/2306.06624, 2023. doi: 10.48550. arXiv
+preprint arXiv.2306.06624 (2023).
+[159] Junhao Su, Yuanliang Wan, Junwei Yang, Hengyu Shi, Tianyang Han, Junfeng Luo, and Yurui Qiu. 2025. Failure
+makes the agent stronger: Enhancing accuracy through structured reflection for reliable tool interactions. arXiv
+preprint arXiv:2509.18847 (2025).
+[160] Xiaoyu Tian, Haotian Wang, Shuaiting Chen, Hao Zhou, Kaichi Yu, Yudian Zhang, Jade Ouyang, Junxi Yin, Jiong
+Chen, Baoyan Guo, et al. 2026. ASTRA: Automated Synthesis of agentic Trajectories and Reinforcement Arenas.
+arXiv preprint arXiv:2601.21558 (2026).
+[161] Eduardo Treviño, Hugo Contant, James Ngai, Graham Neubig, and Zora Zhiruo Wang. 2025. Benchmarking failures
+in tool-augmented language models. In Proceedings of the 2025 Conference of the Nations of the Americas Chapter of
+the Association for Computational Linguistics: Human Language Technologies (Volume 1: Long Papers). 2916–2934.
+[162] Harsh Trivedi, Tushar Khot, Mareike Hartmann, Ruskin Manku, Vinty Dong, Edward Li, Shashank Gupta, Ashish
+Sabharwal, and Niranjan Balasubramanian. 2024. Appworld: A controllable world of apps and people for benchmarking
+interactive coding agents. In Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics
+(Volume 1: Long Papers). 16022–16076.
+[163] Guangya Wan, Mingyang Ling, Xiaoqi Ren, Rujun Han, Sheng Li, and Zizhao Zhang. 2025. Compass: Enhancing
+agent long-horizon reasoning with evolving context. arXiv preprint arXiv:2510.08790 (2025).
+[164] Guanzhi Wang, Yuqi Xie, Yunfan Jiang, Ajay Mandlekar, Chaowei Xiao, Yuke Zhu, Linxi Fan, and Anima Anandkumar.
+2023. Voyager: An open-ended embodied agent with large language models. arXiv preprint arXiv:2305.16291 (2023).
+[165] Hanyu Wang, Yuanpu Cao, Lu Lin, and Jinghui Chen. 2026. PreFlect: From Retrospective to Prospective Reflection in
+Large Language Model Agents. arXiv preprint arXiv:2602.07187 (2026).
+[166] Hongru Wang, Wenyu Huang, Yufei Wang, Yuanhao Xi, Jianqiao Lu, Huan Zhang, Nan Hu, Zeming Liu, Jeff Z Pan,
+and Kam-Fai Wong. 2025. Rethinking Stateful Tool Use in Multi-Turn Dialogues: Benchmarks and Challenges. In
+Findings of the Association for Computational Linguistics: ACL 2025. 5433–5453.
+[167] Haoyu Wang, Christopher M Poskitt, and Jun Sun. 2025. Agentspec: Customizable runtime enforcement for safe and
+reliable llm agents. arXiv preprint arXiv:2503.18666 (2025).
+[168] Jize Wang, Zerun Ma, Yining Li, Songyang Zhang, Cailian Chen, Kai Chen, and Xinyi Le. 2024. GTA: a benchmark
+for general tool agents. Advances in Neural Information Processing Systems 37 (2024), 75749–75790.
+[169] Jingbo Wang, Sendong Zhao, Jiatong Liu, Haochun Wang, Wanting Li, Bing Qin, and Ting Liu. 2026. Orchestrating
+Intelligence: Confidence-Aware Routing for Efficient Multi-Agent Collaboration across Multi-Scale Models. arXiv
+preprint arXiv:2601.04861 (2026).
+[170] Jun Wang, Jiamu Zhou, Xihuai Wang, Xiaoyun Mo, Haoyu Zhang, Qiqiang Lin, Jincheng Jincheng, Muning Wen,
+Weinan Zhang, and Qiuying Peng. 2025. Hammerbench: Fine-grained function-calling evaluation in real mobile
+assistant scenarios. In Findings of the Association for Computational Linguistics: ACL 2025. 3350–3376.
+[171] Luyuan Wang, Yongyu Deng, Yiwei Zha, Guodong Mao, Qinmin Wang, Tianchen Min, Wei Chen, and Shoufa
+Chen. 2024. MobileAgentBench: An Efficient and User-Friendly Benchmark for Mobile LLM Agents. arXiv preprint
+arXiv:2406.08184 (2024). https://arxiv.org/abs/2406.08184
+[172] Pei Wang, Yanan Wu, Noah Wang, Jiaheng Liu, Xiaoshuai Song, Z. Y. Peng, Ken Deng, Chenchen Zhang, Jiakai
+Wang, Junran Peng, Ge Zhang, Hangyu Guo, Zhaoxiang Zhang, Wenbo Su, and Bo Zheng. 2025. MTU-Bench: A
+Multi-granularity Tool-Use Benchmark for Large Language Models. In The Thirteenth International Conference on
+Learning Representations, ICLR 2025, Singapore, April 24-28, 2025. OpenReview.net. https://openreview.net/forum?id=
+6guG2OlXsr
+[173] Renxi Wang, Xudong Han, Lei Ji, Shu Wang, Timothy Baldwin, and Haonan Li. 2024. Toolgen: Unified tool retrieval
+and calling via generation. arXiv preprint arXiv:2410.03439 (2024).
+[174] Weixuan Wang, Dongge Han, Daniel Madrigal Diaz, Jin Xu, Victor Rühle, and Saravan Rajmohan. 2025. Odysseybench:
+Evaluating llm agents on long-horizon complex office application workflows. arXiv preprint arXiv:2508.09124 (2025).
+[175] Yu Wang and Xi Chen. 2025. Mirix: Multi-agent memory system for llm-based agents. arXiv preprint arXiv:2507.07957
+(2025).
+[176] Yanbo Wang, Zixiang Xu, Yue Huang, Xiangqi Wang, Zirui Song, Lang Gao, Chenxi Wang, Xiangru Tang, Yue
+Zhao, Arman Cohan, et al. 2025. DyFlow: Dynamic Workflow Framework for Agentic Reasoning. arXiv preprint
+arXiv:2509.26062 (2025).
+
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+The Evolution of Tool Use in LLM Agents: From Single-Tool Call to Multi-Tool Orchestration
+
+33
+
+[177] Zhenting Wang, Qi Chang, Hemani Patel, Shashank Biju, Cheng-En Wu, Quan Liu, Aolin Ding, Alireza Rezazadeh,
+Ankit Shah, Yujia Bao, and Eugene Siow. 2025. MCP-Bench: Benchmarking Tool-Using LLM Agents with Complex
+Real-World Tasks via MCP Servers. arXiv preprint arXiv:2508.20453 (2025). https://arxiv.org/abs/2508.20453
+[178] Zhiruo Wang, Zhoujun Cheng, Hao Zhu, Daniel Fried, and Graham Neubig. 2024. What are tools anyway? a survey
+from the language model perspective. arXiv preprint arXiv:2403.15452 (2024).
+[179] Zihan Wang, Kangrui Wang, Qineng Wang, Pingyue Zhang, Linjie Li, Zhengyuan Yang, Xing Jin, Kefan Yu, Minh Nhat
+Nguyen, Licheng Liu, et al. 2025. Ragen: Understanding self-evolution in llm agents via multi-turn reinforcement
+learning. arXiv preprint arXiv:2504.20073 (2025).
+[180] Quan Wei, Siliang Zeng, Chenliang Li, William Brown, Oana Frunza, Wei Deng, Anderson Schneider, Yuriy Nevmyvaka,
+Yang Katie Zhao, Alfredo Garcia, et al. 2025. Reinforcing multi-turn reasoning in llm agents via turn-level reward
+design. arXiv preprint arXiv:2505.11821 (2025).
+[181] Georg Wölflein, Dyke Ferber, Daniel Truhn, Ognjen Arandjelovic, and Jakob Nikolas Kather. 2025. Llm agents making
+agent tools. In Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long
+Papers). 26092–26130.
+[182] Michael Wornow, Vaishnav Garodia, Vasilis Vassalos, and Utkarsh Contractor. 2025. Top of the CLASS: Benchmarking
+LLM Agents on Real-World Enterprise Tasks. In ICLR 2025 Workshop on Building Trust in LLMs and LLM Applications.
+https://openreview.net/pdf?id=RQjUpeINII
+[183] Feijie Wu, Weiwu Zhu, Yuxiang Zhang, Soumya Chatterjee, Jiarong Zhu, Fan Mo, Rodin Luo, and Jing Gao. 2025.
+PORTool: Tool-Use LLM Training with Rewarded Tree. arXiv preprint arXiv:2510.26020 (2025).
+[184] Jiaqi Wu, Qinlao Zhao, Zefeng Chen, Kai Qin, Yifei Zhao, Xueqian Wang, and Yuhang Yao. 2025. GAP: Graph-Based
+Agent Planning with Parallel Tool Use and Reinforcement Learning. arXiv preprint arXiv:2510.25320 (2025).
+[185] Mengsong Wu, Tong Zhu, Han Han, Chuanyuan Tan, Xiang Zhang, and Wenliang Chen. 2024. Seal-tools: Self-instruct
+tool learning dataset for agent tuning and detailed benchmark. In CCF International Conference on Natural Language
+Processing and Chinese Computing. Springer, 372–384.
+[186] Ziqiao Xi, Shuang Liang, Qi Liu, Jiaqing Zhang, Letian Peng, Fang Nan, Meshal Nayim, Tianhui Zhang, Rishika
+Mundada, Lianhui Qin, et al. 2026. ToolGym: an Open-world Tool-using Environment for Scalable Agent Testing and
+Data Curation. arXiv preprint arXiv:2601.06328 (2026).
+[187] Chunqiu Steven Xia, Yinlin Deng, Soren Dunn, and Lingming Zhang. 2024. Agentless: Demystifying LLM-based
+Software Engineering Agents. arXiv preprint arXiv:2407.01489 (2024). https://arxiv.org/abs/2407.01489
+[188] Tianbao Xie, Danyang Zhang, Jixuan Chen, Xiaochuan Li, Siheng Zhao, Ruisheng Cao, Toh J Hua, Zhoujun Cheng,
+Dongchan Shin, Fangyu Lei, et al. 2024. Osworld: Benchmarking multimodal agents for open-ended tasks in real
+computer environments. Advances in Neural Information Processing Systems 37 (2024), 52040–52094.
+[189] Mingzhe Xing, Rongkai Zhang, Hui Xue, Qi Chen, Fan Yang, and Zhen Xiao. 2024. Understanding the weakness
+of large language model agents within a complex android environment. In Proceedings of the 30th ACM SIGKDD
+conference on knowledge discovery and data mining. 6061–6072.
+[190] Qian Xiong, Yuekai Huang, Ziyou Jiang, Zhiyuan Chang, Yujia Zheng, Tianhao Li, and Mingyang Li. 2025. Butterfly
+effects in toolchains: A comprehensive analysis of failed parameter filling in llm tool-agent systems. arXiv preprint
+arXiv:2507.15296 (2025).
+[191] Weimin Xiong, Yifan Song, Qingxiu Dong, Bingchan Zhao, Feifan Song, Xun Wang, and Sujian Li. 2025. Mpo: Boosting
+llm agents with meta plan optimization. arXiv preprint arXiv:2503.02682 5, 6 (2025), 7.
+[192] Zidi Xiu, David Q Sun, Kevin Cheng, Maitrik Patel, Yizhe Zhang, Jiarui Lu, Omar Attia, Raviteja Vemulapalli, Oncel
+Tuzel, Meng Cao, et al. 2026. ASTRA-bench: Evaluating Tool-Use Agent Reasoning and Action Planning with Personal
+User Context. arXiv preprint arXiv:2603.01357 (2026).
+[193] Binfeng Xu, Zhiyuan Peng, Bowen Lei, Subhabrata Mukherjee, Yuchen Liu, and Dongkuan Xu. 2023. Rewoo:
+Decoupling reasoning from observations for efficient augmented language models. arXiv preprint arXiv:2305.18323
+(2023).
+[194] Haoran Xu, Jiacong Hu, Ke Zhang, Lei Yu, Yuxin Tang, Xinyuan Song, Yiqun Duan, Lynn Ai, and Bill Shi. 2025. Sedm:
+Scalable self-evolving distributed memory for agents. arXiv preprint arXiv:2509.09498 (2025).
+[195] Weikai Xu, Zhizheng Jiang, Yuxuan Liu, Pengzhi Gao, Wei Liu, Jian Luan, Yuanchun Li, Yunxin Liu, Bin Wang, and Bo
+An. 2025. Mobile-Bench-v2: A More Realistic and Comprehensive Benchmark for VLM-based Mobile Agents. arXiv
+preprint arXiv:2505.11891 (2025). https://arxiv.org/abs/2505.11891
+[196] Wujiang Xu, Zujie Liang, Kai Mei, Hang Gao, Juntao Tan, and Yongfeng Zhang. 2025. A-mem: Agentic memory for
+llm agents. arXiv preprint arXiv:2502.12110 (2025).
+[197] Yechen Xu, Xinhao Kong, Tingjun Chen, and Danyang Zhuo. 2024. Conveyor: Efficient Tool-aware LLM Serving
+with Tool Partial Execution. arXiv preprint arXiv:2406.00059 (2024). https://arxiv.org/abs/2406.00059
+[198] Yifan Xu, Xiao Liu, Xueqiao Sun, Siyi Cheng, Hao Yu, Hanyu Lai, Shudan Zhang, Dan Zhang, Jie Tang, and Yuxiao
+Dong. 2025. AndroidLab: Training and Systematic Benchmarking of Android Autonomous Agents. In Proceedings
+
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+34
+
+Xu, et al.
+
+of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers). 2144–2166.
+https://aclanthology.org/2025.acl-long.107/
+[199] Chen Yang, Ran Le, Yun Xing, Zhenwei An, Zongchao Chen, Wayne Xin Zhao, Yang Song, and Tao Zhang. 2025.
+ToolMind Technical Report: A Large-Scale, Reasoning-Enhanced Tool-Use Dataset. arXiv preprint arXiv:2511.15718
+(2025).
+[200] Jianwei Yang, Hao Zhang, Feng Li, Xueyan Zou, Chunyuan Li, and Jianfeng Gao. 2023. Set-of-mark prompting
+unleashes extraordinary visual grounding in gpt-4v. arXiv preprint arXiv:2310.11441 (2023).
+[201] Ke Yang, Yao Liu, Sapana Chaudhary, Rasool Fakoor, Pratik Chaudhari, George Karypis, and Huzefa Rangwala. 2025.
+AgentOccam: A Simple Yet Strong Baseline for LLM-Based Web Agents. In International Conference on Learning
+Representations. https://openreview.net/forum?id=oWdzUpOlkX
+[202] Rui Yang, Lin Song, Yanwei Li, Sijie Zhao, Yixiao Ge, Xiu Li, and Ying Shan. 2023. Gpt4tools: Teaching large language
+model to use tools via self-instruction. Advances in Neural Information Processing Systems 36 (2023), 71995–72007.
+[203] Shunyu Yao, Noah Shinn, Pedram Razavi, and Karthik Narasimhan. 2024. 𝜏-bench: A Benchmark for Tool-Agent-User
+Interaction in Real-World Domains. CoRR abs/2406.12045 (2024). arXiv:2406.12045 doi:10.48550/ARXIV.2406.12045
+[204] Shunyu Yao, Dian Yu, Jeffrey Zhao, Izhak Shafran, Tom Griffiths, Yuan Cao, and Karthik Narasimhan. 2023. Tree of
+thoughts: Deliberate problem solving with large language models. Advances in neural information processing systems
+36 (2023), 11809–11822.
+[205] Shunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak Shafran, Karthik R Narasimhan, and Yuan Cao. 2022. React: Synergizing reasoning and acting in language models. In The eleventh international conference on learning representations.
+[206] Junjie Ye, Zhengyin Du, Xuesong Yao, Weijian Lin, Yufei Xu, Zehui Chen, Zaiyuan Wang, Sining Zhu, Zhiheng Xi,
+Siyu Yuan, et al. 2025. ToolHop: A Query-Driven Benchmark for Evaluating Large Language Models in Multi-Hop
+Tool Use. In Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long
+Papers). 2995–3021.
+[207] Junjie Ye, Sixian Li, Guanyu Li, Caishuang Huang, Songyang Gao, Yilong Wu, Qi Zhang, Tao Gui, and Xuan-Jing
+Huang. 2024. Toolsword: Unveiling safety issues of large language models in tool learning across three stages. In
+Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers).
+2181–2211.
+[208] Junjie Ye, Yilong Wu, Songyang Gao, Caishuang Huang, Sixian Li, Guanyu Li, Xiaoran Fan, Qi Zhang, Tao Gui, and
+Xuan-Jing Huang. 2024. Rotbench: A multi-level benchmark for evaluating the robustness of large language models
+in tool learning. In Proceedings of the 2024 conference on empirical methods in natural language processing. 313–333.
+[209] Suyu Ye, Haojun Shi, Darren Shih, Hyokun Yun, Tanya G Roosta, and Tianmin Shu. 2026. Realwebassist: A benchmark
+for long-horizon web assistance with real-world users. In Proceedings of the AAAI Conference on Artificial Intelligence,
+Vol. 40. 34441–34449.
+[210] Guoli Yin, Haoping Bai, Shuang Ma, Feng Nan, Yanchao Sun, Zhaoyang Xu, Shen Ma, Jiarui Lu, Xiang Kong, Aonan
+Zhang, et al. 2025. Mmau: A holistic benchmark of agent capabilities across diverse domains. In Findings of the
+Association for Computational Linguistics: NAACL 2025. 4737–4765.
+[211] Boxi Yu, Yuxuan Zhu, Pinjia He, and Daniel Kang. 2025. UTBoost: Rigorous Evaluation of Coding Agents on SWEBench. In Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long
+Papers). 3762–3774. https://aclanthology.org/2025.acl-long.189/
+[212] Peijie Yu, Wei Liu, Yifan Yang, Jinjian Li, Zelong Zhang, Xiao Feng, and feng zhang. 2026. Benchmarking LLM
+Tool-Use in the Wild. In The Fourteenth International Conference on Learning Representations. https://openreview.net/
+forum?id=yz7fL5vfpn
+[213] Xingshan Zeng, Weiwen Liu, Xu Huang, Zezhong Wang, Lingzhi Wang, Liangyou Li, Yasheng Wang, Lifeng Shang,
+Xin Jiang, Ruiming Tang, et al. 2026. ToolACE-R: Model-aware Iterative Training and Adaptive Refinement for Tool
+Learning. In Proceedings of the AAAI Conference on Artificial Intelligence, Vol. 40. 34593–34601.
+[214] Xingshan Zeng, Lingzhi Wang, Weiwen Liu, Liangyou Li, Yasheng Wang, Lifeng Shang, Xin Jiang, and Qun Liu. 2026.
+ARTIS: Agentic Risk-Aware Test-Time Scaling via Iterative Simulation. arXiv preprint arXiv:2602.01709 (2026).
+[215] Qiusi Zhan, Zhixiang Liang, Zifan Ying, and Daniel Kang. 2024. InjecAgent: Benchmarking Indirect Prompt Injections
+in Tool-Integrated Large Language Model Agents. In Findings of the Association for Computational Linguistics: ACL
+2024. 10471–10506. https://aclanthology.org/2024.findings-acl.624/
+[216] Chi Zhang, Zhao Yang, Jiaxuan Liu, Yanda Li, Yucheng Han, Xin Chen, Zebiao Huang, Bin Fu, and Gang Yu. 2025.
+Appagent: Multimodal agents as smartphone users. In Proceedings of the 2025 CHI Conference on Human Factors in
+Computing Systems. 1–20.
+[217] Enhao Zhang, Erkang Zhu, Gagan Bansal, Adam Fourney, Hussein Mozannar, and Jack Gerrits. 2025. Optimizing
+Sequential Multi-Step Tasks with Parallel LLM Agents. arXiv preprint arXiv:2507.08944 (2025).
+[218] Jieyu Zhang, Ranjay Krishna, Ahmed H Awadallah, and Chi Wang. 2023. Ecoassistant: Using llm assistant more
+affordably and accurately. arXiv preprint arXiv:2310.03046 (2023).
+
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+The Evolution of Tool Use in LLM Agents: From Single-Tool Call to Multi-Tool Orchestration
+
+35
+
+[219] Jiayi Zhang, Jinyu Xiang, Zhaoyang Yu, Fengwei Teng, Xionghui Chen, Jiaqi Chen, Mingchen Zhuge, Xin Cheng,
+Sirui Hong, Jinlin Wang, et al. 2024. Aflow: Automating agentic workflow generation. arXiv preprint arXiv:2410.10762
+(2024).
+[220] Kangning Zhang, Wenxiang Jiao, Kounianhua Du, Yuan Lu, Weiwen Liu, Weinan Zhang, and Yong Yu. 2025. LoopTool:
+Closing the Data-Training Loop for Robust LLM Tool Calls. arXiv preprint arXiv:2511.09148 (2025).
+[221] Shaoqing Zhang, Zhuosheng Zhang, Kehai Chen, Xinbei Ma, Muyun Yang, Tiejun Zhao, and Min Zhang. 2024.
+Dynamic planning for llm-based graphical user interface automation. In Findings of the Association for Computational
+Linguistics: EMNLP 2024. 1304–1320.
+[222] Xuan Zhang, Yongliang Shen, Zhe Zheng, Linjuan Wu, Wenqi Zhang, Yuchen Yan, Qiuying Peng, Jun Wang, and
+Weiming Lu. 2025. Asktoact: Enhancing llms tool use via self-correcting clarification. In Proceedings of the 2025
+Conference on Empirical Methods in Natural Language Processing. 13495–13522.
+[223] Xianren Zhang, Xianfeng Tang, Hui Liu, Zongyu Wu, Qi He, Dongwon Lee, and Suhang Wang. 2025. Divide-VerifyRefine: Can LLMs Self-Align with Complex Instructions?. In Findings of the Association for Computational Linguistics:
+ACL 2025. 13783–13800.
+[224] Yifan Zhang, Giridhar Ganapavarapu, Srideepika Jayaraman, Bhavna Agrawal, Dhaval Patel, and Achille Fokoue.
+2026. SPIRAL: Symbolic LLM Planning via Grounded and Reflective Search. In Proceedings of the AAAI Conference on
+Artificial Intelligence, Vol. 40. 36527–36535.
+[225] Yinger Zhang, Shutong Jiang, Renhao Li, Jianhong Tu, Yang Su, Lianghao Deng, Xudong Guo, Chenxu Lv, and Junyang
+Lin. 2026. DeepPlanning: Benchmarking Long-Horizon Agentic Planning with Verifiable Constraints. arXiv preprint
+arXiv:2601.18137 (2026).
+[226] Zhenyu Zhang, Tianyi Chen, Weiran Xu, Alex Pentland, and Jiaxin Pei. 2025. ReCAP: Recursive Context-Aware
+Reasoning and Planning for Large Language Model Agents. arXiv preprint arXiv:2510.23822 (2025).
+[227] Andrew Zhao, Daniel Huang, Quentin Xu, Matthieu Lin, Yong-Jin Liu, and Gao Huang. 2024. Expel: Llm agents are
+experiential learners. In Proceedings of the AAAI Conference on Artificial Intelligence, Vol. 38. 19632–19642.
+[228] Boyuan Zheng, Boyu Gou, Jihyung Kil, Huan Sun, and Yu Su. 2024. Gpt-4v (ision) is a generalist web agent, if
+grounded. arXiv preprint arXiv:2401.01614 (2024).
+[229] Junhao Zheng, Chengming Shi, Xidi Cai, Qiuke Li, Duzhen Zhang, Chenxing Li, Dong Yu, and Qianli Ma. 2026.
+Lifelong learning of large language model based agents: A roadmap. IEEE Transactions on Pattern Analysis and
+Machine Intelligence (2026).
+[230] Lucen Zhong, Zhengxiao Du, Xiaohan Zhang, Haiyi Hu, and Jie Tang. 2025. ComplexFuncBench: Exploring multi-step
+and constrained function calling under long-context scenario. arXiv preprint arXiv:2501.10132 (2025).
+[231] Andy Zhou, Kai Yan, Michal Shlapentokh-Rothman, Haohan Wang, and Yu-Xiong Wang. 2023. Language agent tree
+search unifies reasoning acting and planning in language models. arXiv preprint arXiv:2310.04406 (2023).
+[232] Huichi Zhou, Yihang Chen, Siyuan Guo, Xue Yan, Kin Hei Lee, Zihan Wang, Ka Yiu Lee, Guchun Zhang, Kun Shao,
+Linyi Yang, et al. 2025. Memento: Fine-tuning llm agents without fine-tuning llms. arXiv preprint arXiv:2508.16153
+(2025).
+[233] Yang Zhou, Mingyu Zhao, Zhenting Wang, Difei Gu, Bangwei Guo, Ruosong Ye, Ligong Han, Can Jin, and Dimitris N
+Metaxas. 2025. Mˆ 3-Bench: Multi-Modal, Multi-Hop, Multi-Threaded Tool-Using MLLM Agent Benchmark. arXiv
+preprint arXiv:2511.17729 (2025).
+[234] Dongsheng Zhu, Weixian Shi, Zhengliang Shi, Zhaochun Ren, Shuaiqiang Wang, Lingyong Yan, and Dawei Yin.
+2025. Divide-then-aggregate: An efficient tool learning method via parallel tool invocation. In Proceedings of the 63rd
+Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers). 28859–28875.
+
+, Vol. 1, No. 1, Article . Publication date: April 2026.
+
+

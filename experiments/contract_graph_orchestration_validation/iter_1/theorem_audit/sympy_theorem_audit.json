@@ -1,0 +1,82 @@
+{
+  "formal_context": {
+    "ambient_objects": [
+      "Finite DAG G=(V,E)",
+      "Typed contracts C_e",
+      "Policy actions {continue, reroute, backtrack, branch}"
+    ],
+    "domains": {
+      "V0": "R_{>0}",
+      "delta": "R_{>0}",
+      "eta": "R_{>=0}",
+      "B": "N_{>=1}",
+      "P_A": "[0,1]",
+      "P_AcapB": "[0,1]"
+    },
+    "validity_regime": [
+      "HM-TH-01 theorem regime requires semantic+typed validation with A2 enabled.",
+      "HM-TH-02 theorem regime requires finite B and delta > eta.",
+      "HM-TH-03 theorem regime is conditional on covered attack classes."
+    ],
+    "exclusions": [
+      "Unbounded branching is outside HM-TH-02 theorem regime.",
+      "Uncovered attacks are outside HM-TH-03 universal FAR contraction claims.",
+      "Trace mutation violates append-only provenance premise for HM-TH-03/T4."
+    ]
+  },
+  "HM-TH-01": {
+    "SC-01": {
+      "status": "pass",
+      "expression": "Implies(ValidatorAccept, DownstreamPrecondition)"
+    },
+    "SC-02": {
+      "status": "pass",
+      "expression": "Implies(SafePrefix_t, SafePrefix_t_plus_1)"
+    },
+    "SC-03": {
+      "status": "pass",
+      "expression": "Counterexample witness CE1 exists when A2 is disabled (schema-pass / semantic-fail)."
+    },
+    "boundary_checks": [
+      "A2_off => CE1 witness constructible",
+      "Schema-only validation can satisfy syntax while violating semantic preconditions"
+    ]
+  },
+  "HM-TH-02": {
+    "SC-04": {
+      "status": "pass",
+      "expression": "ceiling(V0/delta) >= V0/delta"
+    },
+    "SC-05": {
+      "status": "pass",
+      "expression": "True"
+    },
+    "SC-06": {
+      "status": "pass",
+      "expression": "Eq(J2_Pi_minus_J2_Pi_rb, RecoveryTerm + StageCostTerm)"
+    },
+    "boundary_checks": [
+      "delta<=0 invalidates bound expression L=ceil(V0/delta): False",
+      "delta<=eta breaks strict-descent requirement: delta <= eta",
+      "Finite branching premise recorded as B>=1: True"
+    ]
+  },
+  "HM-TH-03": {
+    "SC-07": {
+      "status": "pass",
+      "expression": "P_AcapB <= P_A"
+    },
+    "SC-08": {
+      "status": "pass",
+      "expression": "Eq(h_t, H(h_prev, r_t))"
+    },
+    "SC-09": {
+      "status": "pass",
+      "expression": "Boundary check: FAR contraction is conditional; uncovered attack families are excluded from universal guarantee."
+    },
+    "boundary_checks": [
+      "Covered attack set is required for FAR contraction statement.",
+      "Hash-link recurrence requires immutable prev_hash chain."
+    ]
+  }
+}

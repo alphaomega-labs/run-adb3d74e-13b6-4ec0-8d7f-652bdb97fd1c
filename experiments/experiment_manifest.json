@@ -1,0 +1,60 @@
+{
+  "acquisition_budget_used_sec": 8,
+  "acquisition_status": "materialized",
+  "code_paths": [
+    "experiments/run_experiments.py",
+    "experiments/src/method/contract_semantics.py",
+    "experiments/src/data_or_env_adapter/quarks_trace_adapter.py",
+    "experiments/src/analysis/theorem_metrics.py",
+    "experiments/src/reporting/build_artifacts.py",
+    "experiments/src/symbolic_audit/sympy_checks.py"
+  ],
+  "config_paths": [
+    "experiments/configs/validation_config.json",
+    "experiments/experiment_manifest.json"
+  ],
+  "dataset_resolution_log_path": "experiments/contract_graph_orchestration_validation/iter_1/dataset_resolution_log.json",
+  "entrypoint_path": "experiments/run_experiments.py",
+  "excluded_roots": [
+    ".codex",
+    ".git",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "node_modules"
+  ],
+  "experiment_manifest_path": "experiments/experiment_manifest.json",
+  "lint_commands": [
+    "experiments/.venv/bin/ruff check experiments",
+    "experiments/.venv/bin/mypy experiments/src experiments/tests"
+  ],
+  "output_dir": "experiments/contract_graph_orchestration_validation/iter_1",
+  "package_root": "experiments/src",
+  "preflight_commands": [
+    "experiments/.venv/bin/python experiments/run_experiments.py --stage smoke --iteration-tag iter_1"
+  ],
+  "preflight_report_path": "experiments/contract_graph_orchestration_validation/iter_1/preflight/smoke_summary.json",
+  "readme_path": "experiments/README.md",
+  "report_paths": [
+    "experiments/contract_graph_orchestration_validation/iter_1/dataset_resolution_log.json",
+    "experiments/contract_graph_orchestration_validation/iter_1/preflight/smoke_summary.json",
+    "experiments/contract_graph_orchestration_validation/iter_1/results/results_summary.json",
+    "experiments/contract_graph_orchestration_validation/iter_1/theorem_audit/sympy_theorem_audit.json",
+    "experiments/experiment_manifest.json"
+  ],
+  "results_summary_path": "experiments/contract_graph_orchestration_validation/iter_1/results/results_summary.json",
+  "run_commands": [
+    "experiments/.venv/bin/python experiments/run_experiments.py --stage full --iteration-tag iter_1"
+  ],
+  "support_artifact_paths": [],
+  "test_commands": [
+    "experiments/.venv/bin/pytest experiments/tests -q"
+  ],
+  "test_paths": [
+    "experiments/tests/test_preflight_and_invariants.py",
+    "experiments/tests/conftest.py"
+  ]
+}

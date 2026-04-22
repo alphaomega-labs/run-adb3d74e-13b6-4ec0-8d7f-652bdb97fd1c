@@ -1,0 +1,1 @@
+{"claim_id": "HM-TH-02", "finding": "Oscillation and bound violations appear under stress settings including relaxed boundedness assumptions.", "oscillation_rate_mean": 0.4166666666666667, "bound_violation_rate_mean": 0.25, "action": "State non-oscillation guarantees conditionally for finite-B and delta>eta regimes."}

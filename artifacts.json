@@ -1,0 +1,20 @@
+{
+  "artifacts": [],
+  "code": [
+    "code/run_experiments.py",
+    "code/contract_semantics.py",
+    "code/quarks_trace_adapter.py",
+    "code/theorem_metrics.py",
+    "code/build_artifacts.py",
+    "code/sympy_checks.py"
+  ],
+  "experiments": "experiments",
+  "knowledge": "knowledge",
+  "latex_sources": "paper/main.tex",
+  "paper_data": "paper/data",
+  "paper_figures": "paper/figures",
+  "paper_pdf": "paper/main.pdf",
+  "paper_tables": "paper/tables",
+  "paper_thumbnail": "paper/thumbnail.png",
+  "sources": null
+}

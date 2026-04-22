@@ -1,0 +1,2061 @@
+Orchestrating LLM Agents for Scientific Research:
+A Pilot Study of Multiple Choice Question (MCQ)
+Generation and Evaluation
+
+arXiv:2602.18891v1 [cs.CY] 21 Feb 2026
+
+Yuan An
+College of Computing and Informatics
+Drexel University
+Philadelphia, PA 19104, USA
+ya45@drexel.edu
+
+Abstract
+Advances in large language models (LLMs) are rapidly transforming scientific work, yet
+empirical evidence on how these systems reshape research activities remains limited. We
+report a mixed-methods pilot evaluation of an AI-orchestrated research workflow in which
+a human researcher coordinated multiple LLM-based agents to perform data extraction,
+corpus construction, artifact generation, and artifact evaluation. Using the generation and
+assessment of multiple-choice questions (MCQs) as a testbed, we collected 1,071 SAT Math
+MCQs and employed LLM agents to extract questions from PDFs, retrieve and convert
+open textbooks into structured representations, align each MCQ with relevant textbook
+content, generate new MCQs under specified difficulty and cognitive levels, and evaluate
+both original and generated MCQs using a 24-criterion quality framework. Across all
+evaluations, average MCQ quality was high (mean 4.64-4.89/5) and 74.1-93.4% of individual
+criterion scores reached the maximum rating of 5. However, criterion-level analysis and
+equivalence testing show that generated MCQs are not fully comparable to expert-vetted
+baseline questions. Strict similarity (24/24 criteria equivalent) was never achieved, and
+only 9-12/24 criteria met an equivalence threshold depending on LLM-based judge and
+analysis track. Persistent gaps concentrated in skill depth, cognitive engagement, difficulty
+calibration, and metadata alignment, while surface-level qualities, such as grammar fluency,
+clarity options, no duplicates, were consistently strong. Beyond MCQ outcomes, the study
+documents a labor shift. The researcher’s work moved from “authoring items” toward
+specification, orchestration, verification, and governance. Formalizing constraints, designing
+rubrics, building validation loops, recovering from tool failures, and auditing provenance
+constituted the primary activities. We discuss implications for the future of scientific work,
+including emerging “AI research operations” skills required for AI-empowered research
+pipelines.
+Keywords: future of work; scientific workflows; human-AI collaboration; LLMs; agentic tools; evaluation;
+educational content generation
+
+1
+
+Introduction
+
+Artificial intelligence is moving beyond basic tasks like spell-checking to become a core part of the actual
+research work. LLMs can now handle data, write content, and generate code. While many are still debating
+whether AI output is “good enough,” the deeper shift is already underway. In some fields, the technology is
+redefining what it means to be a researcher. In these domains, substantial portions of hypothesis generation,
+data collection, analysis, and even validation can be executed by computational systems rather than humans.
+As algorithms take over drafting and analysis, the researcher’s role shifts from doing the work to managing
+AI systems. This paper tests that shift. We argue that while AI allows us to produce much more, it
+1
+
+fundamentally changes scientific labor from creating content to defining and verifying it. This shift is central
+to the future-of-work conversation in scientific occupations. The practical question is no longer whether AI
+assists research, but how it redefines the work itself:
+When a researcher utilizes an AI-driven pipeline to complete a project end-to-end, which
+tasks are delegated, and what new responsibilities emerge?
+In this study, we attempt to answer this question through a research application that is defined as the
+large-scale generation and evaluation of SAT Math multiple-choice questions (MCQs) derived from open-access
+textbooks. Automatically generating various artifacts has long been studied as a way for reducing human
+labor demands. In the standardized test preparation industry, AI-driven content generation has profound
+impacts on industry, educators, and learners.
+The broader U.S. test preparation sector was projected to grow by more than $18 billion between 2024 and
+2029 (Technavio (2026)). However, on January 21, 2026, Google announced free, full-length digital SAT
+practice tests within its Gemini model family through a partnership with The Princeton Review. Around
+the same time (January 2026), research systems such as ReQUESTA (Tian et al. (2026)) introduce hybrid
+agentic frameworks for generating cognitively diverse multiple-choice questions (MCQs) at scale.
+If large language models (LLMs) can produce SAT-style preparation materials that are pedagogically and
+cognitively comparable to those written by human experts, the economic and professional structure of the
+test preparation industry would be significantly affected. This motivates a central empirical question:
+To what extent are SAT questions generated by LLMs comparable to human-authored
+questions along pedagogical quality, cognitive demand, and assessment validity dimensions?
+
+Figure 1: Overview of the end-to-end AI-orchestrated MCQ research workflow.
+
+Addressing this research question through traditional means would require substantial resources, including
+careful question selection, administration to real students, rigorous expert review, and systematic interpretation
+of results. To reduce cost and improve scalability, recent studies have explored the use of LLMs for generating
+educational questions (Biancini et al. (2025)), simulating student behavior (Martynova et al. (2025); Lu and
+Wang (2024)), modeling student responses (Benedetto et al. (2024)), and estimating item difficulty (Acquaye
+et al. (2026)).
+Building on this emerging line of work, and given the rapid advancement of AI capabilities, we adopt
+an AI-human collaborative approach. In this framework, a researcher orchestrates a set of AI tools for
+2
+
+data generation, simulation, and preliminary analysis, while the human researcher retains responsibility for
+experimental design, validation, theoretical framing, and the interpretation of findings. Figure 1 details the
+full architecture of this process.
+As the figure illustrates, the study proceeds through the following structured phases:
+• Phase 1: Data Identification and Acquisition: Identify and retrieve relevant datasets aligned
+with the research objectives.
+• Phase 2: Data Extraction and Corpus Construction: Extract structured content from PDF
+sources and construct a clean, analyzable corpus.
+• Phase 3: Content Alignment and Structuring: Align questions, metadata, and supporting
+materials across sources to ensure comparability.
+• Phase 4: Artifact Generation: Leverage the aligned corpus to generate new multiple-choice
+questions (MCQs).
+• Phase 5: Artifact Evaluation: Develop evaluation criteria and conduct systematic assessments of
+generated artifacts across pedagogical and cognitive dimensions.
+• Phase 6: Human Interpretation and Insight Development: Interpret the data and results,
+validate findings, and synthesize theoretical and practical insights.
+Throughout Phases 1-5, the human researcher orchestrates and supervises the AI-driven workflow, defining
+objectives, setting constraints, and monitoring outputs. In the final phase, human judgment becomes central,
+transforming AI-generated results into conclusions and implications.
+We claim the following contributions in this paper:
+1. We provide an empirical account of an end-to-end research workflow executed by a single researcher
+orchestrating multiple LLMs and agentic tools, making labor shifts from artifact production to
+specification, coordination, and validation.
+2. We conduct a large-scale LLM-based evaluation of baseline and generated SAT-style MCQs (∼1,000
+items per set), applying 24 criteria and two independent LLM judges to examine both average quality
+and criterion-level performance.
+3. We demonstrate that despite strong average performance, criterion-level equivalence fails on depth
+and calibration dimensions.
+4. We articulate implications for the future of scientific work, arguing orchestration, error control, and
+interpretation as core competencies within emerging “AI research operations.”
+The rest of the paper is organized as follows. Section 2 presents the related work. Section 3 describes the
+study design. Section 4 reports MCQ quality findings across judges and analysis tracks. Section 5 presents
+work-practice findings. Section 6 discusses the results and their implications. Section 7 provides limitations of
+the study. Finally, Section 8 concludes the paper. The Appendix A- G contain the tools, evaluation criteria,
+raw data of the study, costs, and the link to the public Github repository.
+
+2
+
+Related Work
+
+Our study connects four research areas: (1) the transformation of scientific work under generative AI;
+(2) the structure and automation of scientific workflows; (3) the automated generation and evaluation of
+multiple-choice questions (MCQs); and (4) the methodological validity and reliability of LLM-as-a-judge
+frameworks for evaluation and assessment.
+2.1
+
+Generative AI and the Future of Knowledge Work
+
+Autor et al. (2003) introduced a taxonomy that distinguishes routine from non-routine tasks along cognitive and
+manual dimensions. Computerization substitutes for routine cognitive and manual tasks while complementing
+non-routine analytic and interactive work. Acemoglu and Restrepo (2019) extend this framework by arguing
+that automation simultaneously displaces labor from existing tasks and creates entirely new task categories.
+Most recently, Dell’Acqua et al. (2023) provide field-experimental evidence of a “jagged technological frontier.”
+Within a single occupation, AI dramatically improves performance on some tasks while degrading it on others,
+making the task-level boundary between human and machine competence uneven and hard to predict.
+Recent generative-AI work extends these frameworks to knowledge-intensive tasks by measuring exposure and
+by running randomized or quasi-experimental studies. For example, task-exposure analyses suggest broad
+3
+
+potential impact of LLM-based tooling across occupations, with effects magnified when LLMs are embedded
+in software workflows (Eloundou et al., 2024). Controlled studies report productivity gains in writing-centric
+professional tasks when workers have access to LLMs (Noy and Zhang, 2023), and field evidence from customer
+support shows performance improvements alongside changes in how work is executed (Brynjolfsson et al.,
+2025).
+Most future-of-work evidence to date focuses on relatively bounded tasks. Scientific work, however, is a
+composite occupation that interleaves information extraction, synthesis, software construction, evaluation, and
+judgment under uncertainty. Surveys of “AI for science” describe an acceleration narrative, from automation
+toward more autonomous agents across the scientific lifecycle, but also highlight open problems around
+verification, bias, and governance (Zheng et al., 2025; Zhang et al., 2024).
+2.2
+
+Scientific Workflows
+
+Long before LLMs, workflow systems in e-science sought to make computational research more reproducible
+by encoding multi-step pipelines, capturing provenance, and enabling re-execution (Gil et al., 2007; Deelman
+et al., 2015). The literature identifies persistent challenges that remain salient in LLM-mediated pipelines.
+Managing complex dependencies requires reliability of heterogeneous tools, data and metadata quality,
+provenance capture, and the human effort (Gil et al., 2007).
+LLMs alter this landscape by serving as a flexible “glue” layer that can generate code, call tools, and translate
+between representations. Work on tool-augmented or agentic LLMs shows how models can interleave reasoning
+with action (Yao et al., 2022; Schick et al., 2023). Prompting methods such as chain-of-thought can improve
+reasoning performance but also surface verification needs because intermediate rationales may be persuasive
+yet wrong (Wei et al., 2022; Kojima et al., 2022). In software engineering, benchmarks such as SWE-bench
+document both the promise and the limits of LLM autonomy in real-world tasks (Jimenez et al., 2023).
+2.3
+
+Automatic MCQ Generation and Quality
+
+Automatic question generation (AQG) is a mature research area that predates modern LLMs. Surveys of
+automatic MCQ generation describe modular pipelines that identify candidate concepts, construct stems,
+generate distractors, and apply quality filters (Ch and Saha, 2018). Parallel work in measurement and
+classroom assessment provides item-writing principles, clarity of the stem, plausibility and homogeneity of
+distractors, avoidance of cueing, and alignment to intended constructs, that underpin human-generated test
+quality (Haladyna et al., 2002).
+LLMs change the AQG landscape by making the generation dramatically easier, but they also introduce new
+failure issues such as hallucinated facts, inconsistent rationales, and superficial distractors. Various studies
+have used MCQ generation as a testbed for evaluating LLMs’ capabilities on understanding and reasoning
+(Brown et al., 2020; Bommasani et al., 2021; Bender et al., 2021; Achiam et al., 2023).
+Beyond education, AI-driven item generation has been explored in medical licensing (Kung et al., 2023)
+and legal bar examinations (Katz et al., 2024), where LLMs demonstrate passing-level performance and,
+in some cases, generate practice items that experts rate comparably to human-authored questions. These
+cross-domain findings reinforce the generality of the AQG pipeline while underscoring that domain-specific
+validity evidence remains essential.
+2.4
+
+LLM-Based Evaluation and “LLM-as-a-judge”
+
+Evaluating generative outputs at scale is itself a bottleneck. Recent work proposes using strong LLMs as
+evaluators, reporting substantial agreement with human preferences in some settings while also documenting
+systematic biases (Zheng et al., 2023; Li et al., 2025; Kaiser et al., 2025). In natural language generation,
+frameworks such as G-Eval structure LLM judgments via explicit criteria and form-filling, improving alignment
+with human evaluation but still raising concerns about evaluator bias toward certain styles or model families
+(Liu et al., 2023).
+
+3
+
+Study Design
+
+This section describes the setting and the end-to-end pipeline. We document (i) the baseline dataset
+construction and filtering decisions; (ii) the open-source textbook corpus, conversion, and chunking strategy;
+4
+
+(iii) the step that links each baseline MCQ to a source chunk; (iv) the generation of MCQs under explicit
+metadata constraints; and (v) a LLM-based multi-judge evaluation process.
+3.1
+
+Baseline Dataset: SAT Math MCQs
+
+To establish a reliable baseline for comparison, we prompted an AI system to identify authorized SAT question
+banks. It retrieved the official College Board educator question bank (College Board (2026)). From this
+source, we focused on SAT Math questions and downloaded the corresponding PDF files, which contain 1,682
+items across four domains: Algebra, Advanced Math, Problem Solving and Data Analysis, and Geometry and
+Trigonometry.
+We then employed Google AI Studio Gemini 3 Pro Preview to convert the PDF content into structured JSON
+files. Our analysis focused exclusively on multiple-choice questions (MCQs). Out of the 1,682 SAT Math
+items, 1,071 were identified as MCQs. Each MCQ in the bank has a question_id and associated metadata
+fields, including domain, skill, and difficulty. Figure 2 shows a screenshot of the details of an MCQ in
+the question bank. During the extraction process, we also instructed Gemini 3 Pro to extract a cognitive
+level, cognitive_level_bloom, based on Bloom’s taxonomy (Anderson and Krathwohl, 2001).
+
+Figure 2: Example MCQ entry from the College Board question bank.
+
+Because some SAT items depend on figures or tables that were not fully captured during extraction, we
+applied an incomplete-item filter to remove partially extracted questions. This process resulted in a final
+corpus of 1,013 SAT Math MCQs filtered by Gemini and 1,027 filtered by GPT for analysis.
+3.2
+
+Open Textbook Corpus and Chunking
+
+The next step is to map each MCQ to source content in textbooks. The researcher coordinated AI to search
+open-source textbooks. It located the OpenStax (OpenStax, Rice University (2026)) which is the world’s
+largest publisher of open education resources (OER). Each textbook is downloaded as a PDF file. AI systems
+were able to convert the PDF file into markdown format, and chunk the text into retrievable segments
+(Figure 3). Each chunk is treated as a provenance unit and is referenced by a chunk ID during mapping and
+generation.
+We ensure that chunking preserves pedagogical coherence (e.g., keeping a definition with its immediately
+following example) rather than purely token-length-based splitting. We also retained enough surrounding
+context to avoid “orphan” equations or references (e.g., “as shown above”) that would otherwise create
+hallucination pressure during generation.
+5
+
+Figure 3: Divide textbooks into appropriate chunks for retrieval and provenance. The corpus was split into 2,980
+section-based chunks preserving pedagogical coherence.
+
+3.3
+
+Mapping Baseline MCQs to Chunks
+
+For each baseline MCQ, we implemented an LLM-assisted retrieval step in which both MCQs and textbook
+chunks were embedded into vector representations. Each MCQ was represented by two queries, a metadata
+query constructed from the item’s domain and skill labels and a content query constructed from the question
+stem and rationale. The combined relevance score was computed as:
+score = 0.3 × simmetadata + 0.7 × simcontent
+where sim denotes cosine similarity. Using this combined score, the system mapped each MCQ to its most
+semantically relevant textbook chunk(s) within the corpus. These retrieved passages were used as grounding
+context for subsequent question generation.
+3.4
+
+Generating MCQ Sets
+
+To generate new MCQs by LLM from the source material, we first extracted the metadata of each baseline
+MCQ, including its domain, skill, difficulty level, and cognitive level. We then provided this metadata,
+together with the retrieved grounding text, to two representative LLMs, GPT-5-nano (gpt-5-nano, accessed
+February 2026) and Gemini-2.5-Flash (gemini-2.5-flash, accessed February 2026), and prompted them to
+generate a corresponding MCQ.
+3.5
+
+Quality Comparison
+
+3.5.1
+
+Quality Criteria
+
+Given the set of metadata along with the mapped source text, an LLM may generate an MCQ that differs
+linguistically from the original MCQ while still satisfying the specified metadata requirements. Direct
+comparison based on surface-level textual similarity is therefore neither meaningful nor feasible for assessing
+alignment with these requirements.
+Our primary interest lies in whether the LLM-generated MCQs match the original human-vetted MCQs in
+overall quality, rather than in word-for-word similarity. Accordingly, we prompted an AI system to construct
+a comprehensive evaluation rubric for assessing MCQ quality across multiple dimensions. The resulting rubric
+consists of 24 criteria, each rated on a five-point Likert scale with detailed descriptors (see Appendix D).
+The 24 criteria were organized into six thematic categories: Accuracy & Grounding (4 criteria), Clarity &
+Presentation (4 criteria), Distractor & Answer Quality (4 criteria), Difficulty & Engagement (3 criteria),
+Domain & Skill Alignment (5 criteria), and Difficulty & Cognitive Calibration (4 criteria).
+3.5.2
+
+Two Independent LLM Judges
+
+At this stage, we obtained three sets of MCQs: (1) the baseline SAT MCQs, (2) MCQs generated by
+Gemini-2.5-Flash, and (3) MCQs generated by GPT-5-nano. To evaluate and compare their quality using the
+established rubric, we employed the same two representative LLMs as independent evaluators, with each LLM
+6
+
+Baseline SAT Math MCQs
+MCQ
+
+MCQ
+
+MCQ
+
+......
+
+MCQ
+
+Baseline MCQ Evaluations
+
+(1)
+Source Chunk
+
+Source Chunk
+
+MCQ
+Eval
+
+Source Chunk
+
+MCQ
+Eval
+
+MCQ
+Eval
+
+......
+
+MCQ
+Eval
+
+Gemini-Generated MCQ Evaluations
+......
+LLM
+
++
+Requirements
+Specs
+
++
+Requirements
+Specs
+
+(2)
+
++
+Requirements
+Specs
+
+MCQ
+
+MCQ
+
+MCQ
+
+......
+
+MCQ
+
+MCQ
+
+MCQ
+Eval
+
+Comparison
+
+MCQ
+Eval
+
+MCQ
+Eval
+
+......
+
+MCQ
+Eval
+(4)
+
+MCQ
+
+MCQ
+Eval
+
+MCQ
+Eval
+
+MCQ
+Eval
+
+......
+
+MCQ
+Eval
+
+Gemini-Generated MCQ Evaluations
+MCQ
+Eval
+
+GPT-Generated
+MCQ
+
+......
+
+Baseline MCQ Evaluations
+
+LLM
+
+LLM
+
+MCQ
+Eval
+
+GPT-Generated MCQ Evaluations
+MCQ
+Eval
+
+MCQ Generator 1
+
+......
+
+MCQ
+Eval
+
+(3)
+
+Gemini-Generated
+LLM
+
+Judge1
+
+MCQ
+Eval
+
+MCQ
+Eval
+
+MCQ
+Eval
+
+......
+
+MCQ
+Eval
+
+Comparison
+
+Judge2
+
+MCQ
+
+GPT-Generated MCQ Evaluations
+MCQ
+Eval
+
+MCQ Generator 2
+
+MCQ
+Eval
+
+MCQ
+Eval
+
+......
+
+MCQ
+Eval
+
+Figure 4: LLM-based MCQ generation, evaluation, and comparison
+
+scoring all three sets. This dual-judge design enables methodological triangulation, allowing us to examine
+potential judge-specific effects and to identify evaluation patterns that remain stable across independent
+model assessors. Figure 4 illustrates the MCQ generation and judging process.
+3.5.3
+
+Statistical Methods
+
+Because our central question concerns comparability, we adopt statistical methods suited for testing practical
+equivalence. Specifically, we employ the two one-sided tests (TOST) procedure, which evaluates whether
+observed differences fall within a pre-specified smallest effect size of interest (Schuirmann, 1987). Equivalence
+testing has been widely recommended as a complement to traditional null-hypothesis significance testing
+when the goal is to determine whether outcomes are “close enough” for practical purposes (Lakens et al.,
+2018; Lakens, 2017).
+We conducted two complementary analysis tracks: (i) a matched track, using paired comparisons on
+overlapping question_ids; and (ii) a whole-set track, without matching constraints.
+Equivalence outcomes are summarized as follows:
+• Strict similarity: 24/24 criteria equivalent.
+• Practical similarity: ≥19/24 criteria equivalent.
+
+4
+
+Results of MCQ Generation and Evaluation
+
+This section reports MCQ quality findings at three levels: (i) aggregated quality; (ii) criterion-level diagnostics;
+and (iii) inferential and equivalence results. In the next Section 5, we report work-practice findings.
+4.1
+
+Aggregated Quality
+
+Mean scores are high in all conditions (Table 1). Across judges and MCQ sets, average scores cluster near
+the top of the 1-5 scale, implying that most items are fluent and structurally well-formed. For example:
+• SAT baseline mean: 4.80 (Gemini judge) vs. 4.64 (OpenAI GPT judge).
+• Gemini-generated mean: 4.89 (Gemini judge) vs. 4.68 (OpenAI GPT judge).
+• GPT-generated mean: 4.82 (Gemini judge) vs. 4.66 (OpenAI GPT judge).
+Interpretation. The mean scores of the original SAT MCQs evaluated by both LLM judges are lower
+than the mean scores of the LLM-generated MCQs. At face value, these gaps suggest that LLM judges
+7
+
+Table 1: Overall quality summary (mean over 24 criteria).
+Set
+
+Judge
+
+#
+
+Mean±SD
+
+High-quality
+(=5)
+
+Needs review
+(∈[3, 4])
+
+Serious
+(∈[1, 2])
+
+SAT baseline
+Gemini-generated
+GPT-generated
+
+Gemini
+Gemini
+Gemini
+
+1013
+1065
+1071
+
+4.80 ± 0.27
+4.89 ± 0.15
+4.82 ± 0.19
+
+88%
+93.4%
+90%
+
+10%
+5.2%
+8%
+
+2%
+1.4%
+2%
+
+SAT baseline
+Gemini-generated
+GPT-generated
+
+OpenAI
+OpenAI
+OpenAI
+
+1016
+1057
+1058
+
+4.64 ± 0.49
+4.68 ± 0.43
+4.66 ± 0.45
+
+74.1%
+76%
+75.5%
+
+24.5%
+23%
+23%
+
+1.4%
+1%
+1.5%
+
+perceive LLM-generated MCQs as better calibrated to their internal criteria than human-vetted SAT MCQs.
+Because the origin of an MCQ was not disclosed during evaluation, the observed differences likely reflect
+stylistic or structural alignment effects rather than explicit bias based on source knowledge. In particular,
+LLM-generated MCQs may more closely match the formatting, phrasing conventions, or implicit preference
+structures embedded in the judging models.
+Averages can be misleading. They often mask extreme effects and hide rare but serious failures. Therefore,
+we examine criterion-level differences and conduct formal statistical equivalence tests.
+4.2
+
+Criterion-Level Diagnostics
+
+We conducted evaluation across all 24 criteria for each of the six judge–generator configurations. Table 2
+reports the mean score per criterion for each configuration.
+
+Accuracy
+
+factual_accuracy
+no_hallucinations
+correct_key_answer
+content_alignment
+
+4.98
+4.18
+4.98
+4.32
+
+4.98
+4.90
+4.94
+4.93
+
+4.94
+4.88
+4.94
+4.89
+
+4.98
+5.00
+4.95
+4.95
+
+4.98
+4.99
+4.94
+4.99
+
+4.98
+4.99
+4.95
+4.98
+
+Clarity
+
+clarity_question
+clarity_options
+grammar_fluency
+no_duplicates
+
+4.99
+5.00
+4.99
+5.00
+
+4.98
+4.98
+5.00
+4.98
+
+4.97
+4.98
+5.00
+4.98
+
+4.87
+4.96
+4.90
+5.00
+
+4.94
+4.94
+4.98
+4.98
+
+4.95
+4.95
+4.98
+4.98
+
+Distractor
+
+no_answer_hints
+plausible_distractors
+unambiguous_correctness
+recall_vs_guessing
+
+5.00
+4.38
+4.97
+4.99
+
+5.00
+4.60
+4.93
+4.98
+
+4.99
+4.49
+4.93
+4.98
+
+4.84
+3.97
+4.96
+4.51
+
+4.91
+4.16
+4.92
+4.57
+
+4.94
+4.22
+4.95
+4.55
+
+Skill Align. Diff.&Eng.
+
+difficulty_balance
+cognitive_engagement
+holistic_quality
+
+4.70
+4.73
+4.60
+
+4.89
+4.88
+4.89
+
+4.70
+4.78
+4.78
+
+3.97
+3.64
+4.51
+
+4.11
+3.78
+4.66
+
+4.01
+3.74
+4.64
+
+domain_alignment
+domain_appropriateness
+skill_alignment
+skill_depth
+skill_isolation
+
+4.89
+4.91
+4.83
+4.18
+4.93
+
+4.88
+4.90
+4.69
+4.37
+4.82
+
+4.82
+4.83
+4.57
+4.19
+4.77
+
+4.96
+4.93
+4.88
+3.22
+4.78
+
+4.97
+4.96
+4.79
+3.37
+4.71
+
+4.96
+4.95
+4.71
+3.32
+4.65
+
+Calibration
+
+Table 2: Mean evaluation score (1-5) per criterion across six judge-generator configurations. Criteria are grouped by
+thematic category. The three lowest-scoring criteria across all configurations are highlighted in bold. G = Gemini
+judge; O = OpenAI judge; SAT = original SAT items; Gem = Gemini-generated; OAI = OpenAI-generated.
+Category Criterion
+G×SAT G×Gem G×OAI
+O×SAT O×Gem O×OAI
+(n=1013) (n=1065) (n=1071) (n=1016) (n=1057) (n=1058)
+
+difficulty_alignment
+difficulty_consistency
+cog._level_alignment
+cog._level_approp.
+
+4.68
+4.96
+4.96
+4.97
+
+4.90
+4.97
+4.98
+4.99
+
+4.65
+4.95
+4.86
+4.90
+
+4.08
+4.81
+4.83
+4.82
+
+4.24
+4.84
+4.85
+4.87
+
+4.12
+4.81
+4.74
+4.79
+
+4.80
+
+4.89
+
+4.82
+
+4.64
+
+4.68
+
+4.66
+
+Grand mean (24 criteria)
+
+8
+
+Universally Strong Criteria. A cluster of criteria related to surface-level correctness and presentation achieved near-ceiling scores (> 4.9) across all six configurations: grammar_fluency (4.98-5.00),
+no_duplicates (4.97-5.00), factual_accuracy (4.94-4.98), and clarity_options (4.94-4.98). These criteria reflect the ability of both LLM generators (Gemini and GPT) to produce well-formed, grammatically
+correct items with non-overlapping answer choices and factually accurate content. The near-perfect performance on these surface criteria held regardless of judge identity, MCQ source (original SAT vs. generated), or
+generator model, suggesting that modern LLMs have effectively solved the surface aspects of MCQ authoring.
+Baseline Anomaly on Grounding Criteria. Two criteria deviate from this pattern in a noteworthy
+way: no_hallucinations and content_alignment scored substantially lower for the SAT baseline under
+the Gemini judge (4.18 and 4.32, respectively) than for either generated set (4.88-4.90 and 4.89-4.93), while
+the OpenAI judge assigned near-ceiling scores to the SAT baseline on both criteria (5.00 and 4.95). This
+asymmetry is best explained as an artifact of the PDF text extraction process. A subset of SAT items
+contain references to figures or tables (e.g., “according to the graph above”) that were not recoverable
+from plain-text extraction. When the Gemini judge evaluates such an item against a textbook chunk that
+contains no matching visual, it interprets the unresolved reference as an unsupported claim, triggering
+a no_hallucinations or content_alignment penalty. LLM-generated items, by contrast, were written
+entirely from text-based grounding context and therefore contain no such unresolvable references. The
+OpenAI judge, which appears less sensitive to this pattern, does not penalize the baseline accordingly. This
+extraction artifact inflates the apparent quality gap between the SAT baseline and generated sets on these two
+criteria under the Gemini judge; both criteria were classified as equivalent under the OpenAI judge (Table 4).
+At the category level, Accuracy & Grounding and Clarity & Presentation consistently ranked as the two
+strongest categories across all configurations, with category means of 4.48-4.98 and 4.91-4.99, respectively
+(Table 3). This indicates that the RAG-grounded generation pipeline reliably produces MCQs that are
+factually anchored to textbook content and clearly articulated.
+Table 3: Mean category scores across six judge-generator configurations. Categories are sorted by grand mean across
+all configurations. Scores below 4.5 are underlined.
+
+Category
+Accuracy & Grounding
+Clarity & Presentation
+Distractor & Answer Quality
+Diff. & Cognitive Calibr.
+Domain & Skill Alignment
+Difficulty & Engagement
+
+G×SAT
+
+G×Gem
+
+G×OAI
+
+O×SAT
+
+O×Gem
+
+O×OAI
+
+4.48
+4.95
+4.73
+4.78
+4.70
+4.52
+
+4.94
+4.99
+4.88
+4.96
+4.73
+4.89
+
+4.91
+4.98
+4.85
+4.84
+4.64
+4.75
+
+4.91
+4.91
+4.54
+4.60
+4.52
+4.00
+
+4.98
+4.96
+4.64
+4.70
+4.56
+4.18
+
+4.98
+4.96
+4.66
+4.62
+4.52
+4.13
+
+Universally Weak Criteria. In contrast, a different set of criteria consistently occupied the bottom
+ranks. The criterion skill_depth, which assesses whether a question probes the designated skill with
+sufficient rigor rather than superficially invoking it, was the single weakest criterion in all six configurations.
+The plausible_distractors criterion was another persistent weakness, with means ranging from 3.97 to
+4.60. cognitive_engagement (the degree to which an item elicits the level of cognitive processing) and
+difficulty_balance (appropriate calibration of difficulty) also consistently appeared among the bottom
+five criteria, with means of 3.64-4.88 and 3.97-4.89, respectively.
+At the category level, Domain & Skill Alignment (mean: 4.52-4.73) and Difficulty & Engagement (mean:
+4.00-4.89) consistently ranked as the two weakest categories. The Difficulty & Engagement category, comprising difficulty_balance, cognitive_engagement, and holistic_quality, showed the largest spread
+across configurations, indicating that this dimension is both the hardest to get right and the most sensitive
+to evaluator perspective.
+4.3
+
+Inferential and Equivalence Testing
+
+For the TOST comparability test, we set the equivalence bound at δ = 0.2 SD, corresponding to a small
+standardized effect (Cohen, 2013). This threshold was chosen because differences below 0.2 SD are conventionally regarded as trivially small. A more stringent bound (δ = 0.1) would require impractically large
+samples to detect equivalence, while a more lenient bound (δ = 0.3) would risk declaring items equivalent.
+A criterion is declared equivalent only when the entire 90% confidence interval for the mean difference lies
+9
+
+within [−δ, +δ]. A criterion was classified as equivalent across item sources when all three pairwise TOST
+comparisons (Gemini-generated vs. SAT, OpenAI-generated vs. SAT, Gemini-generated vs. OpenAI-generated)
+were individually significant at α = 0.05.
+Table 4 presents the per-criterion equivalence results. Eight criteria were equivalent under every condition
+(both judges, both tracks). These consistently equivalent criteria span the core dimensions of MCQ accuracy,
+clarity, answer quality, and domain appropriateness. Conversely, ten criteria were non-equivalent across
+all conditions. These criteria predominantly concern calibration against MCQ metadata targets, including
+difficulty level, cognitive demand, and fine-grained skill alignment, as well as distractor plausibility and
+overall engagement. The remaining six criteria showed mixed results that varied by judge or track, reflecting
+boundary cases where equivalence is sensitive to the evaluation perspective.
+
+Table 4: Per-criterion equivalence verdicts across judges and analysis tracks. A ✓ indicates that all three pairwise
+TOST comparisons fell within ±0.2 SD at α = 0.05; a × indicates at least one pair was not equivalent.
+Gemini Judge
+
+OpenAI Judge
+
+Matched
+
+Whole
+
+Matched
+
+Whole
+
+Category
+
+Criterion
+
+Accuracy &
+Grounding
+
+Factual accuracy
+No hallucinations
+Correct key answer
+Content alignment
+
+✓
+×
+✓
+×
+
+✓
+×
+✓
+×
+
+✓
+✓
+✓
+✓
+
+✓
+✓
+✓
+×
+
+Clarity &
+Presentation
+
+Stem clarity
+Option clarity
+Grammar & fluency
+No duplicate options
+
+✓
+✓
+✓
+✓
+
+✓
+✓
+✓
+✓
+
+×
+✓
+×
+✓
+
+×
+✓
+×
+✓
+
+Distractor &
+Answer Quality
+
+No answer hints
+Plausible distractors
+Unambiguous correctness
+Recall vs. guessing
+
+✓
+×
+✓
+✓
+
+✓
+×
+✓
+✓
+
+×
+×
+✓
+✓
+
+×
+×
+✓
+✓
+
+Difficulty &
+Engagement
+
+Difficulty balance
+Cognitive engagement
+Holistic quality
+
+×
+×
+×
+
+×
+×
+×
+
+×
+×
+×
+
+×
+×
+×
+
+Domain & Skill
+Alignment
+
+Domain alignment
+Domain appropriateness
+Skill alignment
+Skill depth
+Skill isolation
+
+✓
+✓
+×
+×
+×
+
+✓
+×
+×
+×
+×
+
+✓
+✓
+×
+×
+×
+
+✓
+×
+×
+×
+×
+
+Difficulty &
+Cognitive
+Calibration
+
+Difficulty alignment
+Difficulty consistency
+Cognitive-level alignment
+Cognitive-level approp.
+
+×
+✓
+×
+×
+
+×
+✓
+×
+×
+
+×
+✓
+×
+×
+
+×
+✓
+×
+×
+
+12
+
+11
+
+11
+
+9
+
+Total equivalent (/24)
+
+Tables 5 and 6 report category-level results. In the matched track (Table 5), the Gemini judge found
+Clarity & Presentation and Distractor & Answer Quality equivalent (all |dz | < 0.08 for the latter),
+while the OpenAI judge found Accuracy & Grounding, Clarity & Presentation, and Domain & Skill
+Alignment equivalent (all |dz | ≤ 0.14). Both judges agreed that Difficulty & Engagement and Difficulty
+& Cognitive Calibration were not equivalent. Whole-set results (Table 6) were largely concordant, with
+Hedges’ g values corroborating the matched-track pattern.
+Table 7 summarises the overall outcomes. Track agreement was high (95.8% for the Gemini judge, 91.7% for
+the OpenAI judge).
+
+Interpretation. Overall, the generated sets show partial comparability to baseline: a substantial subset of
+criteria meets equivalence, but strict all-criteria comparability is not supported in either evaluator or analysis
+track.
+10
+
+Table 5: Category-level equivalence results (matched track). Each category is the mean of within-criterion z-scores for
+its constituent criteria. Cohen’s dz is reported for each pairwise comparison; Equiv. indicates whether all three pairs
+pass TOST at δ = 0.2 SD, α = 0.05. Friedman’s χ2 is the omnibus statistic.
+Gemini Judge (n = 986)
+
+OpenAI Judge (n = 966)
+
+Category
+
+dz
+G-O
+
+dz
+G-S
+
+dz
+O-S
+
+Equiv.
+
+dz
+G-O
+
+dz
+G-S
+
+dz
+O-S
+
+Equiv.
+
+Accuracy & Grounding
+Clarity & Presentation
+Distractor & Answer Qual.
+Difficulty & Engagement
+Domain & Skill Alignment
+Difficulty & Cog. Calib.
+
+.057
+.036
+.080
+.242
+.170
+.209
+
+.342
+−.022
+.077
+.349
+−.017
+.134
+
+.240
+−.055
+−.012
+.097
+−.141
+−.106
+
+×
+✓
+✓
+×
+×
+×
+
+.016
+−.019
+−.060
+.090
+.101
+.182
+
+.044
+.111
+.157
+.271
+.044
+.103
+
+.024
+.136
+.228
+.178
+−.047
+−.074
+
+✓
+✓
+×
+×
+✓
+×
+
+Equiv. categories
+
+2/6
+
+3/6
+
+G = Gemini-generated, O = OpenAI-generated, S = SAT baseline.
+Table 6: Category-level equivalence results (whole-set track, independent samples). Hedges’ g is reported for each
+pairwise comparison. Welch’s ANOVA F provides the omnibus test.
+Gemini Judge
+Category
+
+g
+G-O
+
+g
+G-S
+
+g
+O-S
+
+Accuracy & Grounding
+Clarity & Presentation
+Distractor & Answer Qual.
+Difficulty & Engagement
+Domain & Skill Alignment
+Difficulty & Cog. Calib.
+
+.058
+.036
+.084
+.329
+.131
+.296
+
+.472
+−.031
+.087
+.497
+−.040
+.195
+
+.369
+−.071
+−.006
+.142
+−.179
+−.144
+
+Equiv. categories
+
+OpenAI Judge
+Equiv.
+
+g
+G-O
+
+g
+G-S
+
+g
+O-S
+
+Equiv.
+
+×
+✓
+✓
+×
+×
+×
+
+.012
+−.036
+−.080
+.118
+.117
+.217
+
+.052
+.137
+.209
+.349
+.055
+.142
+
+.036
+.182
+.306
+.232
+−.069
+−.072
+
+✓
+×
+×
+×
+✓
+×
+
+2/6
+
+2/6
+
+G = Gemini-generated (nGem ≈ 1,060), O = OpenAI-generated (nOAI ≈ 1,070), S = SAT baseline (nSAT ≈ 1,015).
+Table 7: Summary of equivalence testing outcomes across all conditions. Track agreement indicates the proportion of
+criteria whose equivalence verdict is the same under both analysis tracks for a given judge.
+
+Metric
+Equivalent criteria (/24)
+Equivalent categories (/6)
+Track agreement (criteria)
+
+4.4
+
+Gemini Judge
+
+OpenAI Judge
+
+Matched
+
+Matched
+
+Whole
+
+12
+11
+2
+2
+23/24 (95.8%)
+
+Whole
+
+11
+9
+3
+2
+22/24 (91.7%)
+
+Judge Effects
+
+Gemini-judged scores are consistently higher than OpenAI-judged scores by roughly 0.16–0.21 points in mean
+(Table 1), indicating a rater effect that can be comparable to condition effects. In measurement terms, the
+choice of evaluator changes the observed scale location and may alter which criteria appear problematic.
+This finding supports two operational recommendations. First, evaluations should be treated as a governed
+measurement process (with documentation, calibration checks, and sensitivity analyses), not as an invisible
+backend step. Second, conclusions about “quality” should be reported with evaluator provenance (which
+judge model, prompt, and scoring procedure), because these choices are part of the research instrument.
+
+5
+
+Work-Practice Findings
+
+The project was completed over 10 days, with approximately 80 hours and LLM costs $62. Appendix B lists
+the cost breakdown.
+11
+
+5.1
+
+Task Classification
+
+To characterize the labor shift concretely, we classified all research activities (Appendix F) during the 10-day
+project into five task categories, drawing on the routine/non-routine distinction of Autor et al. (2003).
+Table 8 maps each category to concrete task examples from the project and indicates whether the task is
+routine-cognitive (automatable by LLMs) or non-routine analytic (requiring human judgment).
+Table 8: Classification of research tasks in the AI-orchestrated workflow, mapped to the task framework of Autor et al.
+(2003).
+Task Category
+
+Concrete Examples
+
+Autor et al. Type
+
+Research Framing and
+Problem Definition
+
+Day 1: defining the core hypothesis and
+comparison design; deciding baseline
+and success condition
+
+Non-routine analytic
+
+Data Acquisition and
+Formatting
+
+Day 1-2: downloading SAT PDFs; extracting PDF content to JSON; extracting MCQs; manual source collection
+from OpenStax
+
+Mixed:
+non-routine:
+prompting AIs, manually
+download PDFs; routine:
+generating code for file
+conversion
+
+Pipeline Engineering
+and Operations
+
+Day 3-8: building/testing scripts for
+OCR batching, JSON merging, chunking, embedding, retrieval mapping, segmented generation runs
+
+Mixed: routine-heavy with
+non-routine troubleshooting
+
+Evaluation Design and
+Statistical Analysis
+
+Day 9-10: expanding criteria 15 →
+24; implementing multi-set evaluation
+pipeline; aggregation and formal comparability analysis
+
+Mixed: non-routine: analytics; routine: generate
+the analytic programs
+
+Human Quality Control and Interpretation
+
+Day 4-10: validating scripts/results,
+spot-checking
+outputs,
+agreeing/disagreeing with model ratings,
+interpreting final findings
+
+Non-routine:
+tion/judgment
+
+interac-
+
+The routine cognitive tasks, data extraction, item formatting, rubric-based scoring, and code generation,
+were delegated to LLM agents. The researcher’s residual work was entirely composed of tasks requiring
+judgment, design, and system-level reasoning. This pattern is consistent with Acemoglu and Restrepo (2019)’s
+observation that automation does not merely eliminate tasks but creates new ones: orchestration, verification,
+and governance are emergent task categories that did not exist in the traditional item-writing workflow.
+5.2
+
+Time Allocation
+
+Table 9 reports the approximate distribution of researcher time across the five task categories during the
+10-day project.
+Table 9: Approximate researcher time allocation across task categories (total ≈80 hours over 10 days).
+
+Task Category
+
+Hours
+
+%
+
+Research Framing and Problem Definition
+Data Acquisition and Formatting
+Pipeline Engineering and Operations
+Evaluation Design and Statistical Analysis
+Human Quality Control and Interpretation
+
+8
+10
+42
+12
+8
+
+10%
+12.5%
+52.5%
+15%
+10%
+
+Total
+
+80
+
+100%
+
+The largest share of researcher time (52.5%) went to Pipeline Engineering and Operations, rather than to
+content creation, which was fully delegated to LLM agents. Research framing, evaluation design, and human
+interpretation together accounted for another 35%, reinforcing the finding that the researcher’s role shifted
+from producing artifacts to defining and controlling the production process.
+12
+
+5.3
+
+Efficiency Comparison
+
+For a researcher who already possesses the required domain and tooling expertise, the AI-orchestrated workflow
+produced a striking compression of elapsed time. A project of this scope, encompassing data ingestion, source
+mapping, question synthesis, and evaluation framework design, would typically require approximately six
+months of full-time doctoral student effort. Table 10 presents this as an illustrative contrast.
+Table 10: Illustrative contrast of research resource requirements.
+
+Metric
+
+Traditional PhD Timeline
+
+AI-Orchestrated Workflow
+
+Estimated Duration
+Labor Intensity
+Variable API Cost
+
+∼6 Months
+Full-time
+—
+
+∼10 Days
+∼8 Hours/Day
+∼$62 (Mistral + OpenAI + Gemini)
+
+The six-month estimate reflects the typical pace of a doctoral researcher performing the constituent tasks
+manually with writing program code. The timeline is a retrospective estimate; it is not based on empirical
+measurement. The tasks and time are roughly estimated as: literature search and dataset identification (∼2
+weeks), PDF extraction and data cleaning (∼4 weeks), textbook corpus construction and alignment (∼4
+weeks), MCQ generation and review (∼8 weeks), evaluation framework design and scoring (∼4 weeks), and
+statistical analysis and write-up (∼4 weeks). These estimates are conservative and exclude the learning curve
+for domain expertise.
+In Table 10, the two conditions differ not only in duration but also in labor quality, in output quality
+assurance, and in the cost structure. Both conditions exclude researcher salary. The AI-Orchestrated column
+also excludes subscription services ($40/month for Claude Code and Codex) as fixed costs. The direct cost
+figure reflects variable API charges only and should not be interpreted as the total cost of the research.
+The appropriate interpretation is not that AI reduces research cost, but that it dramatically compresses
+elapsed time for a skilled practitioner who can translate research goals into reliable pipeline specifications.
+This time compression is itself consequential. It changes what is feasible within a grant cycle, a semester, or
+a conference deadline.
+5.4
+
+Deskilling or Reskilling
+
+A natural question is whether the shift from item authoring to orchestration represents a deskilling or
+reskilling of the researcher role. Our experience suggests the latter. Orchestration work requires a distinctive
+skill set that combines domain expertise, software engineering judgment, and evaluation literacy. These
+competencies are not typically part of doctoral training, suggesting that “AI research operations” may emerge
+as a recognized professional capability.
+This observation connects to the reskilling theme: as LLMs absorb content-generation tasks, researchers need
+training not in prompt engineering alone, but in specification design, failure-mode analysis, and evaluation
+governance, skills that are closer to systems engineering than to traditional item writing. This pattern is
+not without precedent. The emergence of bioinformatics in the 1990s created a hybrid role that combined
+biological domain knowledge with computational pipeline expertise, a skill set that did not exist as a recognized
+specialty before sequencing data made it necessary (Gauthier et al., 2019). Similarly, “data scientist” emerged
+as a recognized professional role as statistical analysis was embedded in scalable software pipelines, requiring
+researchers to master both domain interpretation and engineering infrastructure. “AI research operations”
+may follow the same trajectory.
+
+6
+
+Discussion
+
+This study suggests that the real gains from LLMs are not coming from “hands-free” automation, but from a
+reshaping of the work itself. In our workflow, the models took on much of the discovering resources, generating
+code, along with initial evaluation. But that did not eliminate human effort. We had to translate broad goals
+into precise specifications, define constraints, build checks for failure cases, and maintain clear boundaries.
+As generating content became easier, the harder problem became controlling the workflow. The work did not
+vanish; it shifted toward design, coordination, and quality control.
+13
+
+We also found that different LLM-based judges produced systematically different results. That means
+evaluation choices can shape conclusions in meaningful ways. Responsible adoption, therefore, requires
+explicit governance. It consists of documenting how items are evaluated, testing sensitivity to different
+judges, defining failure thresholds, and logging model and prompt versions. Using AI in research is less about
+replacing people and more about building systems that can reliably specify, monitor, and audit high-volume
+machine-generated work.
+
+7
+
+Limitations
+
+This study has several limitations that should be considered when interpreting the results.
+Single researcher in a single domain. The workflow was executed by a single researcher in a single
+domain (SAT Math). The observed labor shift and efficiency gains may not generalize to team-based research
+settings, where coordination overhead, knowledge distribution, and division of labor introduce additional
+complexity. Similarly, the MCQ generation and evaluation results are specific to mathematics; domains
+requiring visual reasoning, laboratory procedures, or open-ended responses may present different challenges
+for LLM-based pipelines.
+LLM-as-judge. A key concern is that LLMs are used to both generate and evaluate artifacts based on
+a set of criteria. Although our dual-judge design provides partial mitigation, both judges are LLMs and
+may share systematic blind spots. Stronger validation would include human expert raters and inter-rater
+reliability analysis. In the future, we will conduct human verification with the LLM-evaluation results and
+evaluate whether stronger LLM models produce more reliable justifications.
+Another possible extension would be to use an LLM to simulate a classroom of students answering MCQs.
+Such a simulation could generate empirical difficulty estimates (e.g., p-values and Rasch parameters) based
+on item response theory (IRT) modeling (Hambleton and Swaminathan, 2013). We reserve this direction for
+follow-up work.
+AI-generated rubric provenance. The 24-criterion evaluation rubric was itself developed with AI
+assistance, raising a provenance concern. The evaluation instrument may implicitly favor the kinds of quality
+dimensions that LLMs are good at detecting while underweighting dimensions that require human pedagogical
+expertise. Future iterations should involve domain experts in rubric design and validation.
+Generalizability. The efficiency comparison (Table 10) is based on a single project and should not be
+extrapolated to other research contexts without careful consideration of domain complexity, researcher
+expertise, and tooling maturity. The comparison also excludes the researcher’s own time cost, which would
+reduce the apparent efficiency advantage.
+
+8
+
+Conclusion
+
+This pilot provides empirical evidence that AI-orchestrated research workflows can scale end-to-end research
+operations while shifting human labor toward orchestration and verification. Using SAT Math MCQ generation
+and evaluation as a testbed, we showed that a single researcher coordinating multiple LLMs and agentic tools
+can produce and evaluate large volumes of artifacts under explicit constraints and with traceable provenance.
+At the workflow level, the study documents a qualitative labor shift consistent with future-of-work frameworks.
+As execution tasks become cheaper to automate, the scarce and consequential work moves to system-level
+control, including specifying constraints, orchestrating heterogeneous tools, verifying correctness and alignment,
+and maintaining auditable records. In this sense, the primary value of LLMs in scientific work is not simply
+faster writing or coding, but the enabling of new forms of high-throughput research.
+As a pilot study, this work establishes feasibility and identifies key patterns, but a full validation would require
+several additional steps: (i) independent human expert raters scoring a representative subset of items to
+anchor LLM judge outputs; (ii) administration of generated items to real students, with item-response-theory
+(IRT) analysis to estimate psychometric properties; (iii) multi-researcher replication to assess whether the
+observed labor shift and efficiency gains hold across different skill levels and working styles; and (iv) extension
+to other domains and item types beyond SAT Math MCQs. These directions would move the evidence base
+from proof-of-concept toward operational readiness.
+14
+
+References
+Daron Acemoglu and Pascual Restrepo. Automation and new tasks: How technology displaces and reinstates
+labor. Journal of economic perspectives, 33(2):3–30, 2019.
+Josh Achiam, Steven Adler, Sandhini Agarwal, Lama Ahmad, Ilge Akkaya, Florencia Leoni Aleman, Diogo
+Almeida, Janko Altenschmidt, Sam Altman, Shyamal Anadkat, et al. Gpt-4 technical report. arXiv preprint
+arXiv:2303.08774, 2023.
+Christabel Acquaye, Yi Ting Huang, Marine Carpuat, and Rachel Rudinger. Take Out Your Calculators:
+Estimating the Real Difficulty of Question Items with LLM Student Simulations. arXiv e-prints, art.
+arXiv:2601.09953, January 2026. doi: 10.48550/arXiv.2601.09953.
+Lorin W. Anderson and David R. Krathwohl, editors. A Taxonomy for Learning, Teaching, and Assessing: A
+Revision of Bloom’s Taxonomy of Educational Objectives. Longman, New York, 2001. ISBN 978-0-80131903-7.
+David H. Autor, Frank Levy, and Richard J. Murnane. The skill content of recent technological change: An
+empirical exploration. The Quarterly Journal of Economics, 118(4):1279–1333, 2003.
+Emily M Bender, Timnit Gebru, Angelina McMillan-Major, and Shmargaret Shmitchell. On the dangers
+of stochastic parrots: Can language models be too big? In Proceedings of the 2021 ACM conference on
+fairness, accountability, and transparency, pages 610–623, 2021.
+Luca Benedetto, Giovanni Aradelli, Antonia Donvito, Alberto Lucchetti, Andrea Cappelli, and Paula Buttery.
+Using LLMs to simulate students’ responses to exam questions. In Yaser Al-Onaizan, Mohit Bansal,
+and Yun-Nung Chen, editors, Findings of the Association for Computational Linguistics: EMNLP 2024,
+pages 11351–11368, Miami, Florida, USA, November 2024. Association for Computational Linguistics. doi:
+10.18653/v1/2024.findings-emnlp.663. URL https://aclanthology.org/2024.findings-emnlp.663/.
+Giorgio Biancini, Alessio Ferrato, and Carla Limongelli. Multiple-Choice Question Generation Using Large
+Language Models: Methodology and Educator Insights. arXiv e-prints, art. arXiv:2506.04851, June 2025.
+doi: 10.48550/arXiv.2506.04851.
+Rishi Bommasani, Drew A. Hudson, et al. On the Opportunities and Risks of Foundation Models. arXiv
+e-prints, art. arXiv:2108.07258, August 2021. doi: 10.48550/arXiv.2108.07258.
+Tom Brown, Benjamin Mann, Nick Ryder, Melanie Subbiah, Jared D Kaplan, Prafulla Dhariwal, Arvind
+Neelakantan, Pranav Shyam, Girish Sastry, Amanda Askell, et al. Language models are few-shot learners.
+Advances in neural information processing systems, 33:1877–1901, 2020.
+Erik Brynjolfsson, Danielle Li, and Lindsey Raymond. Generative ai at work. The Quarterly Journal of
+Economics, 140(2):889–942, 2025.
+Dhawaleswar Rao Ch and Sujan Kumar Saha. Automatic multiple choice question generation from text: A
+survey. IEEE Transactions on Learning Technologies, 13(1):14–25, 2018.
+Jacob Cohen. Statistical power analysis for the behavioral sciences. routledge, 2013.
+College Board. Sat suite educator question bank, 2026. URL https://satsuiteeducatorquestionbank.
+collegeboard.org/. Accessed: 2026-02-13.
+Ewa Deelman, Karan Vahi, Gideon Juve, Mats Rynge, Scott Callaghan, Philip J Maechling, Rajiv Mayani,
+Weiwei Chen, Rafael Ferreira Da Silva, Miron Livny, et al. Pegasus, a workflow management system for
+science automation. Future Generation Computer Systems, 46:17–35, 2015.
+Fabrizio Dell’Acqua, Edward McFowland III, Ethan R. Mollick, Hila Lifshitz-Assaf, Katherine Kellogg, Saran
+Rajendran, Lisa Krayer, François Candelon, and Karim R. Lakhani. Navigating the jagged technological
+frontier: Field experimental evidence of the effects of AI on knowledge worker productivity and quality.
+Harvard Business School Technology & Operations Mgt. Unit Working Paper, (24-013), 2023.
+Tyna Eloundou, Sam Manning, Pamela Mishkin, and Daniel Rock. Gpts are gpts: Labor market impact
+potential of llms. Science, 384(6702):1306–1308, 2024.
+Jeff Gauthier, Antony T Vincent, Steve J Charette, and Nicolas Derome. A brief history of bioinformatics.
+Briefings in bioinformatics, 20(6):1981–1996, 2019.
+Yolanda Gil, Ewa Deelman, Mark Ellisman, Thomas Fahringer, Geoffrey Fox, Dennis Gannon, Carole Goble,
+Miron Livny, Luc Moreau, and Jim Myers. Examining the challenges of scientific workflows. Computer, 40
+(12):24–32, 2007.
+15
+
+Thomas M Haladyna, Steven M Downing, and Michael C Rodriguez. A review of multiple-choice item-writing
+guidelines for classroom assessment. Applied measurement in education, 15(3):309–333, 2002.
+Ronald K. Hambleton and Hariharan Swaminathan. Item response theory: Principles and applications.
+Springer Science & Business Media, 2013. ISBN 94-017-1988-8.
+Carlos E. Jimenez, John Yang, Alexander Wettig, Shunyu Yao, Kexin Pei, Ofir Press, and Karthik
+Narasimhan. SWE-bench: Can Language Models Resolve Real-World GitHub Issues? arXiv e-prints, art.
+arXiv:2310.06770, October 2023. doi: 10.48550/arXiv.2310.06770.
+Marcus Kaiser, Nina Rismal, Peadar Coyle, and Thomas Wiecki. Llms reproduce human purchase intent via
+semantic similarity elicitation of likert ratings, 2025. URL https://arxiv.org/abs/2510.08338.
+Daniel Martin Katz, Michael James Bommarito, Shang Gao, and Pablo Arredondo. Gpt-4 passes the bar
+exam. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences,
+382(2270), 2024.
+Takeshi Kojima, Shixiang Shane Gu, Machel Reid, Yutaka Matsuo, and Yusuke Iwasawa. Large language
+models are zero-shot reasoners. Advances in neural information processing systems, 35:22199–22213, 2022.
+Tiffany H Kung, Morgan Cheatham, Arielle Medenilla, Czarina Sillos, Lorie De Leon, Camille Elepaño, Maria
+Madriaga, Rimel Aggabao, Giezel Diaz-Candido, James Maningo, et al. Performance of chatgpt on usmle:
+potential for ai-assisted medical education using large language models. PLoS digital health, 2(2):e0000198,
+2023.
+Daniël Lakens. Equivalence tests: A practical primer for t tests, correlations, and meta-analyses. Social
+psychological and personality science, 8(4):355–362, 2017.
+Daniël Lakens, Anne M Scheel, and Peder M Isager. Equivalence testing for psychological research: A tutorial.
+Advances in methods and practices in psychological science, 1(2):259–269, 2018.
+Ang Li, Haozhe Chen, Hongseok Namkoong, and Tianyi Peng. Llm generated persona is a promise with a
+catch. arXiv preprint arXiv:2503.16527, 2025.
+Yang Liu, Dan Iter, Yichong Xu, Shuohang Wang, Ruochen Xu, and Chenguang Zhu. G-eval: NLG evaluation
+using gpt-4 with better human alignment. In Houda Bouamor, Juan Pino, and Kalika Bali, editors,
+Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing, pages 2511–2522,
+Singapore, December 2023. Association for Computational Linguistics. doi: 10.18653/v1/2023.emnlp-main.
+153. URL https://aclanthology.org/2023.emnlp-main.153/.
+Xinyi Lu and Xu Wang. Generative students: Using llm-simulated student profiles to support question
+item evaluation. Proceedings of the Eleventh ACM Conference on Learning @ Scale, 2024. URL https:
+//api.semanticscholar.org/CorpusID:269922100.
+Daria Martynova, Jakub Macina, Nico Daheim, Nilay Yalcin, Xiaoyu Zhang, and Mrinmaya Sachan. Can
+LLMs effectively simulate human learners? teachers’ insights from tutoring LLM students. In Ekaterina
+Kochmar, Bashar Alhafni, Marie Bexte, Jill Burstein, Andrea Horbach, Ronja Laarmann-Quante, Anaïs
+Tack, Victoria Yaneva, and Zheng Yuan, editors, Proceedings of the 20th Workshop on Innovative Use
+of NLP for Building Educational Applications (BEA 2025), pages 100–117, Vienna, Austria, July 2025.
+Association for Computational Linguistics. ISBN 979-8-89176-270-1. doi: 10.18653/v1/2025.bea-1.8. URL
+https://aclanthology.org/2025.bea-1.8/.
+Shakked Noy and Whitney Zhang. Experimental evidence on the productivity effects of generative artificial
+intelligence. Science, 381(6654):187–192, 2023.
+OpenStax, Rice University. Openstax | free digital textbooks and teaching tools, 2026. URL https:
+//openstax.org/. Accessed: 2026-02-14.
+Timo Schick, Jane Dwivedi-Yu, Roberto Dessì, Roberta Raileanu, Maria Lomeli, Eric Hambro, Luke
+Zettlemoyer, Nicola Cancedda, and Thomas Scialom. Toolformer: Language models can teach themselves
+to use tools. Advances in Neural Information Processing Systems, 36:68539–68551, 2023.
+Donald J Schuirmann. A comparison of the two one-sided tests procedure and the power approach for
+assessing the equivalence of average bioavailability. Journal of pharmacokinetics and biopharmaceutics, 15
+(6):657–680, 1987.
+Technavio.
+Test preparation market in us growth analysis - size and forecast 2025-2029.
+Technical report, Infiniti Research Limited, 2026.
+URL https://www.technavio.com/report/
+test-preparation-market-industry-in-the-us-analysis. Accessed: February 13, 2026.
+16
+
+Yu Tian, Linh Huynh, Katerina Christhilf, Shubham Chakraborty, Micah Watanabe, Tracy Arner, and
+Danielle McNamara. Cognitively Diverse Multiple-Choice Question Generation: A Hybrid Multi-Agent
+Framework with Large Language Models. arXiv e-prints, art. arXiv:2602.03704, February 2026. doi:
+10.48550/arXiv.2602.03704.
+Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Fei Xia, Ed Chi, Quoc V Le, Denny Zhou, et al.
+Chain-of-thought prompting elicits reasoning in large language models. Advances in neural information
+processing systems, 35:24824–24837, 2022.
+Shunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak Shafran, Karthik R Narasimhan, and Yuan Cao. React:
+Synergizing reasoning and acting in language models. In The eleventh international conference on learning
+representations, 2022.
+Yu Zhang, Xiusi Chen, Bowen Jin, Sheng Wang, Shuiwang Ji, Wei Wang, and Jiawei Han. A comprehensive
+survey of scientific large language models and their applications in scientific discovery. In Yaser Al-Onaizan,
+Mohit Bansal, and Yun-Nung Chen, editors, Proceedings of the 2024 Conference on Empirical Methods
+in Natural Language Processing, pages 8783–8817, Miami, Florida, USA, November 2024. Association for
+Computational Linguistics. doi: 10.18653/v1/2024.emnlp-main.498. URL https://aclanthology.org/
+2024.emnlp-main.498/.
+Lianmin Zheng, Wei-Lin Chiang, Ying Sheng, Siyuan Zhuang, Zhanghao Wu, Yonghao Zhuang, Zi Lin,
+Zhuohan Li, Dacheng Li, Eric Xing, et al. Judging llm-as-a-judge with mt-bench and chatbot arena.
+Advances in neural information processing systems, 36:46595–46623, 2023.
+Tianshi Zheng, Zheye Deng, Hong Ting Tsang, Weiqi Wang, Jiaxin Bai, Zihao Wang, and Yangqiu Song.
+From automation to autonomy: A survey on large language models in scientific discovery. arXiv preprint
+arXiv:2505.13259, 2025.
+
+Appendix A: AI Tools
+This study was conducted using a coordinated multi-agent workflow that integrated Claude Code1 (Anthropic),
+Codex2 (OpenAI), Gemini CLI3 (Google), and Ampcode4 (Amp) as development and research assistants.
+The underlying model and tooling stack included:
+1. Google AI Studio Gemini 3 Pro Preview, used for SAT question extraction from PDF source
+files.
+2. OpenAI GPT-5-nano and Google Gemini 2.5 Flash, used for MCQ generation and LLM-based
+evaluation.
+3. Mistral OCR 3, used to convert textbook PDFs into Markdown for downstream processing.
+
+Appendix B: Time and Cost
+The project was completed over 10 days, from February 2, 2026 to February 12, 2026, by a single researcher
+who orchestrated agents and managed all LLM interactions. On each day (including weekends), the researcher
+spent approximately 8 hours on project activities.
+The tooling and billing setup was as follows:
+• Anthropic Claude Code subscription: $20/month
+• OpenAI Codex subscription: $20/month
+• Google Gemini API: pay-as-you-go
+• OpenAI API: pay-as-you-go
+• Mistral API: pay-as-you-go
+• Ampcode: $10 daily free with ads
+Direct usage costs incurred during this project were:
+1
+
+https://claude.ai/code
+https://openai.com/codex
+3
+https://github.com/google-gemini/gemini-cli
+4
+https://ampcode.com/
+2
+
+17
+
+1. $0 for extracting SAT Math questions from PDFs downloaded from https://satsuitequestionbank.
+collegeboard.org/.
+2. $11 for converting four textbook PDFs to Markdown via Mistral OCR.
+3. $9 for OpenAI API usage.
+4. $42 for Gemini API usage.
+
+Appendix C: Datasets
+Table 11 describes the three sets of data in the study.
+Table 11: Datasets
+Artifact
+
+Description
+
+Source
+
+SAT baseline
+
+Expert-vetted SAT Math MCQs (text extracted from PDFs; incomplete items filtered)
+MCQs generated from open textbook
+chunks under domain, skill, difficulty, and
+cognitive-level constraints
+MCQs generated from open textbook
+chunks under the same constraints
+
+College Board SAT Suite Question Bank
+PDFs
+
+∼1,017
+
+LLM-based generator (Gemini)
+
+∼1,065
+
+LLM-based generator (GPT)
+
+∼1,071
+
+Gemini-generated
+GPT-generated
+
+N
+
+Appendix D: Evaluation rubric (24 criteria)
+Table 12 lists the evaluation criteria. Each criterion is scored on a 1–5 scale by an LLM judge.
+• 5 = Excellent / no issues
+• 4 = Minor issues, still strong
+• 3 = Noticeable issues that could affect learning/validity
+• 2 = Serious issues; should be revised
+• 1 = Fundamentally broken / invalid
+Definitions below are paraphrased for readability.
+Criterion
+
+Group
+
+Short definition (paraphrased)
+
+factual_accuracy
+
+Accuracy & Grounding
+
+no_hallucinations
+
+Accuracy & Grounding
+
+correct_key_answer
+content_alignment
+
+Accuracy & Grounding
+Accuracy & Grounding
+
+Stem/options/key are mathematically correct as
+written.
+Does not invent missing context; no unsupported
+claims.
+The labeled correct option is truly correct.
+Item targets the intended concept from the
+mapped chunk.
+
+clarity_question
+clarity_options
+
+Clarity & Presentation
+Clarity & Presentation
+
+grammar_fluency
+no_duplicates
+
+Clarity & Presentation
+Clarity & Presentation
+
+no_answer_hints
+
+Distractor
+Quality
+Distractor
+Quality
+Distractor
+Quality
+Distractor
+Quality
+
+plausible_distractors
+unambiguous_correctness
+recall_vs_guessing
+
+Stem is complete, readable, and unambiguous.
+Options are parallel, readable, and distinguishable.
+Language and notation are fluent and consistent.
+No duplicate or near-duplicate options.
+
+& Answer
+
+No inadvertent clues revealing the answer.
+
+& Answer
+
+Wrong options are plausible and misconceptionbased.
+Exactly one defensible correct answer.
+
+& Answer
+& Answer
+
+18
+
+Requires reasoning/knowledge, not superficial
+guessing.
+
+Criterion
+
+Group
+
+difficulty_balance
+
+Difficulty
+ment
+Difficulty
+ment
+Difficulty
+ment
+
+cognitive_engagement
+holistic_quality
+domain_alignment
+domain_appropriateness
+skill_alignment
+skill_depth
+skill_isolation
+difficulty_alignment
+difficulty_consistency
+cognitive_level_alignment
+cognitive_level_
+appropriateness
+
+Short definition (paraphrased)
+& Engage& Engage& Engage-
+
+Domain & Skill Alignment
+Domain & Skill Alignment
+Domain & Skill Alignment
+Domain & Skill Alignment
+Domain & Skill Alignment
+Difficulty & Cognitive
+Calibration
+Difficulty & Cognitive
+Calibration
+Difficulty & Cognitive
+Calibration
+Difficulty & Cognitive
+Calibration
+
+Difficulty is appropriate and not trickinflated/deflated.
+Requires meaningful cognitive work beyond
+recognition.
+Overall quality combining correctness, clarity,
+and pedagogy.
+Declared SAT domain matches actual content.
+Domain label is reasonable for the problem.
+Declared skill matches what is tested.
+Measures depth (conceptual understanding, not
+pattern match).
+Primarily tests the declared skill without confounds.
+Matches the declared difficulty label.
+No hidden leaps; consistent difficulty across
+stem/options.
+Bloom level label matches the item’s demand.
+Bloom level is appropriate for SAT context and
+intent.
+
+Table 12: Evaluation Criteria
+
+Appendix E: Statistical analysis
+E.1
+
+Two comparison tracks
+1. Matched track (paired): Compare only shared question_ids across sets.
+2. Whole-set track (unpaired): Compare all available MCQs per set.
+
+E.2
+
+Primary inferential tests (summary)
+• Matched: Friedman omnibus; Wilcoxon signed-rank pairwise (Holm correction); paired effect size
+(dz ); paired TOST equivalence.
+• Whole-set: Welch ANOVA (or Kruskal–Wallis fallback); Welch pairwise (Holm correction); Hedges g;
+independent-sample TOST equivalence.
+
+E.3
+
+Similarity decision rules
+• Strict similarity: 24/24 criteria equivalent.
+• Practical similarity: ≥19/24 criteria equivalent.
+
+Appendix F: Research Activity Logs
+A coarse-grained log file documenting the daily research activities is publicly available in the project repository
+at: https://github.com/anyuanay/context_aware_sat_math_mcqs/blob/main/docs/plans/Research_
+Activity_Log.md.
+19
+
+Appendix G: Reproducibility
+To support full reproducibility, all project artifacts, including prompts, datasets, and analysis code, are
+publicly available at: https://github.com/anyuanay/context_aware_sat_math_mcqs.
+
+20
+
+

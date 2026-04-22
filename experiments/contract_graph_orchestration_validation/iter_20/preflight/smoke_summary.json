@@ -1,0 +1,7 @@
+{
+  "status": "completed",
+  "commands": [
+    "experiments/.venv/bin/python experiments/run_experiments.py --stage smoke"
+  ],
+  "generated_at": "2026-04-22T09:29:10.211522+00:00"
+}

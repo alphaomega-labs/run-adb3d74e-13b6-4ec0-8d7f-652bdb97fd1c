@@ -1,0 +1,92 @@
+{
+  "figures": [
+    "paper/figures/iter_20/fig_hm_th_01_unsafe_commit.pdf",
+    "paper/figures/iter_20/fig_hm_th_02_recovery_bounds.pdf",
+    "paper/figures/iter_20/fig_hm_th_03_far_frr_frontier.pdf"
+  ],
+  "tables": [
+    "paper/tables/iter_20/tab_hm_th_01_assumption_matrix.tex",
+    "paper/tables/iter_20/tab_hm_th_02_regret_summary.tex",
+    "paper/tables/iter_20/tab_hm_th_03_attack_coverage.tex",
+    "paper/tables/iter_20/tab_theorem_audit_summary.tex"
+  ],
+  "datasets": [
+    "experiments/contract_graph_orchestration_validation/iter_20/data/full_hm_th_01.jsonl",
+    "experiments/contract_graph_orchestration_validation/iter_20/data/full_hm_th_02.jsonl",
+    "experiments/contract_graph_orchestration_validation/iter_20/data/full_hm_th_03.jsonl",
+    "experiments/contract_graph_orchestration_validation/iter_20/data/smoke_hm_th_01.jsonl",
+    "experiments/contract_graph_orchestration_validation/iter_20/data/smoke_hm_th_02.jsonl",
+    "experiments/contract_graph_orchestration_validation/iter_20/data/smoke_hm_th_03.jsonl",
+    "paper/data/iter_20/full_hm_th_01_metrics.csv",
+    "paper/data/iter_20/full_hm_th_02_metrics.csv",
+    "paper/data/iter_20/full_hm_th_03_metrics.csv"
+  ],
+  "sympy_report": {
+    "path": "experiments/contract_graph_orchestration_validation/iter_20/theorem_audit/sympy_theorem_audit.json",
+    "check_ids": [
+      "SC-01",
+      "SC-02",
+      "SC-03",
+      "SC-04",
+      "SC-05",
+      "SC-06",
+      "SC-07",
+      "SC-08",
+      "SC-09"
+    ],
+    "status": "completed"
+  },
+  "claim_support_status": {
+    "HM-TH-01": {
+      "support_status": "supported",
+      "why": "A2_on with semantic+typed validator achieved zero unsafe commits, while schema-only/A2_off regimes generated deterministic unsafe commits.",
+      "appendix_artifact": "paper/appendix/APP-A1-counterexample-bundle.tex"
+    },
+    "HM-TH-02": {
+      "support_status": "mixed",
+      "why": "Bounded regimes satisfy non-oscillation criteria, but stress regimes (unbounded branching or delta<=eta) produce oscillation by construction.",
+      "appendix_artifact": "paper/appendix/APP-A2-recovery-boundary-audit.tex"
+    },
+    "HM-TH-03": {
+      "support_status": "mixed",
+      "why": "Composite guards reduce FAR on covered attacks, but uncovered classes remain a scoped failure boundary.",
+      "appendix_artifact": "paper/appendix/APP-A3-adversarial-audit-bundle.tex"
+    }
+  },
+  "confirmatory_analysis_outcomes": [
+    {
+      "claim_id": "HM-TH-01",
+      "analysis": "Strictness sensitivity and A2 toggle ablation",
+      "outcome": "strengthened",
+      "details": "semantic+typed with A2_on maintained unsafe_commit_rate=0.0; weakened modes had unsafe_commit_rate>= 1.000."
+    },
+    {
+      "claim_id": "HM-TH-02",
+      "analysis": "Boundary stress with delta<=eta and unbounded branching",
+      "outcome": "weakened",
+      "details": "bounded regimes had oscillation_rate=0.000, but violated regimes rose to oscillation_rate=1.000, delimiting theorem scope."
+    },
+    {
+      "claim_id": "HM-TH-03",
+      "analysis": "Covered-vs-uncovered attack-family split with threshold sweep",
+      "outcome": "mixed",
+      "details": "covered FAR improved from 0.1816 (trust-only) to 0.0616 (composite), while uncovered FAR remained 0.1916 under composite guard."
+    }
+  ],
+  "negative_results": [
+    "HM-TH-02: Unbounded branching and delta<=eta regimes produced oscillation, violating non-oscillation assumptions outside theorem conditions.",
+    "HM-TH-03: Uncovered attack class remains high-FAR even with composite guards; theorem is conditional on declared attack coverage.",
+    "HM-TH-03: Forced mutation breaks hash-link integrity by design, marking the explicit falsification boundary for T4."
+  ],
+  "figure_captions": {
+    "paper/figures/iter_20/fig_hm_th_01_unsafe_commit.pdf": "Single-panel bar chart of unsafe commit rates across validator modes and assumption toggles. X-axis: validator mode; Y-axis: unsafe commit proportion. Error bars show SD across seeds. Key takeaway: semantic+typed mode with A2_on remains at 0 while schema-only and A2_off degrade safety.",
+    "paper/figures/iter_20/fig_hm_th_02_recovery_bounds.pdf": "Two-panel recovery diagnostics: left panel oscillation rate vs delta; right panel bound ratio vs delta. Both panels include baseline and B_max encodings with SD error bars. Interpretation: bounded policies show near-zero oscillation for delta>eta, while unbounded branching violates bounds.",
+    "paper/figures/iter_20/fig_hm_th_03_far_frr_frontier.pdf": "Two-panel FAR/FRR frontier across guard composition and attack coverage classes. X-axis is trust threshold; Y-axes are FAR and FRR respectively, with SD bars over seeds. Composite guards reduce FAR on covered classes while uncovered classes remain an explicit boundary case."
+  },
+  "provenance": {
+    "quarks_substrate": "resources/codebases/quarks-e2c886f43f88",
+    "dataset_resolution_log_path": "experiments/contract_graph_orchestration_validation/iter_20/dataset_resolution_log.json",
+    "full_summary_path": "experiments/contract_graph_orchestration_validation/iter_20/results/full_summary.json",
+    "smoke_summary_path": "experiments/contract_graph_orchestration_validation/iter_20/preflight/smoke_summary.json"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "SC-01": {
+    "status": "pass",
+    "expression": "True"
+  },
+  "SC-02": {
+    "status": "pass",
+    "expression": "True"
+  },
+  "SC-03": {
+    "status": "pass",
+    "expression": "Constructed CE1 witness under A2_off"
+  },
+  "SC-04": {
+    "status": "pass",
+    "expression": "ceiling(v0/delta) - v0/delta"
+  },
+  "SC-05": {
+    "status": "pass",
+    "expression": "L = ceiling(V0/delta) well-defined for delta>0"
+  },
+  "SC-06": {
+    "status": "pass",
+    "expression": "Regret decomposition J2(Pi)-J2(Pi_rb) computed"
+  },
+  "SC-07": {
+    "status": "pass",
+    "expression": "p_a >= p_ab"
+  },
+  "SC-08": {
+    "status": "pass",
+    "expression": "Eq(hash_t, H(hash_prev, rec))"
+  },
+  "SC-09": {
+    "status": "pass",
+    "expression": "Uncovered class boundary marks conditional theorem scope"
+  }
+}

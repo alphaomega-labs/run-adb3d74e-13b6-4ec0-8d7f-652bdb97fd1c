@@ -1,0 +1,1 @@
+{"claim_id": "HM-TH-03", "finding": "Uncovered attack classes remain outside strict contraction guarantee scope.", "far_mean": 0.1516, "hash_integrity_mean": 0.3333333333333333, "action": "Keep theorem conditional on covered classes and append-only integrity assumptions."}

@@ -1,0 +1,166 @@
+{
+  "figures": [
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/figures/iter_1/fig_hm_th_01_unsafe_commit.pdf",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/figures/iter_1/fig_hm_th_02_recovery_bounds.pdf",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/figures/iter_1/fig_hm_th_03_far_frr_frontier.pdf"
+  ],
+  "tables": [
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/tables/iter_1/tab_hm_th_01_assumption_matrix.tex",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/tables/iter_1/tab_hm_th_02_regret_summary.tex",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/tables/iter_1/tab_hm_th_03_attack_coverage.tex",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/tables/iter_1/tab_theorem_audit_summary.tex"
+  ],
+  "datasets": [
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/experiments/contract_graph_orchestration_validation/iter_1/data/full_hm_th_01.jsonl",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/experiments/contract_graph_orchestration_validation/iter_1/data/full_hm_th_02.jsonl",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/experiments/contract_graph_orchestration_validation/iter_1/data/full_hm_th_03.jsonl",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/experiments/contract_graph_orchestration_validation/iter_1/data/smoke_hm_th_01.jsonl",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/experiments/contract_graph_orchestration_validation/iter_1/data/smoke_hm_th_02.jsonl",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/experiments/contract_graph_orchestration_validation/iter_1/data/smoke_hm_th_03.jsonl",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/data/iter_1/full_hm_th_01_metrics.csv",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/data/iter_1/full_hm_th_02_metrics.csv",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/data/iter_1/full_hm_th_03_metrics.csv"
+  ],
+  "sympy_report": {
+    "path": "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/experiments/contract_graph_orchestration_validation/iter_1/theorem_audit/sympy_theorem_audit.json",
+    "check_ids": [
+      "HM-TH-01",
+      "HM-TH-02",
+      "HM-TH-03",
+      "formal_context"
+    ],
+    "status": "completed"
+  },
+  "claim_status_map": {
+    "HM-TH-01": {
+      "theorem_regime_status": "supported",
+      "aggregate_status": "mixed",
+      "status_note": "Theorem regime uses semantic_and_typed + A2_on; aggregate includes stress baselines and weakened assumptions."
+    },
+    "HM-TH-02": {
+      "theorem_regime_status": "supported",
+      "aggregate_status": "mixed",
+      "status_note": "Theorem regime requires bounded branching and delta>eta; aggregate includes boundary-stress regimes."
+    },
+    "HM-TH-03": {
+      "theorem_regime_status": "supported",
+      "aggregate_status": "mixed",
+      "status_note": "FAR contraction is supported for covered classes; uncovered classes remain explicit boundary cases."
+    }
+  },
+  "claim_support_status": {
+    "HM-TH-01": {
+      "support_status": "mixed",
+      "theorem_regime_status": "supported",
+      "why": "Semantic+typed with A2_on remains safe; stress regimes intentionally expose counterexamples.",
+      "appendix_artifact": "paper/appendix/APP-A1-counterexample-bundle.tex"
+    },
+    "HM-TH-02": {
+      "support_status": "mixed",
+      "theorem_regime_status": "supported",
+      "why": "Non-oscillation holds in bounded regime and fails outside stated assumptions.",
+      "appendix_artifact": "paper/appendix/APP-A2-recovery-boundary-audit.tex"
+    },
+    "HM-TH-03": {
+      "support_status": "mixed",
+      "theorem_regime_status": "supported",
+      "why": "Composite guards improve covered FAR; uncovered classes and mutations bound the theorem scope.",
+      "appendix_artifact": "paper/appendix/APP-A3-adversarial-audit-bundle.tex"
+    }
+  },
+  "claim_evidence_links": [
+    {
+      "claim_id": "HM-TH-01",
+      "claim_text": "Committed-prefix soundness under A1-A4.",
+      "support_status": "mixed",
+      "evidence_refs": [
+        "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/figures/iter_1/fig_hm_th_01_unsafe_commit.pdf",
+        "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/tables/iter_1/tab_hm_th_01_assumption_matrix.tex",
+        "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/tables/iter_1/tab_theorem_audit_summary.tex",
+        "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/experiments/contract_graph_orchestration_validation/iter_1/theorem_audit/sympy_theorem_audit.json"
+      ],
+      "metric_alignment": {
+        "metric": "unsafe_commit_rate",
+        "theorem_regime_mean": 0.0,
+        "aggregate_mean": 0.9166666666666666
+      },
+      "caveats": [
+        "Aggregate status is mixed because stress baselines and A2_off runs are intentionally included."
+      ]
+    },
+    {
+      "claim_id": "HM-TH-02",
+      "claim_text": "Bounded recovery and non-oscillation under B1-B4.",
+      "support_status": "mixed",
+      "evidence_refs": [
+        "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/figures/iter_1/fig_hm_th_02_recovery_bounds.pdf",
+        "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/tables/iter_1/tab_hm_th_02_regret_summary.tex",
+        "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/tables/iter_1/tab_theorem_audit_summary.tex",
+        "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/experiments/contract_graph_orchestration_validation/iter_1/theorem_audit/sympy_theorem_audit.json"
+      ],
+      "metric_alignment": {
+        "metric": "oscillation_rate",
+        "theorem_regime_mean": 0.0,
+        "aggregate_mean": 0.4166666666666667
+      },
+      "caveats": [
+        "Stress settings with delta<=eta and unbounded branching are intentional boundary checks."
+      ]
+    },
+    {
+      "claim_id": "HM-TH-03",
+      "claim_text": "Composite guard FAR contraction and provenance invariance under covered attacks.",
+      "support_status": "mixed",
+      "evidence_refs": [
+        "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/figures/iter_1/fig_hm_th_03_far_frr_frontier.pdf",
+        "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/tables/iter_1/tab_hm_th_03_attack_coverage.tex",
+        "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/tables/iter_1/tab_theorem_audit_summary.tex",
+        "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/experiments/contract_graph_orchestration_validation/iter_1/theorem_audit/sympy_theorem_audit.json"
+      ],
+      "metric_alignment": {
+        "metric": "far",
+        "covered_composite_mean": 0.0616,
+        "covered_trust_only_mean": 0.18159999999999998
+      },
+      "caveats": [
+        "Guarantee is conditional on covered classes; uncovered class remains mixed by theorem design."
+      ]
+    }
+  ],
+  "confirmatory_analyses": [
+    {
+      "claim_id": "HM-TH-01",
+      "analysis": "Strictness-sensitivity and A2 toggle ablation",
+      "outcome": "strengthened",
+      "details": "Theorem-regime rows maintain zero unsafe commits while A2_off generates deterministic failures."
+    },
+    {
+      "claim_id": "HM-TH-02",
+      "analysis": "Boundary stress with delta<=eta and unbounded branching",
+      "outcome": "strengthened",
+      "details": "Theorem-regime rows maintain zero oscillation; boundary violations exhibit expected oscillation spikes."
+    },
+    {
+      "claim_id": "HM-TH-03",
+      "analysis": "Covered-vs-uncovered attack split across theta sweep",
+      "outcome": "left_unchanged",
+      "details": "Covered FAR contracts under composite guards, but uncovered FAR remains mixed as expected."
+    }
+  ],
+  "negative_results": [
+    "HM-TH-02: delta<=eta and unbounded branching induce oscillation outside theorem assumptions.",
+    "HM-TH-03: uncovered attack classes maintain elevated FAR under composite guards.",
+    "HM-TH-03: hash mutation tests fail integrity checks by design and delimit T4 applicability."
+  ],
+  "figure_captions": {
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/figures/iter_1/fig_hm_th_01_unsafe_commit.pdf": "Single-panel bar chart of unsafe commit rates across validator modes and assumption toggles. X-axis: validator mode; Y-axis: unsafe commit proportion. Error bars show SD across seeds. Key takeaway: semantic+typed mode with A2_on remains at 0 while schema-only and A2_off degrade safety.",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/figures/iter_1/fig_hm_th_02_recovery_bounds.pdf": "Two-panel recovery diagnostics: left panel oscillation rate vs delta; right panel bound ratio vs delta. Both panels include baseline and B_max encodings with SD error bars. Interpretation: bounded policies show near-zero oscillation for delta>eta, while unbounded branching violates bounds.",
+    "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/paper/figures/iter_1/fig_hm_th_03_far_frr_frontier.pdf": "Two-panel FAR/FRR frontier across guard composition and attack coverage classes. X-axis is trust threshold; Y-axes are FAR and FRR respectively, with SD bars over seeds. Composite guards reduce FAR on covered classes while uncovered classes remain an explicit boundary case."
+  },
+  "provenance": {
+    "quarks_substrate": "resources/codebases/quarks-e2c886f43f88",
+    "dataset_resolution_log_path": "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/experiments/contract_graph_orchestration_validation/iter_1/dataset_resolution_log.json",
+    "full_summary_path": "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/experiments/contract_graph_orchestration_validation/iter_1/results/full_summary.json",
+    "smoke_summary_path": "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/experiments/contract_graph_orchestration_validation/iter_1/preflight/smoke_summary.json"
+  }
+}

@@ -1,0 +1,470 @@
+[
+  {
+    "id_url": "http://arxiv.org/abs/2412.00652v2",
+    "title": "Multi-Agent Collaboration in Incident Response with Large Language Models",
+    "summary": "Incident response (IR) is a critical aspect of cybersecurity, requiring rapid decision-making and coordinated efforts to address cyberattacks effectively. Leveraging large language models (LLMs) as intelligent agents offers a novel approach to enhancing collaboration and efficiency in IR scenarios. This paper explores the application of LLM-based multi-agent collaboration using the Backdoors & Breaches framework, a tabletop game designed for cybersecurity training. We simulate real-world IR dynamics through various team structures, including centralized, decentralized, and hybrid configurations. By analyzing agent interactions and performance across these setups, we provide insights into optimizing multi-agent collaboration for incident response. Our findings highlight the potential of LLMs to enhance decision-making, improve adaptability, and streamline IR processes, paving the way for more effective and coordinated responses to cyber threats.",
+    "year": 2024,
+    "published": "2024-12-01T03:12:26Z",
+    "authors": [
+      "Zefang Liu"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2303.17760v2",
+    "title": "CAMEL: Communicative Agents for \"Mind\" Exploration of Large Language Model Society",
+    "summary": "The rapid advancement of chat-based language models has led to remarkable progress in complex task-solving. However, their success heavily relies on human input to guide the conversation, which can be challenging and time-consuming. This paper explores the potential of building scalable techniques to facilitate autonomous cooperation among communicative agents, and provides insight into their \"cognitive\" processes. To address the challenges of achieving autonomous cooperation, we propose a novel communicative agent framework named role-playing. Our approach involves using inception prompting to guide chat agents toward task completion while maintaining consistency with human intentions. We showcase how role-playing can be used to generate conversational data for studying the behaviors and capabilities of a society of agents, providing a valuable resource for investigating conversational language models. In particular, we conduct comprehensive studies on instruction-following cooperation in multi-agent settings. Our contributions include introducing a novel communicative agent framework, offering a scalable approach for studying the cooperative behaviors and capabilities of multi-agent systems, and open-sourcing our library to support research on communicative agents and beyond: https://github.com/camel-ai/camel.",
+    "year": 2023,
+    "published": "2023-03-31T01:09:00Z",
+    "authors": [
+      "Guohao Li",
+      "Hasan Abed Al Kader Hammoud",
+      "Hani Itani",
+      "Dmitrii Khizbullin",
+      "Bernard Ghanem"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2602.18891v1",
+    "title": "Orchestrating LLM Agents for Scientific Research: A Pilot Study of Multiple Choice Question (MCQ) Generation and Evaluation",
+    "summary": "Advances in large language models (LLMs) are rapidly transforming scientific work, yet empirical evidence on how these systems reshape research activities remains limited. We report a mixed-methods pilot evaluation of an AI-orchestrated research workflow in which a human researcher coordinated multiple LLM-based agents to perform data extraction, corpus construction, artifact generation, and artifact evaluation. Using the generation and assessment of multiple-choice questions (MCQs) as a testbed, we collected 1,071 SAT Math MCQs and employed LLM agents to extract questions from PDFs, retrieve and convert open textbooks into structured representations, align each MCQ with relevant textbook content, generate new MCQs under specified difficulty and cognitive levels, and evaluate both original and generated MCQs using a 24-criterion quality framework. Across all evaluations, average MCQ quality was high. However, criterion-level analysis and equivalence testing show that generated MCQs are not fully comparable to expert-vetted baseline questions. Strict similarity (24/24 criteria equivalent) was never achieved. Persistent gaps concentrated in skill\\ depth, cognitive engagement, difficulty calibration, and metadata alignment, while surface-level qualities, such as {grammar fluency}, {clarity options}, {no duplicates}, were consistently strong. Beyond MCQ outcomes, the study documents a labor shift. The researcher's work moved from ``authoring items'' toward {specification, orchestration, verification}, and {governance}. Formalizing constraints, designing rubrics, building validation loops, recovering from tool failures, and auditing provenance constituted the primary activities. We discuss implications for the future of scientific work, including emerging ``AI research operations'' skills required for AI-empowered research pipelines.",
+    "year": 2026,
+    "published": "2026-02-21T16:20:07Z",
+    "authors": [
+      "Yuan An"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2402.01680v2",
+    "title": "Large Language Model based Multi-Agents: A Survey of Progress and Challenges",
+    "summary": "Large Language Models (LLMs) have achieved remarkable success across a wide array of tasks. Due to the impressive planning and reasoning abilities of LLMs, they have been used as autonomous agents to do many tasks automatically. Recently, based on the development of using one LLM as a single planning or decision-making agent, LLM-based multi-agent systems have achieved considerable progress in complex problem-solving and world simulation. To provide the community with an overview of this dynamic field, we present this survey to offer an in-depth discussion on the essential aspects of multi-agent systems based on LLMs, as well as the challenges. Our goal is for readers to gain substantial insights on the following questions: What domains and environments do LLM-based multi-agents simulate? How are these agents profiled and how do they communicate? What mechanisms contribute to the growth of agents' capacities? For those interested in delving into this field of study, we also summarize the commonly used datasets or benchmarks for them to have convenient access. To keep researchers updated on the latest studies, we maintain an open-source GitHub repository, dedicated to outlining the research on LLM-based multi-agent systems.",
+    "year": 2024,
+    "published": "2024-01-21T23:36:14Z",
+    "authors": [
+      "Taicheng Guo",
+      "Xiuying Chen",
+      "Yaqi Wang",
+      "Ruidi Chang",
+      "Shichao Pei",
+      "Nitesh V. Chawla",
+      "Olaf Wiest",
+      "Xiangliang Zhang"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2305.16291v2",
+    "title": "Voyager: An Open-Ended Embodied Agent with Large Language Models",
+    "summary": "We introduce Voyager, the first LLM-powered embodied lifelong learning agent in Minecraft that continuously explores the world, acquires diverse skills, and makes novel discoveries without human intervention. Voyager consists of three key components: 1) an automatic curriculum that maximizes exploration, 2) an ever-growing skill library of executable code for storing and retrieving complex behaviors, and 3) a new iterative prompting mechanism that incorporates environment feedback, execution errors, and self-verification for program improvement. Voyager interacts with GPT-4 via blackbox queries, which bypasses the need for model parameter fine-tuning. The skills developed by Voyager are temporally extended, interpretable, and compositional, which compounds the agent's abilities rapidly and alleviates catastrophic forgetting. Empirically, Voyager shows strong in-context lifelong learning capability and exhibits exceptional proficiency in playing Minecraft. It obtains 3.3x more unique items, travels 2.3x longer distances, and unlocks key tech tree milestones up to 15.3x faster than prior SOTA. Voyager is able to utilize the learned skill library in a new Minecraft world to solve novel tasks from scratch, while other techniques struggle to generalize. We open-source our full codebase and prompts at https://voyager.minedojo.org/.",
+    "year": 2023,
+    "published": "2023-05-25T17:46:38Z",
+    "authors": [
+      "Guanzhi Wang",
+      "Yuqi Xie",
+      "Yunfan Jiang",
+      "Ajay Mandlekar",
+      "Chaowei Xiao",
+      "Yuke Zhu",
+      "Linxi Fan",
+      "Anima Anandkumar"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2312.07850v1",
+    "title": "Large Language Model Enhanced Multi-Agent Systems for 6G Communications",
+    "summary": "The rapid development of the Large Language Model (LLM) presents huge opportunities for 6G communications, e.g., network optimization and management by allowing users to input task requirements to LLMs by nature language. However, directly applying native LLMs in 6G encounters various challenges, such as a lack of private communication data and knowledge, limited logical reasoning, evaluation, and refinement abilities. Integrating LLMs with the capabilities of retrieval, planning, memory, evaluation and reflection in agents can greatly enhance the potential of LLMs for 6G communications. To this end, we propose a multi-agent system with customized communication knowledge and tools for solving communication related tasks using natural language, comprising three components: (1) Multi-agent Data Retrieval (MDR), which employs the condensate and inference agents to refine and summarize communication knowledge from the knowledge base, expanding the knowledge boundaries of LLMs in 6G communications; (2) Multi-agent Collaborative Planning (MCP), which utilizes multiple planning agents to generate feasible solutions for the communication related task from different perspectives based on the retrieved knowledge; (3) Multi-agent Evaluation and Reflecxion (MER), which utilizes the evaluation agent to assess the solutions, and applies the reflexion agent and refinement agent to provide improvement suggestions for current solutions. Finally, we validate the effectiveness of the proposed multi-agent system by designing a semantic communication system, as a case study of 6G communications.",
+    "year": 2023,
+    "published": "2023-12-13T02:35:57Z",
+    "authors": [
+      "Feibo Jiang",
+      "Li Dong",
+      "Yubo Peng",
+      "Kezhi Wang",
+      "Kun Yang",
+      "Cunhua Pan",
+      "Dusit Niyato",
+      "Octavia A. Dobre"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2405.13050v2",
+    "title": "Human-Centered LLM-Agent User Interface: A Position Paper",
+    "summary": "Large Language Model (LLM) -in-the-loop applications have been shown to effectively interpret the human user's commands, make plans, and operate external tools/systems accordingly. Still, the operation scope of the LLM agent is limited to passively following the user, requiring the user to frame his/her needs with regard to the underlying tools/systems. We note that the potential of an LLM-Agent User Interface (LAUI) is much greater. A user mostly ignorant to the underlying tools/systems should be able to work with a LAUI to discover an emergent workflow. Contrary to the conventional way of designing an explorable GUI to teach the user a predefined set of ways to use the system, in the ideal LAUI, the LLM agent is initialized to be proficient with the system, proactively studies the user and his/her needs, and proposes new interaction schemes to the user. To illustrate LAUI, we present Flute X GPT, a concrete example using an LLM agent, a prompt manager, and a flute-tutoring multi-modal software-hardware system to facilitate the complex, real-time user experience of learning to play the flute.",
+    "year": 2024,
+    "published": "2024-05-19T13:02:45Z",
+    "authors": [
+      "Daniel Chin",
+      "Yuxuan Wang",
+      "Gus Xia"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2407.11384v2",
+    "title": "InvAgent: A Large Language Model based Multi-Agent System for Inventory Management in Supply Chains",
+    "summary": "Supply chain management (SCM) involves coordinating the flow of goods, information, and finances across various entities to deliver products efficiently. Effective inventory management is crucial in today's volatile and uncertain world. Previous research has demonstrated the superiority of heuristic methods and reinforcement learning applications in inventory management. However, the application of large language models (LLMs) as autonomous agents in multi-agent systems for inventory management remains underexplored. This study introduces a novel approach using LLMs to manage multi-agent inventory systems. Leveraging their zero-shot learning capabilities, our model, InvAgent, enhances resilience and improves efficiency across the supply chain network. Our contributions include utilizing LLMs for zero-shot learning to enable adaptive and informed decision-making without prior training, providing explainability and clarity through chain-of-thought, and demonstrating dynamic adaptability to varying demand scenarios while reducing costs and preventing stockouts. Extensive evaluations across different scenarios highlight the efficiency of our model in SCM.",
+    "year": 2024,
+    "published": "2024-07-16T04:55:17Z",
+    "authors": [
+      "Yinzhu Quan",
+      "Zefang Liu"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2307.02485v2",
+    "title": "Building Cooperative Embodied Agents Modularly with Large Language Models",
+    "summary": "In this work, we address challenging multi-agent cooperation problems with decentralized control, raw sensory observations, costly communication, and multi-objective tasks instantiated in various embodied environments. While previous research either presupposes a cost-free communication channel or relies on a centralized controller with shared observations, we harness the commonsense knowledge, reasoning ability, language comprehension, and text generation prowess of LLMs and seamlessly incorporate them into a cognitive-inspired modular framework that integrates with perception, memory, and execution. Thus building a Cooperative Embodied Language Agent CoELA, who can plan, communicate, and cooperate with others to accomplish long-horizon tasks efficiently. Our experiments on C-WAH and TDW-MAT demonstrate that CoELA driven by GPT-4 can surpass strong planning-based methods and exhibit emergent effective communication. Though current Open LMs like LLAMA-2 still underperform, we fine-tune a CoELA with data collected with our agents and show how they can achieve promising performance. We also conducted a user study for human-agent interaction and discovered that CoELA communicating in natural language can earn more trust and cooperate more effectively with humans. Our research underscores the potential of LLMs for future research in multi-agent cooperation. Videos can be found on the project website https://vis-www.cs.umass.edu/Co-LLM-Agents/.",
+    "year": 2023,
+    "published": "2023-07-05T17:59:27Z",
+    "authors": [
+      "Hongxin Zhang",
+      "Weihua Du",
+      "Jiaming Shan",
+      "Qinhong Zhou",
+      "Yilun Du",
+      "Joshua B. Tenenbaum",
+      "Tianmin Shu",
+      "Chuang Gan"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2511.14631v1",
+    "title": "Enhancing Agentic Autonomous Scientific Discovery with Vision-Language Model Capabilities",
+    "summary": "We show that multi-agent systems guided by vision-language models (VLMs) improve end-to-end autonomous scientific discovery. By treating plots as verifiable checkpoints, a VLM-as-a-judge evaluates figures against dynamically generated domain-specific rubrics, enabling agents to correct their own errors and steer exploratory data analysis in real-time. Case studies in cosmology and astrochemistry demonstrate recovery from faulty reasoning paths and adaptation to new datasets without human intervention. On a 10-task benchmark for data-driven discovery, VLM-augmented systems achieve pass at 1 scores of 0.7-0.8, compared to 0.2-0.3 for code-only and 0.4-0.5 for code-and-text baselines, while also providing auditable reasoning traces that improve interpretability. Code available here: https://github.com/CMBAgents/cmbagent",
+    "year": 2025,
+    "published": "2025-11-18T16:23:02Z",
+    "authors": [
+      "Kahaan Gandhi",
+      "Boris Bolliet",
+      "Inigo Zubeldia"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2603.13189v1",
+    "title": "LLM Constitutional Multi-Agent Governance",
+    "summary": "Large Language Models (LLMs) can generate persuasive influence strategies that shift cooperative behavior in multi-agent populations, but a critical question remains: does the resulting cooperation reflect genuine prosocial alignment, or does it mask erosion of agent autonomy, epistemic integrity, and distributional fairness? We introduce Constitutional Multi-Agent Governance (CMAG), a two-stage framework that interposes between an LLM policy compiler and a networked agent population, combining hard constraint filtering with soft penalized-utility optimization that balances cooperation potential against manipulation risk and autonomy pressure. We propose the Ethical Cooperation Score (ECS), a multiplicative composite of cooperation, autonomy, integrity, and fairness that penalizes cooperation achieved through manipulative means. In experiments on scale-free networks of 80 agents under adversarial conditions (70% violating candidates), we benchmark three regimes: full CMAG, naive filtering, and unconstrained optimization. While unconstrained optimization achieves the highest raw cooperation (0.873), it yields the lowest ECS (0.645) due to severe autonomy erosion (0.867) and fairness degradation (0.888). CMAG attains an ECS of 0.741, a 14.9% improvement, while preserving autonomy at 0.985 and integrity at 0.995, with only modest cooperation reduction to 0.770. The naive ablation (ECS = 0.733) confirms that hard constraints alone are insufficient. Pareto analysis shows CMAG dominates the cooperation-autonomy trade-off space, and governance reduces hub-periphery exposure disparities by over 60%. These findings establish that cooperation is not inherently desirable without governance: constitutional constraints are necessary to ensure that LLM-mediated influence produces ethically stable outcomes rather than manipulative equilibria.",
+    "year": 2026,
+    "published": "2026-03-13T17:21:26Z",
+    "authors": [
+      "J. de Curt\u00f2",
+      "I. de Zarz\u00e0"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2603.22862v2",
+    "title": "The Evolution of Tool Use in LLM Agents: From Single-Tool Call to Multi-Tool Orchestration",
+    "summary": "Tool use enables large language models (LLMs) to access external information, invoke software systems, and act in digital environments beyond what can be solved from model parameters alone. Early research mainly studied whether a model could select and execute a correct single tool call. As agent systems evolve, however, the central problem has shifted from isolated invocation to multi-tool orchestration over long trajectories with intermediate state, execution feedback, changing environments, and practical constraints such as safety, cost, and verifiability. We comprehensively review recent progress in multi-tool LLM agents and analyzes the state of the art in this rapidly developing area. First, we unify task formulations and distinguish single-call tool use from long-horizon orchestration. Then, we organize the literature around six core dimensions: inference-time planning and execution, training and trajectory construction, safety and control, efficiency under resource constraints, capability completeness in open environments, and benchmark design and evaluation. We further summarize representative applications in software engineering, enterprise workflows, graphical user interfaces, and mobile systems. Finally, we discuss major challenges and outline future directions for building reliable, scalable, and verifiable multi-tool agents.",
+    "year": 2026,
+    "published": "2026-03-24T07:05:05Z",
+    "authors": [
+      "Haoyuan Xu",
+      "Chang Li",
+      "Xinyan Ma",
+      "Xianhao Ou",
+      "Zihan Zhang",
+      "Tao He",
+      "Xiangyu Liu",
+      "Zixiang Wang",
+      "Jiafeng Liang",
+      "Zheng Chu",
+      "Runxuan Liu",
+      "Rongchuan Mu",
+      "Dandan Tu",
+      "Ming Liu",
+      "Bing Qin"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2602.04418v3",
+    "title": "SPEAR: An Engineering Case Study of Multi-Agent Coordination for Smart Contract Auditing",
+    "summary": "We present SPEAR, a multi-agent coordination framework for smart contract auditing that applies established MAS patterns in a realistic security analysis workflow. SPEAR models auditing as a coordinated mission carried out by specialized agents: a Planning Agent prioritizes contracts using risk-aware heuristics, an Execution Agent allocates tasks via the Contract Net protocol, and a Repair Agent autonomously recovers from brittle generated artifacts using a programmatic-first repair policy. Agents maintain local beliefs updated through AGM-compliant revision, coordinate via negotiation and auction protocols, and revise plans as new information becomes available. An empirical study compares the multi-agent design with centralized and pipeline-based alternatives under controlled failure scenarios, focusing on coordination, recovery behavior, and resource use.",
+    "year": 2026,
+    "published": "2026-02-04T10:51:19Z",
+    "authors": [
+      "Indraveni Chebolu",
+      "Arnab Mallick",
+      "Harmesh Rana"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2604.11767v2",
+    "title": "$\u03bb_A$: A Typed Lambda Calculus for LLM Agent Composition",
+    "summary": "Existing LLM agent frameworks lack formal semantics: there is no principled way to determine whether an agent configuration is well-formed or will terminate. We present $\u03bb_A$, a typed lambda calculus for agent composition that extends the simply-typed lambda calculus with oracle calls, bounded fixpoints (the ReAct loop), probabilistic choice, and mutable environments. We prove type safety, termination of bounded fixpoints, and soundness of derived lint rules, with full Coq mechanization (1,519 lines, 42 theorems, 0 Admitted). As a practical application, we derive a lint tool that detects structural configuration errors directly from the operational semantics. An evaluation on 835 real-world GitHub agent configurations shows that 94.1% are structurally incomplete under $\u03bb_A$, with YAML-only lint precision at 54%, rising to 96--100% under joint YAML+Python AST analysis on 175 samples. This gap quantifies, for the first time, the degree of semantic entanglement between declarative configuration and imperative code in the agent ecosystem. We further show that five mainstream paradigms (LangGraph, CrewAI, AutoGen, OpenAI SDK, Dify) embed as typed $\u03bb_A$ fragments, establishing $\u03bb_A$ as a unifying calculus for LLM agent composition.",
+    "year": 2026,
+    "published": "2026-04-13T17:39:23Z",
+    "authors": [
+      "Qin Liu"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2410.03688v1",
+    "title": "LLM Agents as 6G Orchestrator: A Paradigm for Task-Oriented Physical-Layer Automation",
+    "summary": "The rapid advancement in generative pre-training models is propelling a paradigm shift in technological progression from basic applications such as chatbots towards more sophisticated agent-based systems. It is with huge potential and necessity that the 6G system be combined with the copilot of large language model (LLM) agents and digital twins (DT) to manage the highly complicated communication system with new emerging features such as native AI service and sensing. With the 6G-oriented agent, the base station could understand the transmission requirements of various dynamic upper-layer tasks, automatically orchestrate the optimal system workflow. Through continuously get feedback from the 6G DT for reinforcement, the agents can finally raise the performance of practical system accordingly. Differing from existing LLM agents designed for general application, the 6G-oriented agent aims to make highly rigorous and precise planning with a vast amount of extra expert knowledge, which inevitably requires a specific system design from model training to implementation. This paper proposes a novel comprehensive approach for building task-oriented 6G LLM agents. We first propose a two-stage continual pre-training and fine-tuning scheme to build the field basic model and diversities of specialized expert models for meeting the requirements of various application scenarios. Further, a novel inference framework based on semantic retrieval for leveraging the existing communication-related functions is proposed. Experiment results of exemplary tasks, such as physical-layer task decomposition, show the proposed paradigm's feasibility and effectiveness.",
+    "year": 2024,
+    "published": "2024-09-21T05:08:29Z",
+    "authors": [
+      "Zhuoran Xiao",
+      "Chenhui Ye",
+      "Yunbo Hu",
+      "Honggang Yuan",
+      "Yihang Huang",
+      "Yijia Feng",
+      "Liyu Cai",
+      "Jiang Chang"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2502.09809v1",
+    "title": "AgentGuard: Repurposing Agentic Orchestrator for Safety Evaluation of Tool Orchestration",
+    "summary": "The integration of tool use into large language models (LLMs) enables agentic systems with real-world impact. In the meantime, unlike standalone LLMs, compromised agents can execute malicious workflows with more consequential impact, signified by their tool-use capability. We propose AgentGuard, a framework to autonomously discover and validate unsafe tool-use workflows, followed by generating safety constraints to confine the behaviors of agents, achieving the baseline of safety guarantee at deployment. AgentGuard leverages the LLM orchestrator's innate capabilities - knowledge of tool functionalities, scalable and realistic workflow generation, and tool execution privileges - to act as its own safety evaluator. The framework operates through four phases: identifying unsafe workflows, validating them in real-world execution, generating safety constraints, and validating constraint efficacy. The output, an evaluation report with unsafe workflows, test cases, and validated constraints, enables multiple security applications. We empirically demonstrate AgentGuard's feasibility with experiments. With this exploratory work, we hope to inspire the establishment of standardized testing and hardening procedures for LLM agents to enhance their trustworthiness in real-world applications.",
+    "year": 2025,
+    "published": "2025-02-13T23:00:33Z",
+    "authors": [
+      "Jizhou Chen",
+      "Samuel Lee Cong"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2406.09757v2",
+    "title": "Evaluating LLM-driven User-Intent Formalization for Verification-Aware Languages",
+    "summary": "Verification-aware programming languages such as Dafny and F* provide means to formally specify and prove properties of a program. Although the problem of checking an implementation against a specification can be defined mechanically, there is no algorithmic way of ensuring the correctness of the {\\it user-intent formalization for programs}, expressed as a formal specification. This is because intent or requirement is expressed {\\it informally} in natural language and the specification is a formal artefact. Despite, the advent of large language models (LLMs) has made tremendous strides bridging the gap between informal intent and formal program implementations recently, driven in large parts by benchmarks and automated metrics for evaluation. Recent work has proposed a framework for evaluating the {\\it user-intent formalization} problem for mainstream programming languages~\\cite{endres-fse24}. However, such an approach does not readily extend to verification-aware languages that support rich specifications (using quantifiers and ghost variables) that cannot be evaluated through dynamic execution. Previous work also required generating program mutants using LLMs to create the benchmark. We advocate an alternate, perhaps simpler approach of {\\it symbolically testing specifications} to provide an intuitive metric for evaluating the quality of specifications for verification-aware languages. We demonstrate that our automated metric agrees closely on a human-labeled dataset of Dafny specifications for the popular MBPP code-generation benchmark, yet demonstrates cases where the human labeling is not perfect. We also outline formal verification challenges that need to be addressed to apply the technique more widely. We believe our work provides a stepping stone to enable the establishment of a benchmark and research agenda for the problem of user-intent formalization for programs.",
+    "year": 2024,
+    "published": "2024-06-14T06:52:08Z",
+    "authors": [
+      "Shuvendu K. Lahiri"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2408.03244v2",
+    "title": "Modular assurance of an Autonomous Ferry using Contract-Based Design and Simulation-based Verification Principles",
+    "summary": "With the introduction of autonomous technology into our society, e.g. autonomous shipping, it is important to assess and assure the safety of autonomous systems in a real-world context. Simulation-based testing is a common approach to attempt to verify performance of autonomous systems, but assurance also requires formal evidence. This paper introduces the Assurance of Digital Assets (ADA) framework, a structured method for the assurance of digital assets, i.e. novel, complex, or intelligent systems enabled by digital technologies, using contract-based design. Results are shown for an autonomous ferry assurance case, focusing on collision avoidance during the ferry's transit. Further, we discuss the role of simulation-based testing in verifying compliance to contract specifications, to build the necessary evidence for an assurance case.",
+    "year": 2024,
+    "published": "2024-08-06T15:05:27Z",
+    "authors": [
+      "Jon Arne Glomsrud",
+      "Stephanie Kemna",
+      "Chanjei Vasanthan",
+      "Luman Zhao",
+      "Dag McGeorge",
+      "Tom Arne Pedersen",
+      "Tobias Rye Torben",
+      "B\u00f8rge Rokseth",
+      "Dong Trong Nguyen"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2310.20151v2",
+    "title": "Multi-Agent Consensus Seeking via Large Language Models",
+    "summary": "Multi-agent systems driven by large language models (LLMs) have shown promising abilities for solving complex tasks in a collaborative manner. This work considers a fundamental problem in multi-agent collaboration: consensus seeking. When multiple agents work together, we are interested in how they can reach a consensus through inter-agent negotiation. To that end, this work studies a consensus-seeking task where the state of each agent is a numerical value and they negotiate with each other to reach a consensus value. It is revealed that when not explicitly directed on which strategy should be adopted, the LLM-driven agents primarily use the average strategy for consensus seeking although they may occasionally use some other strategies. Moreover, this work analyzes the impact of the agent number, agent personality, and network topology on the negotiation process. The findings reported in this work can potentially lay the foundations for understanding the behaviors of LLM-driven multi-agent systems for solving more complex tasks. Furthermore, LLM-driven consensus seeking is applied to a multi-robot aggregation task. This application demonstrates the potential of LLM-driven agents to achieve zero-shot autonomous planning for multi-robot collaboration tasks. Project website: windylab.github.io/ConsensusLLM/.",
+    "year": 2023,
+    "published": "2023-10-31T03:37:11Z",
+    "authors": [
+      "Huaben Chen",
+      "Wenkang Ji",
+      "Lufeng Xu",
+      "Shiyu Zhao"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2406.07155v3",
+    "title": "Scaling Large Language Model-based Multi-Agent Collaboration",
+    "summary": "Recent breakthroughs in large language model-driven autonomous agents have revealed that multi-agent collaboration often surpasses each individual through collective reasoning. Inspired by the neural scaling law--increasing neurons enhances performance, this study explores whether the continuous addition of collaborative agents can yield similar benefits. Technically, we utilize directed acyclic graphs to organize agents into a multi-agent collaboration network (MacNet), upon which their interactive reasoning is topologically orchestrated for autonomous task solving. Extensive evaluations reveal that it effectively supports collaboration among over a thousand agents, with irregular topologies outperforming regular ones. We also identify a collaborative scaling law--the overall performance follows a logistic growth pattern as agents scale, with collaborative emergence occurring earlier than traditional neural emergence. We speculate this may be because scaling agents catalyzes their multidimensional considerations during interactive reflection and refinement, thereby producing more comprehensive artifacts. The code is available at https://github.com/OpenBMB/ChatDev/tree/macnet.",
+    "year": 2024,
+    "published": "2024-06-11T11:02:04Z",
+    "authors": [
+      "Chen Qian",
+      "Zihao Xie",
+      "YiFei Wang",
+      "Wei Liu",
+      "Kunlun Zhu",
+      "Hanchen Xia",
+      "Yufan Dang",
+      "Zhuoyun Du",
+      "Weize Chen",
+      "Cheng Yang",
+      "Zhiyuan Liu",
+      "Maosong Sun"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2307.07924v5",
+    "title": "ChatDev: Communicative Agents for Software Development",
+    "summary": "Software development is a complex task that necessitates cooperation among multiple members with diverse skills. Numerous studies used deep learning to improve specific phases in a waterfall model, such as design, coding, and testing. However, the deep learning model in each phase requires unique designs, leading to technical inconsistencies across various phases, which results in a fragmented and ineffective development process. In this paper, we introduce ChatDev, a chat-powered software development framework in which specialized agents driven by large language models (LLMs) are guided in what to communicate (via chat chain) and how to communicate (via communicative dehallucination). These agents actively contribute to the design, coding, and testing phases through unified language-based communication, with solutions derived from their multi-turn dialogues. We found their utilization of natural language is advantageous for system design, and communicating in programming language proves helpful in debugging. This paradigm demonstrates how linguistic communication facilitates multi-agent collaboration, establishing language as a unifying bridge for autonomous task-solving among LLM agents. The code and data are available at https://github.com/OpenBMB/ChatDev.",
+    "year": 2023,
+    "published": "2023-07-16T02:11:34Z",
+    "authors": [
+      "Chen Qian",
+      "Wei Liu",
+      "Hongzhang Liu",
+      "Nuo Chen",
+      "Yufan Dang",
+      "Jiahao Li",
+      "Cheng Yang",
+      "Weize Chen",
+      "Yusheng Su",
+      "Xin Cong",
+      "Juyuan Xu",
+      "Dahai Li",
+      "Zhiyuan Liu",
+      "Maosong Sun"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2507.07155v1",
+    "title": "Evaluating Retrieval-Augmented Generation Agents for Autonomous Scientific Discovery in Astrophysics",
+    "summary": "We evaluate 9 Retrieval Augmented Generation (RAG) agent configurations on 105 Cosmology Question-Answer (QA) pairs that we built specifically for this purpose.The RAG configurations are manually evaluated by a human expert, that is, a total of 945 generated answers were assessed. We find that currently the best RAG agent configuration is with OpenAI embedding and generative model, yielding 91.4\\% accuracy. Using our human evaluation results we calibrate LLM-as-a-Judge (LLMaaJ) system which can be used as a robust proxy for human evaluation. These results allow us to systematically select the best RAG agent configuration for multi-agent system for autonomous scientific discovery in astrophysics (e.g., cmbagent presented in a companion paper) and provide us with an LLMaaJ system that can be scaled to thousands of cosmology QA pairs. We make our QA dataset, human evaluation results, RAG pipelines, and LLMaaJ system publicly available for further use by the astrophysics community.",
+    "year": 2025,
+    "published": "2025-07-09T16:46:03Z",
+    "authors": [
+      "Xueqing Xu",
+      "Boris Bolliet",
+      "Adrian Dimitrov",
+      "Andrew Laverick",
+      "Francisco Villaescusa-Navarro",
+      "Licong Xu",
+      "\u00cd\u00f1igo Zubeldia"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2602.03128v1",
+    "title": "Understanding Multi-Agent LLM Frameworks: A Unified Benchmark and Experimental Analysis",
+    "summary": "Multi-agent LLM frameworks are widely used to accelerate the development of agent systems powered by large language models (LLMs). These frameworks impose distinct architectural structures that govern how agents interact, store information, and coordinate tasks. However, their impact on system performance remains poorly understood. This gap is critical, as architectural choices alone can induce order-of-magnitude differences in latency and throughput, as well as substantial variation in accuracy and scalability. Addressing this challenge requires (i) jointly evaluating multiple capabilities, such as orchestration overhead, memory behavior, planning, specialization, and coordination, and (ii) conducting these evaluations under controlled, framework-level conditions to isolate architectural effects. Existing benchmarks focus on individual capabilities and lack standardized framework-level evaluation. We address these limitations by (i) introducing an architectural taxonomy for systematically comparing multi-agent LLM frameworks along fundamental dimensions, and (ii) developing MAFBench, a unified evaluation suite that integrates existing benchmarks under a standardized execution pipeline. Using MAFBench, we conduct a controlled empirical study across several widely used frameworks. Our results show that framework-level design choices alone can increase latency by over 100x, reduce planning accuracy by up to 30%, and lower coordination success from above 90% to below 30%. Finally, we translate our findings into concrete architectural design principles and framework selection guidance, and outline promising future research directions.",
+    "year": 2026,
+    "published": "2026-02-03T05:37:56Z",
+    "authors": [
+      "Abdelghny Orogat",
+      "Ana Rostam",
+      "Essam Mansour"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2604.05018v1",
+    "title": "PaperOrchestra: A Multi-Agent Framework for Automated AI Research Paper Writing",
+    "summary": "Synthesizing unstructured research materials into manuscripts is an essential yet under-explored challenge in AI-driven scientific discovery. Existing autonomous writers are rigidly coupled to specific experimental pipelines, and produce superficial literature reviews. We introduce PaperOrchestra, a multi-agent framework for automated AI research paper writing. It flexibly transforms unconstrained pre-writing materials into submission-ready LaTeX manuscripts, including comprehensive literature synthesis and generated visuals, such as plots and conceptual diagrams. To evaluate performance, we present PaperWritingBench, the first standardized benchmark of reverse-engineered raw materials from 200 top-tier AI conference papers, alongside a comprehensive suite of automated evaluators. In side-by-side human evaluations, PaperOrchestra significantly outperforms autonomous baselines, achieving an absolute win rate margin of 50%-68% in literature review quality, and 14%-38% in overall manuscript quality.",
+    "year": 2026,
+    "published": "2026-04-06T18:00:00Z",
+    "authors": [
+      "Yiwen Song",
+      "Yale Song",
+      "Tomas Pfister",
+      "Jinsung Yoon"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2305.11738v4",
+    "title": "CRITIC: Large Language Models Can Self-Correct with Tool-Interactive Critiquing",
+    "summary": "Recent developments in large language models (LLMs) have been impressive. However, these models sometimes show inconsistencies and problematic behavior, such as hallucinating facts, generating flawed code, or creating offensive and toxic content. Unlike these models, humans typically utilize external tools to cross-check and refine their initial content, like using a search engine for fact-checking, or a code interpreter for debugging. Inspired by this observation, we introduce a framework called CRITIC that allows LLMs, which are essentially \"black boxes\" to validate and progressively amend their own outputs in a manner similar to human interaction with tools. More specifically, starting with an initial output, CRITIC interacts with appropriate tools to evaluate certain aspects of the text, and then revises the output based on the feedback obtained during this validation process. Comprehensive evaluations involving free-form question answering, mathematical program synthesis, and toxicity reduction demonstrate that CRITIC consistently enhances the performance of LLMs. Meanwhile, our research highlights the crucial importance of external feedback in promoting the ongoing self-improvement of LLMs.",
+    "year": 2023,
+    "published": "2023-05-19T15:19:44Z",
+    "authors": [
+      "Zhibin Gou",
+      "Zhihong Shao",
+      "Yeyun Gong",
+      "Yelong Shen",
+      "Yujiu Yang",
+      "Nan Duan",
+      "Weizhu Chen"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2407.15073v3",
+    "title": "Multi-Agent Causal Discovery Using Large Language Models",
+    "summary": "Causal discovery aims to identify causal relationships between variables and is a critical research area in machine learning. Traditional methods focus on statistical or machine learning algorithms to uncover causal links from structured data, often overlooking the valuable contextual information provided by metadata. Large language models (LLMs) have shown promise in creating unified causal discovery frameworks by incorporating both structured data and metadata. However, their potential in multi-agent settings remains largely unexplored. To address this gap, we introduce the Multi-Agent Causal Discovery Framework (MAC), which consists of two key modules: the Debate-Coding Module (DCM) and the Meta-Debate Module (MDM). The DCM begins with a multi-agent debating and coding process, where agents use both structured data and metadata to collaboratively select the most suitable statistical causal discovery (SCD) method. The selected SCD is then applied to the structured data to generate an initial causal graph. This causal graph is transformed into causal metadata through the Meta Fusion mechanism. With all the metadata, MDM then refines the causal structure by leveraging a multi-agent debating framework. Extensive experiments across five datasets demonstrate that MAC outperforms both traditional statistical causal discovery methods and existing LLM-based approaches, achieving state-of-the-art performance.",
+    "year": 2024,
+    "published": "2024-07-21T06:21:47Z",
+    "authors": [
+      "Hao Duong Le",
+      "Xin Xia",
+      "Zhang Chen"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2310.10701v3",
+    "title": "Theory of Mind for Multi-Agent Collaboration via Large Language Models",
+    "summary": "While Large Language Models (LLMs) have demonstrated impressive accomplishments in both reasoning and planning, their abilities in multi-agent collaborations remains largely unexplored. This study evaluates LLM-based agents in a multi-agent cooperative text game with Theory of Mind (ToM) inference tasks, comparing their performance with Multi-Agent Reinforcement Learning (MARL) and planning-based baselines. We observed evidence of emergent collaborative behaviors and high-order Theory of Mind capabilities among LLM-based agents. Our results reveal limitations in LLM-based agents' planning optimization due to systematic failures in managing long-horizon contexts and hallucination about the task state. We explore the use of explicit belief state representations to mitigate these issues, finding that it enhances task performance and the accuracy of ToM inferences for LLM-based agents.",
+    "year": 2023,
+    "published": "2023-10-16T07:51:19Z",
+    "authors": [
+      "Huao Li",
+      "Yu Quan Chong",
+      "Simon Stepputtis",
+      "Joseph Campbell",
+      "Dana Hughes",
+      "Michael Lewis",
+      "Katia Sycara"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2308.08155v2",
+    "title": "AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation",
+    "summary": "AutoGen is an open-source framework that allows developers to build LLM applications via multiple agents that can converse with each other to accomplish tasks. AutoGen agents are customizable, conversable, and can operate in various modes that employ combinations of LLMs, human inputs, and tools. Using AutoGen, developers can also flexibly define agent interaction behaviors. Both natural language and computer code can be used to program flexible conversation patterns for different applications. AutoGen serves as a generic infrastructure to build diverse applications of various complexities and LLM capacities. Empirical studies demonstrate the effectiveness of the framework in many example applications, with domains ranging from mathematics, coding, question answering, operations research, online decision-making, entertainment, etc.",
+    "year": 2023,
+    "published": "2023-08-16T05:57:52Z",
+    "authors": [
+      "Qingyun Wu",
+      "Gagan Bansal",
+      "Jieyu Zhang",
+      "Yiran Wu",
+      "Beibin Li",
+      "Erkang Zhu",
+      "Li Jiang",
+      "Xiaoyun Zhang",
+      "Shaokun Zhang",
+      "Jiale Liu",
+      "Ahmed Hassan Awadallah",
+      "Ryen W White",
+      "Doug Burger",
+      "Chi Wang"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2402.00854v4",
+    "title": "SymbolicAI: A framework for logic-based approaches combining generative models and solvers",
+    "summary": "We introduce SymbolicAI, a versatile and modular framework employing a logic-based approach to concept learning and flow management in generative processes. SymbolicAI enables the seamless integration of generative models with a diverse range of solvers by treating large language models (LLMs) as semantic parsers that execute tasks based on both natural and formal language instructions, thus bridging the gap between symbolic reasoning and generative AI. We leverage probabilistic programming principles to tackle complex tasks, and utilize differentiable and classical programming paradigms with their respective strengths. The framework introduces a set of polymorphic, compositional, and self-referential operations for multi-modal data that connects multi-step generative processes and aligns their outputs with user objectives in complex workflows. As a result, we can transition between the capabilities of various foundation models with in-context learning capabilities and specialized, fine-tuned models or solvers proficient in addressing specific problems. Through these operations based on in-context learning our framework enables the creation and evaluation of explainable computational graphs. Finally, we introduce a quality measure and its empirical score for evaluating these computational graphs, and propose a benchmark that compares various state-of-the-art LLMs across a set of complex workflows. We refer to the empirical score as the \"Vector Embedding for Relational Trajectory Evaluation through Cross-similarity\", or VERTEX score for short. The framework codebase and benchmark are linked below.",
+    "year": 2024,
+    "published": "2024-02-01T18:50:50Z",
+    "authors": [
+      "Marius-Constantin Dinu",
+      "Claudiu Leoveanu-Condrei",
+      "Markus Holzleitner",
+      "Werner Zellinger",
+      "Sepp Hochreiter"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2412.17146v1",
+    "title": "LLM Agent for Fire Dynamics Simulations",
+    "summary": "Significant advances have been achieved in leveraging foundation models, such as large language models (LLMs), to accelerate complex scientific workflows. In this work we introduce FoamPilot, a proof-of-concept LLM agent designed to enhance the usability of FireFOAM, a specialized solver for fire dynamics and fire suppression simulations built using OpenFOAM, a popular open-source toolbox for computational fluid dynamics (CFD). FoamPilot provides three core functionalities: code insight, case configuration and simulation evaluation. Code insight is an alternative to traditional keyword searching leveraging retrieval-augmented generation (RAG) and aims to enable efficient navigation and summarization of the FireFOAM source code for developers and experienced users. For case configuration, the agent interprets user requests in natural language and aims to modify existing simulation setups accordingly to support intermediate users. FoamPilot's job execution functionality seeks to manage the submission and execution of simulations in high-performance computing (HPC) environments and provide preliminary analysis of simulation results to support less experienced users. Promising results were achieved for each functionality, particularly for simple tasks, and opportunities were identified for significant further improvement for more complex tasks. The integration of these functionalities into a single LLM agent is a step aimed at accelerating the simulation workflow for engineers and scientists employing FireFOAM for complex simulations critical for improving fire safety.",
+    "year": 2024,
+    "published": "2024-12-22T20:03:35Z",
+    "authors": [
+      "Leidong Xu",
+      "Danyal Mohaddes",
+      "Yi Wang"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2410.06153v3",
+    "title": "AgentSquare: Automatic LLM Agent Search in Modular Design Space",
+    "summary": "Recent advancements in Large Language Models (LLMs) have led to a rapid growth of agentic systems capable of handling a wide range of complex tasks. However, current research largely relies on manual, task-specific design, limiting their adaptability to novel tasks. In this paper, we introduce a new research problem: Modularized LLM Agent Search (MoLAS). We propose a modular design space that abstracts existing LLM agent designs into four fundamental modules with uniform IO interface: Planning, Reasoning, Tool Use, and Memory. Building on this design space, we present a novel LLM agent search framework called AgentSquare, which introduces two core mechanisms, i.e., module evolution and recombination, to efficiently search for optimized LLM agents. To further accelerate the process, we design a performance predictor that uses in-context surrogate models to skip unpromising agent designs. Extensive experiments across six benchmarks, covering the diverse scenarios of web, embodied, tool use and game applications, show that AgentSquare substantially outperforms hand-crafted agents, achieving an average performance gain of 17.2% against best-known human designs. Moreover, AgentSquare can generate interpretable design insights, enabling a deeper understanding of agentic architecture and its impact on task performance. We believe that the modular design space and AgentSquare search framework offer a platform for fully exploiting the potential of prior successful designs and consolidating the collective efforts of research community. Code repo is available at https://github.com/tsinghua-fib-lab/AgentSquare.",
+    "year": 2024,
+    "published": "2024-10-08T15:52:42Z",
+    "authors": [
+      "Yu Shang",
+      "Yu Li",
+      "Keyu Zhao",
+      "Likai Ma",
+      "Jiahe Liu",
+      "Fengli Xu",
+      "Yong Li"
+    ]
+  },
+  {
+    "id_url": "http://arxiv.org/abs/2601.02577v1",
+    "title": "Orchestral AI: A Framework for Agent Orchestration",
+    "summary": "The rapid proliferation of LLM agent frameworks has forced developers to choose between vendor lock-in through provider-specific SDKs and complex multi-package ecosystems that obscure control flow and hinder reproducibility. Integrating tool calling across multiple LLM providers remains a core engineering challenge due to fragmented APIs, incompatible message formats, and inconsistent streaming and tool-calling behavior, making it difficult to build portable, reliable agent systems. We introduce Orchestral, a lightweight Python framework that provides a unified, type-safe interface for building LLM agents across major providers while preserving the simplicity required for scientific computing and production deployment. Orchestral defines a single universal representation for messages, tools, and LLM usage that operates seamlessly across providers, eliminating manual format translation and reducing framework-induced complexity. Automatic tool schema generation from Python type hints removes the need for handwritten descriptors while maintaining type safety across provider boundaries. A synchronous execution model with streaming support enables deterministic behavior, straightforward debugging, and real-time interaction without introducing server dependencies. The framework's modular architecture cleanly separates provider integration, tool execution, conversation orchestration, and user-facing interfaces, enabling extensibility without architectural entanglement. Orchestral supports advanced agent capabilities found in larger frameworks, including rich tool calling, context compaction, workspace sandboxing, user approval workflows, sub-agents, memory management, and MCP integration.",
+    "year": 2026,
+    "published": "2026-01-05T22:02:11Z",
+    "authors": [
+      "Alexander Roman",
+      "Jacob Roman"
+    ]
+  }
+]

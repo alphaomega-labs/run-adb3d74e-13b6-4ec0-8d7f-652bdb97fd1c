@@ -1,0 +1,17 @@
+{
+  "/app/outputs/runs/adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c/workspace/paper/figures/iter_20/fig_hm_th_01_unsafe_commit.pdf": {
+    "status": "ok",
+    "preview_path": "/app/outputs/runs/adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c/workspace/paper/figures/iter_20/fig_hm_th_01_unsafe_commit.preview.png",
+    "stderr": ""
+  },
+  "/app/outputs/runs/adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c/workspace/paper/figures/iter_20/fig_hm_th_02_recovery_bounds.pdf": {
+    "status": "ok",
+    "preview_path": "/app/outputs/runs/adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c/workspace/paper/figures/iter_20/fig_hm_th_02_recovery_bounds.preview.png",
+    "stderr": ""
+  },
+  "/app/outputs/runs/adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c/workspace/paper/figures/iter_20/fig_hm_th_03_far_frr_frontier.pdf": {
+    "status": "ok",
+    "preview_path": "/app/outputs/runs/adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c/workspace/paper/figures/iter_20/fig_hm_th_03_far_frr_frontier.preview.png",
+    "stderr": ""
+  }
+}

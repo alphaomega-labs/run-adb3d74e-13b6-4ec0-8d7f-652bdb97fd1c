@@ -1,0 +1,14 @@
+{
+  "oscillation_rate_summary": {
+    "mean": 0.4166666666666667,
+    "std": 0.4930066485916347
+  },
+  "bound_violation_summary": {
+    "mean": 0.25,
+    "std": 0.4330127018922193
+  },
+  "regret_summary": {
+    "mean": 0.065,
+    "std": 0.003535533905932738
+  }
+}

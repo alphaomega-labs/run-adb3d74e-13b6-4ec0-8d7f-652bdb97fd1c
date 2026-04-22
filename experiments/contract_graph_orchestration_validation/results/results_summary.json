@@ -1,0 +1,50 @@
+{
+  "figures": [
+    "/app/outputs/runs/adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c/workspace/paper/figures/iter_19/fig_hm_th_01_unsafe_commit.pdf",
+    "/app/outputs/runs/adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c/workspace/paper/figures/iter_19/fig_hm_th_02_recovery_bounds.pdf",
+    "/app/outputs/runs/adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c/workspace/paper/figures/iter_19/fig_hm_th_03_far_frr_frontier.pdf"
+  ],
+  "tables": [
+    "/app/outputs/runs/adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c/workspace/paper/tables/iter_19/tab_hm_th_01_assumption_matrix.tex",
+    "/app/outputs/runs/adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c/workspace/paper/tables/iter_19/tab_hm_th_02_regret_summary.tex",
+    "/app/outputs/runs/adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c/workspace/paper/tables/iter_19/tab_hm_th_03_attack_coverage.tex"
+  ],
+  "datasets": [
+    "experiments/contract_graph_orchestration_validation/data/full_hm_th_01.jsonl",
+    "experiments/contract_graph_orchestration_validation/data/full_hm_th_02.jsonl",
+    "experiments/contract_graph_orchestration_validation/data/full_hm_th_03.jsonl"
+  ],
+  "sympy_report": "/app/outputs/runs/adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c/workspace/experiments/contract_graph_orchestration_validation/theorem_audit/sympy_theorem_audit.json",
+  "theorem_reports": [
+    "experiments/contract_graph_orchestration_validation/results/theorem_audit/hm_th_01_report.json",
+    "experiments/contract_graph_orchestration_validation/results/theorem_audit/hm_th_02_report.json",
+    "experiments/contract_graph_orchestration_validation/results/theorem_audit/hm_th_03_report.json"
+  ],
+  "figure_captions": {
+    "/app/outputs/runs/adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c/workspace/paper/figures/iter_19/fig_hm_th_01_unsafe_commit.pdf": "Single-panel bar chart of unsafe commit rates across validator modes and assumption toggles. X-axis: validator mode; Y-axis: unsafe commit proportion. Error bars show SD across seeds. Key takeaway: semantic+typed mode with A2_on remains at 0 while schema-only and A2_off degrade safety.",
+    "/app/outputs/runs/adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c/workspace/paper/figures/iter_19/fig_hm_th_02_recovery_bounds.pdf": "Two-panel recovery diagnostics: left panel oscillation rate vs delta; right panel bound ratio vs delta. Both panels include baseline and B_max encodings with SD error bars. Interpretation: bounded policies show near-zero oscillation for delta>eta, while unbounded branching violates bounds.",
+    "/app/outputs/runs/adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c/workspace/paper/figures/iter_19/fig_hm_th_03_far_frr_frontier.pdf": "Two-panel FAR/FRR frontier across guard composition and attack coverage classes. X-axis is trust threshold; Y-axes are FAR and FRR respectively, with SD bars over seeds. Composite guards reduce FAR on covered classes while uncovered classes remain an explicit boundary case."
+  },
+  "claim_support": {
+    "HM-TH-01": {
+      "status": "supported",
+      "reason": "Unsafe commit rate is 0.0 in the assumption-satisfying semantic+typed regime, while schema-only and A2_off produce counterexamples.",
+      "appendix_artifact": "paper/appendix/APP-A1-counterexample-bundle.tex"
+    },
+    "HM-TH-02": {
+      "status": "mixed",
+      "reason": "Bounded regime (delta>eta, finite B) shows zero oscillation, but unbounded branching and violated boundary settings show oscillation and bound failures.",
+      "appendix_artifact": "paper/appendix/APP-A2-recovery-boundary-audit.tex"
+    },
+    "HM-TH-03": {
+      "status": "supported",
+      "reason": "Composite guard lowers FAR on covered classes versus trust-only baseline and hash integrity behaves as required in non-mutated vs mutated runs.",
+      "appendix_artifact": "paper/appendix/APP-A3-adversarial-audit-bundle.tex"
+    }
+  },
+  "confirmatory_analyses_effect": {
+    "HM-TH-01 strictness-sensitivity and A2 toggle ablation": "strengthened",
+    "HM-TH-02 boundary stress with delta<=eta and unbounded branching": "strengthened",
+    "HM-TH-03 covered vs uncovered attack-class split with theta sweep": "strengthened"
+  }
+}

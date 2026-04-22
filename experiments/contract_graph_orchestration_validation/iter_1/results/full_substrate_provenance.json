@@ -1,0 +1,13 @@
+{
+  "substrate_root": "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/resources/codebases/quarks-e2c886f43f88/quarks",
+  "files": {
+    "graph.py": "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/resources/codebases/quarks-e2c886f43f88/quarks/backend/src/quarks/orchestrator/graph.py",
+    "coordinator.py": "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/resources/codebases/quarks-e2c886f43f88/quarks/backend/src/quarks/orchestrator/coordinator.py",
+    "runner.py": "/app/outputs/runs/5abf9e2f-bac7-4539-8eb1-473bbbf8e77e/workspace/resources/codebases/quarks-e2c886f43f88/quarks/backend/src/quarks/orchestrator/runner.py"
+  },
+  "checksums": {
+    "graph.py": "f1089f27dac8e6e002ff10d804ec870bd6fd662c5d4f1ea074a40cf7bd4a2c04",
+    "coordinator.py": "2166b00c59236b78026f3ffac7892d9541117097d21f5df63540e3a5decf1908",
+    "runner.py": "117daa00007e8aa1e1a41bc52fe8c64d7d4d8a8f5b0d94722fa10aae5ba9e846"
+  }
+}

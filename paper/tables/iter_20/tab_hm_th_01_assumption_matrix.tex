@@ -1,0 +1,19 @@
+% Validation table: committed-prefix safety by validator and assumption regime.
+\begin{tabular}{p{0.34\linewidth}p{0.34\linewidth}r}
+\hline
+Validator Mode & Assumption Profile & Unsafe Commit Rate \\
+\hline
+No hard validator & Downstream-precondition implication disabled & 1.0000 \\
+No hard validator & Full safety assumptions enabled & 1.0000 \\
+No hard validator & Prefix-monotonicity assumption disabled & 1.0000 \\
+Schema-only validator & Downstream-precondition implication disabled & 1.0000 \\
+Schema-only validator & Full safety assumptions enabled & 1.0000 \\
+Schema-only validator & Prefix-monotonicity assumption disabled & 1.0000 \\
+Semantic+typed composite validator & Downstream-precondition implication disabled & 1.0000 \\
+Semantic+typed composite validator & Full safety assumptions enabled & 0.0000 \\
+Semantic+typed composite validator & Prefix-monotonicity assumption disabled & 1.0000 \\
+Trust-only gate & Downstream-precondition implication disabled & 1.0000 \\
+Trust-only gate & Full safety assumptions enabled & 1.0000 \\
+Trust-only gate & Prefix-monotonicity assumption disabled & 1.0000 \\
+\hline
+\end{tabular}

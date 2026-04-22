@@ -1,0 +1,10 @@
+% Validation table: cross-claim theorem-audit closure summary.
+\begin{tabular}{p{0.23\linewidth}p{0.20\linewidth}p{0.19\linewidth}p{0.24\linewidth}p{0.10\linewidth}}
+\hline
+Claim Family & Formal Targets & Symbolic Audit & Pass Criterion & Support \\
+\hline
+Committed-prefix safety & Local closure + global soundness & Implication, monotonicity, counterexample reconstruction & Zero unsafe commits under full compositional guards & Mixed \\
+Bounded recovery & Potential-descent lemma + bounded-length theorem & Telescoping bound and regret decomposition checks & Near-zero oscillation only when finite corrective depth and strict descent hold & Mixed \\
+Security and provenance & Trust baseline lower bound + FAR contraction + hash-link invariance & Set-inclusion FAR audit, hash-recurrence integrity, uncovered-class boundary checks & Composite guards outperform trust-only on covered attack classes while preserving append-only traces & Supported with scope caveat \\
+\hline
+\end{tabular}

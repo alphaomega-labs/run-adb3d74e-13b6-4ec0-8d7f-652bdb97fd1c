@@ -1,0 +1,1550 @@
+𝜆𝐴 : A Typed Lambda Calculus for LLM Agent Composition
+QIN LIU, State Key Laboratory of Novel Software Technology, Nanjing University, China and Software
+
+arXiv:2604.11767v2 [cs.PL] 14 Apr 2026
+
+Institute, Nanjing University, China
+Existing LLM agent frameworks lack formal semantics: there is no principled way to determine whether
+an agent configuration is well-formed or will terminate. We present 𝜆𝐴 , a typed lambda calculus for agent
+composition that extends the simply-typed lambda calculus with oracle calls, bounded fixpoints (the ReAct
+loop), probabilistic choice, and mutable environments. We prove type safety, termination of bounded fixpoints,
+and soundness of derived lint rules, with full Coq mechanization (1,519 lines, 42 theorems, 0 Admitted).
+As a practical application, we derive a lint tool that detects structural configuration errors directly from
+the operational semantics. An evaluation on 835 real-world GitHub agent configurations shows that 94.1%
+are structurally incomplete under 𝜆𝐴 —with YAML-only lint precision at 54%, rising to 96–100% under joint
+YAML+Python AST analysis on 175 samples. This gap quantifies, for the first time, the degree of semantic
+entanglement between declarative configuration and imperative code in the agent ecosystem. We further
+show that five mainstream paradigms (LangGraph, CrewAI, AutoGen, OpenAI SDK, Dify) embed as typed 𝜆𝐴
+fragments, establishing 𝜆𝐴 as a unifying calculus for LLM agent composition.
+
+1
+
+Introduction
+
+LLM-based agents are increasingly deployed in production, typically configured via YAML or
+JSON files that specify a language model, a set of tools, a control flow pattern (such as ReAct [1]),
+and optional persistent memory. The community has developed numerous frameworks for agent
+construction—LangChain, DSPy [2], CrewAI, AutoGen—yet none provides a formal account of
+what an agent configuration means.
+This absence of formal semantics has concrete consequences:
+• A ReAct agent configured without a terminate tool may loop indefinitely; no existing tool warns
+the developer.
+• Two agent pipelines that “look different” in YAML may be semantically equivalent (e.g., a chain
+of two agents vs. a single agent with a composed prompt), but there is no way to establish this.
+• Refactoring an agent pipeline—splitting a monolithic agent into sub-agents, adding a validation
+step, introducing memory—is done by trial and error, not by semantics-preserving transformation.
+We argue that these configurations already encode a lambda calculus, and that making this
+structure explicit yields immediate practical benefits.
+Contributions.
+(1) We define 𝜆𝐴 (§3–§4), a typed lambda calculus for agent composition with 11 term formers, a
+type system (§3.2), and small-step and big-step operational semantics (§4).
+(2) We prove type safety (Theorem 5.3), termination of bounded fixpoints (Theorem 5.4), and
+soundness of lint rules (Theorem 5.8) in §5. We argue compilation adequacy empirically rather
+than formally, since no independent formal YAML semantics exists (§5.3).
+(3) We implement lambdagent (§6), a Python DSL realizing 𝜆𝐴 with a from_config compiler and
+lint tool.
+(4) We evaluate (§7) on 835 GitHub agent configurations from 17 repositories and 6 frameworks,
+finding that 94.1% are structurally incomplete under 𝜆𝐴 semantics. We validate lint correctness
+via fault injection (42 tests, 100% precision/recall), estimate YAML-only precision at 54%, and
+Author’s Contact Information: Qin Liu, State Key Laboratory of Novel Software Technology, Nanjing University, Nanjing,
+Jiangsu, China and Software Institute, Nanjing University, Nanjing, Jiangsu, China, qinliu@nju.edu.cn.
+
+2
+
+Qin Liu
+
+Listing 1. A production ReAct agent configuration.
+agentId : seeCoderManus
+type : react
+model : { name : qwen3 - max , temperature : 0.7}
+systemPrompt : " You ␣ are ␣a␣ coding ␣ assistant ... "
+react : { maxSteps : 20}
+mcp :
+onlineTool : { SeeCoder - mcp : [ sum , improve ]}
+localTools : [ terminate ]
+memory : { strategy : redis , size : 20 , ttl : 7200}
+
+show that joint YAML+Python AST analysis raises it to 96–100% (on 50 and 175 samples)—
+discovering that 46% of production configurations split semantics across YAML and Python
+(“semantic entanglement”).
+(5) We demonstrate architectural unification (§7.6): five mainstream agent paradigms—graph state
+machines (LangGraph), role-driven (CrewAI), multi-agent (AutoGen), SDK wrappers (OpenAI/Claude), and low-code (Dify)—are all embeddable as typed fragments of 𝜆𝐴 (Proposition 7.2),
+validated on 835 real-world configurations and 125 semantic faithfulness tests.
+Why simply typed? Our contribution is not a new type theory but the first formal semantics for
+LLM agent configurations, together with a fully mechanized metatheory (1,519 lines Coq, 42 Qed,
+0 Admitted) and practical tooling. A simply typed calculus suffices because agent configurations
+operate at the string level: LLM inputs and outputs are token sequences (type Str), tools accept and
+return strings, and composition chains string-to-string functions. Richer type features—dependent
+types for structured output validation, an effect system for LLM/tool/memory tracking, graded
+types for cost prediction—are natural extensions that we sketch in §9 and develop in companion
+work. The simply typed foundation already enables the three practical benefits demonstrated in
+this paper: static lint, termination bounds, and architectural unification.
+2
+
+Overview
+
+Consider the agent configuration in Listing 1. Our compiler from_config translates it to the 𝜆𝐴
+term:
+mem (fix20 (𝜆𝑠.𝜆𝑥 . let 𝑡 = (lam 𝑝 𝜃 ) 𝑥 in case 𝑡 [𝑙𝑖 ⇒ 𝑎𝑖 ] in . . .)) 𝜎
+where lam is an oracle abstraction (LLM call), fix20 is a bounded fixpoint (the ReAct loop), and
+mem extends the environment with a persistent store 𝜎.
+Bug 1: Missing base case. If localTools omits terminate, the case expression has no branch
+that avoids calling 𝑠 (the self-reference). In 𝜆𝐴 , this means fix20 will exhaust all 20 steps without
+reaching a normal form—a forced truncation rather than a clean termination. Our lint rule L004
+detects this statically.
+Bug 2: Vacuous loop. If maxSteps is set to 0, the fix0 reduces immediately to ⊥ (the stuck term).
+Lint rule L003 flags this as an error.
+Bug 3: Incomplete dispatch. If routes in a type: router configuration omit a default branch,
+the case expression is non-exhaustive: inputs classified outside the listed labels cause a runtime
+RouteError. Lint rule L013 warns about this.
+All three rules are derived from the formal semantics, not ad-hoc heuristics.
+
+𝜆𝐴 : A Typed Lambda Calculus for LLM Agent Composition
+
+3
+
+End-to-end example. We illustrate the complete pipeline on a real GitHub configuration (from
+our 835-config dataset). The following CrewAI agent YAML (simplified) defines a research analyst:
+Listing 2. A real CrewAI agent (simplified from GitHub).
+role : " Senior ␣ Research ␣ Analyst "
+goal : " Produce ␣ comprehensive ␣ research ␣ reports "
+backstory : " Expert ␣ in ␣ data ␣ analysis ␣ and ␣ synthesis "
+tools : []
+
+Running lambdagent lint produces:
+ERROR L004c
+WARN
+
+L017
+
+mcp . localTools : no terminate tool
+( CrewAI : handled by framework ) -> INFO
+react . maxSteps : not specified
+
+The lint correctly identifies that tools:[] means no terminate base case (case with no identity
+branch), but the framework-aware stratification (L004c) downgrades this to Info because CrewAI
+handles termination in Python code. Meanwhile, from_config compiles this to:
+lam “Senior Research Analyst...” 𝜃
+a single oracle call (type Str → Str), since no tools or loops are configured. Type safety guarantees
+that this term, when applied to a string input, either produces a string output or encounters a guard
+failure—never undefined behavior.
+3
+
+The 𝜆𝐴 Calculus: Syntax
+
+3.1
+
+Terms
+
+Definition 3.1 (𝜆𝐴 Terms). The set of 𝜆𝐴 terms is defined by the grammar:
+𝑒 F 𝑥 | 𝜆𝑥:𝜏 . 𝑒 | 𝑒 1 𝑒 2
+
+(standard 𝜆)
+
+| 𝑒1 » 𝑒2
+
+(composition)
+
+| if 𝑒 1 then 𝑒 2 else 𝑒 3
+
+(conditional)
+
+| fix𝑛 𝑒
+
+(bounded fixpoint)
+
+| ⟨𝑒 1, 𝑒 2 ⟩ | 𝜋1 𝑒 | 𝜋 2 𝑒
+
+(pairs)
+
+| tool[𝑓 ]
+
+(oracle / external function)
+
+| case 𝑒 of {𝑙𝑖 ⇒ 𝑒𝑖 }𝑖 ∈𝐼
+
+(dispatch)
+
+| guard 𝑒 𝑃
+
+(refinement)
+
+| mem 𝑒 𝜎
+
+(environment extension)
+
+| 𝑒 1 ⊕𝑝 𝑒 2
+
+(probabilistic choice)
+
+| lam 𝑝 𝜃
+
+(LLM oracle abstraction)
+
+where 𝑛 ∈ N, 𝑝 ∈ [0, 1], 𝜃 denotes model parameters, 𝑝 denotes a prompt (system message), 𝑓 is an
+external function identifier, 𝜎 is a store, and 𝑃 is a decidable predicate. Labels 𝑙𝑖 are drawn from a
+finite label set L.
+Values are:
+𝑣 F 𝜆𝑥:𝜏 . 𝑒 | ⟨𝑣 1, 𝑣 2 ⟩ | tool[𝑓 ] | lam 𝑝 𝜃
+Definition 3.2 (Store and Store Typing). A store 𝜎 is a finite map from keys to values with metadata:
+𝜎 : Key ⇀ Val × N × N, where the two natural numbers are capacity and time-to-live. A store typing
+
+4
+
+Qin Liu
+
+Σ : Key ⇀ 𝜏 assigns types to store locations. We write 𝜎 : Σ when 𝜎 (𝑘) : Σ(𝑘) for all 𝑘 ∈ dom(Σ),
+and Σ′ ⊇ Σ when dom(Σ) ⊆ dom(Σ′ ) and Σ′ (𝑘) = Σ(𝑘) for all 𝑘 ∈ dom(Σ).
+
+Syntactic sugar. Composition desugars: 𝑒 1 » 𝑒 2 ≡ 𝜆𝑥:𝜏 . 𝑒 2 (𝑒 1 𝑥). Parallel execution: 𝑒 1 | 𝑒 2 ≡
+𝜆𝑥:𝜏 . ⟨𝑒 1 𝑥, 𝑒 2 𝑥⟩.
+
+Primitive vs. derivable constructs. Of the 11 term formers, 5 are primitive (not expressible in
+terms of the others): lam (oracle call), tool (external function), fix𝑛 (bounded recursion), mem
+(mutable environment), and ⊕𝑝 (probabilistic choice). The remaining 6 are derivable: » is function
+composition, if is case with two branches, case is nested if, ⟨·, ·⟩ and 𝜋𝑖 are standard pairs, and
+guard is if (𝑃 (𝑟 )) 𝑟 ⊥. We retain derivable constructs as first-class for three reasons: (1) developer
+ergonomics—Route is more readable than nested If; (2) targeted lint rules—the lint rule for empty
+routes (L005) requires matching case specifically; (3) independent optimization—the compiler can
+optimize each construct without desugaring.
+
+3.2
+
+Types
+
+Definition 3.3 (𝜆𝐴 Types).
+
+𝜏 F Str
+
+(base type: token sequences)
+
+| 𝜏1 → 𝜏2
+
+(function type)
+
+| 𝜏1 × 𝜏2
+
+(product type)
+
+| ⟨𝑙𝑖 : 𝜏𝑖 ⟩𝑖 ∈𝐼
+
+(variant type / labels)
+
+| {𝑥:𝜏 | 𝑃 (𝑥)}
+
+(refinement type)
+
+The base type Str is the type of all LLM inputs and outputs (token sequences). We study the
+deterministic fragment (temperature = 0), where each LLM call yields a single string. A probabilistic
+extension via monadic Dist(𝜏) types is straightforward but deferred to future work.
+
+3.3
+
+Typing Rules
+
+A typing judgment has the form Γ; Σ ⊢ 𝑒 : 𝜏, where Σ is a store typing. We abbreviate Γ; ∅ ⊢ 𝑒 : 𝜏 as
+Γ ⊢ 𝑒 : 𝜏 when no store is in scope. We present the non-standard rules; standard rules for variables,
+application, and abstraction are as usual.
+
+𝜆𝐴 : A Typed Lambda Calculus for LLM Agent Composition
+
+T-Lam-Oracle
+
+5
+
+T-Comp
+
+𝜃 : Model
+
+Γ ⊢ 𝑒 1 : 𝜏1 → 𝜏2
+
+𝑝 : Str
+
+Γ ⊢ lam 𝑝 𝜃 : Str → Str
+
+Γ ⊢ 𝑒 1 » 𝑒 2 : 𝜏1 → 𝜏3
+T-Tool
+
+T-Fix
+
+Γ ⊢ 𝑒 : (𝜏 → 𝜏) → (𝜏 → 𝜏)
+
+𝑛∈N
+
+𝑓 : 𝜏1 → 𝜏2
+
+Γ ⊢ fix𝑛 𝑒 : 𝜏 → 𝜏
+T-Case
+
+Γ ⊢ 𝑒 : 𝜏 → ⟨𝑙𝑖 : 𝜏𝑖 ⟩
+
+Γ ⊢ tool[𝑓 ] : 𝜏1 → 𝜏2
+T-Guard
+
+Γ ⊢ 𝑒 : 𝜏 → 𝜏′
+
+∀𝑖. Γ ⊢ 𝑒𝑖 : 𝜏 → 𝜏 ′
+
+Γ ⊢ case 𝑒 of {𝑙𝑖 ⇒ 𝑒𝑖 } : 𝜏 → 𝜏 ′
+T-Mem
+
+Γ; Σ ⊢ 𝑒 : 𝜏 → 𝜏 ′
+
+Γ; Σ ⊢ mem 𝑒 𝜎 : 𝜏 → 𝜏
+
+Γ ⊢ 𝑒1 : 𝜏
+
+Γ ⊢ 𝑒2 : 𝜏
+
+𝑝 ∈ [0, 1]
+
+Γ ⊢ 𝑒 1 ⊕𝑝 𝑒 2 : 𝜏
+
+′
+
+𝑃 : 𝜏 ′ → Bool
+
+Γ ⊢ guard 𝑒 𝑃 : 𝜏 → {𝑥:𝜏 ′ | 𝑃 (𝑥)}
+
+T-Prob
+
+𝜎:Σ
+
+Γ ⊢ 𝑒 2 : 𝜏2 → 𝜏3
+
+(deterministic: pick one)
+
+T-Proj
+
+T-Pair
+
+Γ ⊢ 𝑒 1 : 𝜏1
+
+Γ ⊢ 𝑒 : 𝜏1 × 𝜏2
+
+Γ ⊢ 𝑒 2 : 𝜏2
+
+Γ ⊢ ⟨𝑒 1, 𝑒 2 ⟩ : 𝜏1 × 𝜏2
+
+Γ ⊢ 𝜋𝑖 𝑒 : 𝜏𝑖
+
+Observation 1 (terminate = identity at type Str → Str). The terminate tool is typed
+tool[id] : Str → Str where id = 𝜆𝑥 . 𝑥. It is the only tool in a ReAct agent that does not change the
+state, making it the base case of the bounded fixpoint.
+4
+
+Operational Semantics
+
+We present both small-step (for metatheory) and big-step (for implementation correspondence)
+semantics.
+4.1
+
+Small-Step Semantics
+
+The reduction relation 𝑒 −→ 𝑒 ′ is defined by the following rules (we omit standard 𝛽-reduction
+and congruence rules):
+E-Comp
+
+E-Fix-Zero
+
+E-Fix-Step
+
+𝑒 (𝜆𝑥 . fix𝑛−1 𝑒 𝑥) 𝑣 −→ 𝑣 ′
+
+𝑒 1 𝑣 −→ 𝑣 1
+(𝑒 1 » 𝑒 2 ) 𝑣 −→ 𝑒 2 𝑣 1
+E-Case
+
+fix0 𝑒 𝑣 −→ 𝑣
+
+𝑒 𝑗 𝑣 −→ 𝑣 ′
+
+𝑒 𝑣 −→ 𝑙 𝑗
+
+E-Guard-Ok
+
+𝑒 𝑣 −→ 𝑣 ′
+
+case 𝑒 of {𝑙𝑖 ⇒ 𝑒𝑖 } 𝑣 −→ 𝑣 ′
+E-Mem
+
+𝑒 𝑣 [Γ; 𝜎] −→ 𝑣 ′ ⊣ 𝜎 ′
+
+fix𝑛 𝑒 𝑣 −→ 𝑣 ′
+
+mem 𝑒 𝜎 𝑣 −→ 𝑣 ′ ⊣ 𝜎 ′
+
+𝑓 (𝑣) = 𝑣 ′
+
+tool[𝑓 ] 𝑣 −→ 𝑣 ′
+E-Guard-Fail
+
+𝑃 (𝑣 ′ ) = true
+
+𝑒 𝑣 −→ 𝑣 ′
+
+guard 𝑒 𝑃 𝑣 −→ 𝑣 ′
+𝜎′ ⊇ 𝜎
+
+E-Tool
+
+𝑃 (𝑣 ′ ) = false
+
+guard 𝑒 𝑃 𝑣 −→ stuck
+
+E-Prob-L
+
+(𝑒 1 ⊕𝑝 𝑒 2 ) −→ 𝑒 1
+
+with probability 𝑝
+
+E-Lam-Oracle
+
+E-Prob-R
+
+LLM𝜃 (𝑝, 𝑣) = D
+(𝑒 1 ⊕𝑝 𝑒 2 ) −→ 𝑒 2
+
+with probability 1−𝑝
+
+lam 𝑝 𝜃 𝑣 −→ D
+
+6
+
+Qin Liu
+
+Key rule: E-Fix-Step. This is the operational content of the Y combinator. The body 𝑒 receives
+two arguments: a “self” reference 𝜆𝑥 . fix𝑛−1 𝑒 𝑥 (which can be called for recursion, but with a
+decremented bound), and the current input 𝑣. When 𝑛 reaches 0, E-Fix-Zero forces termination.
+4.2
+
+Big-Step Semantics
+
+The big-step judgment 𝑒 𝑣 ⇓𝑘 𝑟 means “𝑒 applied to 𝑣 evaluates to 𝑟 in 𝑘 steps.” We highlight the
+ReAct-specific rule:
+B-React
+
+step𝑖 = (𝑠𝑖 , 𝑎𝑖 , 𝑜𝑖 , 𝑠𝑖+1 )
+
+for 0 ≤ 𝑖 < 𝑘
+
+𝑎𝑘 = terminate
+
+𝑘 ≤𝑛
+
+fix𝑛 𝑒 react 𝑠 0 ⇓𝑘 𝑠𝑘
+where each step𝑖 is a 7-phase decomposition:
+(1) Think: 𝑡𝑖 = (lam 𝑝 𝜃 ) 𝑠𝑖
+(LLM call)
+(2) Parse: 𝑎𝑖 = parse(𝑡𝑖 )
+(action extraction)
+(3) Route: tool𝑖 = lookup(𝑎𝑖 , tools)
+(dispatch)
+(4) Invoke: 𝑜𝑖 = tool[tool𝑖 ] (args(𝑎𝑖 ))
+(tool call)
+(5) Observe: obs𝑖 = format(𝑜𝑖 )
+(result formatting)
+(6) Update: 𝜎 ′ = 𝜎 [𝑘𝑖 ↦→ summary(𝑡𝑖 , 𝑜𝑖 )]
+(memory write)
+(7) Check: if 𝑎𝑖 = terminate then halt, else 𝑠𝑖+1 = 𝑠𝑖 ⊕ obs𝑖
+This decomposition corresponds precisely to one unfolding of the bounded fixpoint fix𝑛 .
+5
+
+Metatheory
+
+5.1
+
+Type Safety
+
+Theorem 5.1 (Progress). If Γ ⊢ 𝑒 : 𝜏 and 𝑒 is not a value, then either 𝑒 −→ 𝑒 ′ for some 𝑒 ′ , or 𝑒 is a
+guard failure (stuck).
+Proof. By induction on the typing derivation Γ ⊢ 𝑒 : 𝜏.
+• T-Lam-Oracle: lam 𝑝 𝜃 is a value. If applied, (lam 𝑝 𝜃 ) 𝑣 reduces by E-Lam-Oracle (the
+LLM oracle always returns a distribution). ✓
+• T-Comp: (𝑒 1 » 𝑒 2 ) 𝑣 reduces by I.H. on 𝑒 1 𝑣, then E-Comp. ✓
+• T-Fix: fix𝑛 𝑒 𝑣 reduces by E-Fix-Zero (if 𝑛 = 0) or E-Fix-Step (if 𝑛 > 0). ✓
+• T-Tool: tool[𝑓 ] 𝑣 reduces by E-Tool (external functions are total by assumption). ✓
+• T-Case: By I.H. on the classifier, it reduces to some label 𝑙 𝑗 . If 𝑗 ∈ 𝐼 , the corresponding branch
+reduces. If 𝑗 ∉ 𝐼 , the term is stuck—but this cannot happen if the type ⟨𝑙𝑖 ⟩ is exhaustive. ✓
+• T-Guard: Reduces by I.H. on inner agent. If 𝑃 (𝑣 ′ ) holds, E-Guard-Ok; otherwise E-GuardFail yields stuck. This is the only source of stuckness. ✓
+• All other cases follow from standard progress arguments.
+□
+□
+Theorem 5.2 (Preservation). If Γ; Σ ⊢ 𝑒 : 𝜏 and 𝑒 −→𝜎 𝑒 ′ ⊣ 𝜎 ′ where 𝜎 : Σ, then there exists
+Σ′ ⊇ Σ such that 𝜎 ′ : Σ′ and Γ; Σ′ ⊢ 𝑒 ′ : 𝜏.
+Proof. By induction on the reduction 𝑒 −→ 𝑒 ′ .
+• E-Fix-Step: fix𝑛 𝑒 𝑣 −→ 𝑣 ′ where 𝑒 (𝜆𝑥 . fix𝑛−1 𝑒 𝑥) 𝑣 −→ 𝑣 ′ . By T-Fix, 𝑒 : (𝜏 → 𝜏) → (𝜏 →
+𝜏). The self-reference 𝜆𝑥 . fix𝑛−1 𝑒 𝑥 : 𝜏 → 𝜏. By I.H., 𝑣 ′ : 𝜏. ✓
+• E-Comp: (𝑒 1 » 𝑒 2 ) 𝑣 −→ 𝑒 2 𝑣 1 . By T-Comp, 𝑒 1 : 𝜏1 → 𝜏2 and 𝑒 2 : 𝜏2 → 𝜏3 . By I.H., 𝑣 1 : 𝜏2 , so
+𝑒 2 𝑣 1 : 𝜏3 . ✓
+
+𝜆𝐴 : A Typed Lambda Calculus for LLM Agent Composition
+
+7
+
+• E-Mem: mem 𝑒 𝜎 𝑣 −→ 𝑣 ′ ⊣ 𝜎 ′ with 𝜎 ′ ⊇ 𝜎. By T-Mem, Γ; Σ ⊢ 𝑒 : 𝜏 → 𝜏 ′ and 𝜎 : Σ.
+The store update produces 𝜎 ′ : Σ′ where Σ′ ⊇ Σ (new keys may be added, but existing
+keys retain their types—the store is append-only with respect to typing). By I.H. on 𝑒 𝑣 in
+environment Γ; Σ′ , we get Γ; Σ′ ⊢ 𝑣 ′ : 𝜏 ′ . ✓
+• E-Lam-Oracle: (lam 𝑝 𝜃 ) 𝑣 −→ 𝑣 ′ where 𝑣 ′ ∈ Str. By T-Lam-Oracle, the type is Str → Str.
+At temperature = 0, the LLM returns a deterministic string. ✓
+• Other cases are standard.
+□
+□
+Theorem 5.3 (Type Safety). If Γ ⊢ 𝑒 : 𝜏, then evaluation of 𝑒 either:
+(a) produces a value 𝑣 with Γ ⊢ 𝑣 : 𝜏, or
+(b) encounters a guard failure (a well-defined error, not undefined behavior).
+Proof. By iterated application of Progress and Preservation. The only source of stuckness is
+E-Guard-Fail, which is a checked runtime error (the predicate 𝑃 is decidable), not undefined
+behavior.
+□
+□
+5.2
+
+Termination
+
+Theorem 5.4 (Termination of Bounded Fixpoints). For all 𝑛, 𝑒, and 𝑣: evaluation of fix𝑛 𝑒 𝑣
+terminates in at most 𝑛 unfoldings, assuming each oracle call (lam and tool) terminates.
+Proof. By strong induction on 𝑛.
+• Base: 𝑛 = 0. fix0 𝑒 𝑣 −→ 𝑣 by E-Fix-Zero. Terminates in 0 unfoldings. ✓
+• Step: 𝑛 > 0. fix𝑛 𝑒 𝑣 −→ 𝑒 (𝜆𝑥 . fix𝑛−1 𝑒 𝑥) 𝑣 by E-Fix-Step. The self-reference 𝜆𝑥 . fix𝑛−1 𝑒 𝑥
+can be called at most once per unfolding, and fix𝑛−1 terminates in ≤ 𝑛 − 1 unfoldings by
+I.H. Total: ≤ 1 + (𝑛 − 1) = 𝑛. ✓
+□
+□
+Corollary 5.5 (ReAct Termination). A ReAct agent with maxSteps: n terminates in at most 𝑛
+iterations, regardless of whether terminate is invoked.
+Theorem 5.6 (Cost Bound). Let 𝑇 be the 𝛽-reduction trace produced by evaluating fix𝑛 𝑒 𝑣, where
+each oracle call (LLM or tool) has cost 𝑐𝑖 (e.g., API tokens consumed). Then:
+cost(𝑇 ) ≤ 𝑛 ×
+
+max
+
+𝑐𝑖
+
+𝑖 ∈oracles(𝑒 )
+
+Proof. Each unfolding of fix𝑛 invokes at most one oracle call (the body 𝑒 calls think then
+selects one tool). By Theorem 5.4, there are at most 𝑛 unfoldings. In each unfolding, the cost is
+bounded by max𝑖 𝑐𝑖 . The total cost is bounded by the product.
+□
+□
+This theorem enables pre-deployment cost estimation: given a configuration with maxSteps:
+20 and an LLM costing $0.01 per call, the maximum API cost is 20 × $0.01 = $0.20 per invocation.
+This is not possible in frameworks without formal termination bounds.
+Theorem 5.7 (Pipeline Algebra). Agent composition » satisfies the monoid laws:
+(𝑎 » 𝑏) » 𝑐 ≡ 𝑎 » (𝑏 » 𝑐)
+
+(associativity)
+
+(1)
+
+𝑎 » id ≡ id » 𝑎 ≡ 𝑎
+
+(identity)
+
+(2)
+
+where id = 𝜆𝑥 : Str. 𝑥 and ≡ denotes extensional equivalence: 𝑓 ≡ 𝑔 ⇐⇒ ∀𝑣. 𝑓 𝑣 = 𝑔 𝑣.
+
+8
+
+Qin Liu
+
+Proof. Associativity: (𝑎 » 𝑏) » 𝑐 = 𝜆𝑥 . 𝑐 ((𝑎 » 𝑏) (𝑥)) = 𝜆𝑥 . 𝑐 (𝑏 (𝑎(𝑥))). Likewise 𝑎 » (𝑏 » 𝑐) =
+𝜆𝑥 . (𝑏 » 𝑐) (𝑎(𝑥)) = 𝜆𝑥 . 𝑐 (𝑏 (𝑎(𝑥))). Identity: 𝑎 » id = 𝜆𝑥 . id(𝑎(𝑥)) = 𝜆𝑥 . 𝑎(𝑥) = 𝑎. Symmetric for
+id » 𝑎.
+□
+□
+The monoid structure enables algebraic optimization: 𝑎»id»𝑏 can be simplified to 𝑎»𝑏, eliminating
+a redundant identity stage. More generally, the terminate tool (= id) can be recognized as a neutral
+element in pipeline composition.
+5.3
+
+Compilation Adequacy
+
+A formal compilation correctness theorem would require an independent formal semantics for
+YAML agent configurations—the “source language.” No such semantics exists: the meaning of
+a YAML configuration is defined informally by each framework’s documentation and runtime
+behavior. We therefore make an explicitly weaker claim.
+Adequacy argument. The from_config compiler translates each YAML field to a 𝜆𝐴 term by case
+analysis on the type field:
+• type: simple ↦→ lam (single oracle call);
+• type: react ↦→ fix𝑛 (𝜆self.𝜆𝑥 . . . .) with 𝑛 = maxSteps;
+• tools: [t1 , . . . ] ↦→ case with one branch per tool;
+• memory: {...} ↦→ mem.
+Each case is designed to match the informal specification of the corresponding framework pattern.
+We verify empirically rather than prove formally: the 125 semantic faithfulness tests (Section 7)
+execute from_config on real configurations and check that the compiled 𝜆𝐴 term produces the
+expected output.
+Why not a formal theorem? Formal compilation correctness (in the CompCert [17] sense) requires
+two independently defined formal semantics and a proof that they agree. Defining a formal semantics
+for YAML agent configurations—across 6 incompatible frameworks—is a substantial undertaking
+orthogonal to our contribution. We leave it to future work, noting that our lint soundness theorem
+(below) does not depend on compilation correctness: lint rules are defined over the 𝜆𝐴 target
+language only.
+5.4
+
+Lint Soundness
+
+Theorem 5.8 (Lint Soundness). If lint(𝐶) = Error(𝑅) for lint rule 𝑅, then configuration 𝐶 has
+a semantic defect as defined by the operational semantics.
+Proof. We verify each ERROR-level rule:
+• L001 (systemPrompt empty): lam 𝜖 𝜃 is an LLM call with empty prompt. By E-Lam-Oracle,
+the output distribution has maximum entropy—the agent’s behavior is undefined. ✓
+• L003 (maxSteps = 0): fix0 𝑒 𝑣 −→ 𝑣 by E-Fix-Zero. The agent returns its input unchanged—
+a vacuous computation. ✓
+• L004a (no terminate, no alternative termination mechanism): In the case expression within
+fix𝑛 , every branch invokes 𝑠 (the self-reference). There is no branch that returns without
+recursion, and no bounded iteration fallback, is_termination_msg, or framework-internal
+termination logic was detected. This is a genuine risk of infinite looping. ✓
+• L004b (no terminate, but has bounded fallback): same as L004a, except a max_iter or
+equivalent field is present. By Theorem 5.4, the fixpoint terminates at step 𝑛, but via forced
+truncation, not a clean base case. Downgraded to Warn. ✓
+
+𝜆𝐴 : A Typed Lambda Calculus for LLM Agent Composition
+
+9
+
+Table 1. Implementation architecture: code ↔ formalism correspondence.
+Layer
+
+Formalism
+
+LoC
+
+Key Classes
+
+Core DSL
+
+𝜆𝐴 syntax (Def. 3.1)
+
+575
+
+from_config
+
+Compilation (§5.3)
+
+999
+
+Runtime
+
+Op. semantics (§4)
+
+2,097
+
+CLI + lint
+
+Static analysis (§5)
+
+1,232
+
+13 classes: Term, Lam,
+Compose, Loop, Tool,
+Route, etc.
+Compiler,
+5
+type
+branches
+Executor, ReActEngine,
+ActionParser
+8 commands, 26 lint
+rules
+
+Total
+
+4,903
+
+58 classes
+
+• L004c/d (no terminate, framework handles termination): For CrewAI (built-in completion detection in Python code), LangChain (AgentFinish return type), and AutoGen
+(is_termination_msg string matching), the Y combinator base case exists but is external to the YAML configuration. Downgraded to Info. ✓
+• L005 (empty routes): case 𝑒 of {} = stuck for all inputs—the dispatch has no branches to
+take. ✓
+• L021 (multi-agent, no termination): GroupChat with no max_turns, no max_rounds, and
+no is_termination_msg—an unbounded multi-agent loop with no base case and no bound.
+✓
+□
+□
+Framework-aware termination analysis. Our analysis of 663 raw GitHub configurations identified 6 alternative termination mechanisms across production frameworks: (1) bounded iteration
+(max_iter, 86 configs), (2) LLM output string matching (is_termination_msg, AutoGen), (3) multiturn limits (max_rounds), (4) framework-internal logic (CrewAI Python code), (5) DAG termination
+nodes (Dify), and (6) delegation termination (allow_delegation=false).
+These mechanisms are all functionally equivalent to 𝜆𝑥 .𝑥 (the identity function)—they stop the Y
+combinator by returning state unchanged—but they are invisible at the YAML level. Our lint v3
+detects these alternatives and adjusts severity:
+• L004a (ERROR): no terminate and no alternative ⇒ genuine risk
+• L004b (WARN): no terminate but bounded fallback ⇒ forced truncation
+• L004c/d (INFO): framework handles termination ⇒ structurally expected
+This reduces the estimated false positive rate from ∼82% (old single L004 rule) to <5% (new L004a).
+Corollary 5.9 (Soundness of framework-aware lint). Every configuration flagged as Error
+by lint v3 (rules L001–L006, L021, L023) has a genuine semantic defect that cannot be mitigated by
+framework-internal mechanisms. Warn-level findings (L004b, L007–L013, L017–L018, L020, L022,
+L024–L025) indicate potential issues that may or may not be addressed by framework runtime behavior.
+6
+
+Implementation
+
+lambdagent is implemented in 4,903 lines of Python across 28 modules, comprising 58 classes. The
+architecture is organized into four layers, each corresponding to a layer of the formal development.
+
+10
+
+Qin Liu
+
+Core DSL: 11 constructs = 13 classes. Each 𝜆𝐴 term former maps to one Python class with
+an apply(input, ctx) method implementing the corresponding operational semantics rule.
+StoreTyping (Σ) enforces append-only store typing at runtime: Memory.remember(k, v) raises
+TypeError if key 𝑘 already has a different type, matching the Preservation proof for E-Mem. The »
+and | operators are overloaded for composition and parallel execution.
+from_config: YAML → 𝜆𝐴 compilation. The compiler dispatches on 5 agent types:
+• simple ↦→ lam
+• react ↦→ fix𝑛
+• chain ↦→ comp
+• router ↦→ case
+• parallel ↦→ par
+Post-compilation wrappers apply guard and mem if configured. Compilation is structurally
+recursive: sub-agent configurations are compiled by recursive calls to build_agent.
+Agent Runtime: 𝛽-reduction engine. Runtime.run(term, input) creates a Context (Γ), invokes
+Executor.reduce(), and collects the 𝛽-reduction trace. The executor dispatches by isinstance
+across all 11 term types—a direct implementation of call-by-value evaluation. The ReActEngine
+implements the 7-phase big-step rule (B-React) with TerminationOracle as the base case detector.
+Five 𝛽-reduction trace points (ctx.log()) record every LLM call, tool invocation, and loop iteration.
+One-stop execution: YAML → result in 3 lines. A complete agent run requires only:
+from lambdagent . agentruntime import Runtime
+result = Runtime . execute ( " config . yml " ,
+" Write ␣ quicksort " )
+print ( result . result ) # agent output
+print ( result . stats )
+# 15 steps , 4821 tokens
+
+CLI: 8 subcommands. compile (YAML → 𝜆), run (compile + execute), repl (interactive), lint
+(static analysis), trace (view 𝛽-reductions), lambda (export 𝜆𝐴 expression), tools (list/test MCP
+tools), version.
+Demonstrations. hello.py (193 lines) exercises all 11 constructs in sequence. demo_advanced.py
+(446 lines) implements 4 realistic agent patterns:
+(1) Self-correcting translator: 𝑌 (translate ≫ back-translate ≫ if score≥8)
+(2) Multi-perspective: Par(opt, pess, real) ≫ synthesize
+(3) Recursive doc generator: outline ≫ MAP(expand) ≫ 𝑌 (review/fix)
+(4) Self-learning: 𝑌 (𝜆𝐷. guard(Lam(𝐷), test))
+7
+
+Evaluation
+
+We evaluate three claims: (1) lint finds real bugs, (2) the DSL is expressive, and (3) the formal
+semantics is faithful.
+7.1
+
+Lint Effectiveness on Real Configurations
+
+We crawled 2,225 YAML/JSON files from GitHub using 43 Code Search queries and file tree scans
+of 17 major repositories (CrewAI, LangChain, AutoGen, SWE-agent, MetaGPT, Dify, LobeChat,
+etc.). We normalized 6 configuration formats (CrewAI, LangChain, AutoGen, Dify, multi-agent,
+generic) and ran lambdagent lint on 835 valid agent configurations.
+
+𝜆𝐴 : A Typed Lambda Calculus for LLM Agent Composition
+
+11
+
+Table 2. Lint results on 835 GitHub agent configurations.
+
+Rule
+
+Level
+
+Count
+
+Pct
+
+Lambda Semantics
+
+mcp.localTools ERROR
+systemPrompt
+ERROR
+model
+ERROR
+react.maxSteps ERROR
+
+483
+282
+51
+1
+
+57.8% No 𝜆𝑥 .𝑥 base case
+33.8% 𝜆𝑥 .⊥ (undefined body)
+6.1% No LLM = no computation
+0.1% 𝑌 unbounded
+
+Total configs with ≥1 ERROR
+Clean (no ERROR/WARN)
+
+786
+46
+
+94.1%
+5.5%
+
+Table 3. Lint results stratified by framework.
+
+Framework
+
+Configs
+
+w/ ERROR
+
+CrewAI
+Generic
+Multi-agent
+LangChain
+AutoGen
+lambdagent
+
+441
+283
+45
+35
+22
+9
+
+∼430
+∼260
+∼40
+∼30
+∼20
+∼6
+
+Dominant Defect
+
+Nature
+
+mcp.localTools
+systemPrompt
+systemPrompt
+systemPrompt
+model
+mixed
+
+structural†
+genuine
+genuine
+genuine
+genuine
+genuine
+
+† CrewAI defines tools in Python code, not in YAML. The YAML is structurally incomplete by
+
+design; our lint detects this structural incompleteness, which is informative but not a runtime
+failure.
+Result. 786 out of 835 configurations (94.1%) are structurally incomplete under 𝜆𝐴 semantics—the
+YAML alone does not constitute a well-formed lambda term (Table 2). We emphasize that structural
+incompleteness does not necessarily imply a runtime defect: production frameworks routinely
+supplement YAML with Python code, environment variables, or built-in defaults.
+Stratified analysis. The headline 94.1% rate requires stratification by framework, because different
+frameworks place tool declarations in different locations:
+Excluding CrewAI’s expected mcp.localTools findings, the incompleteness rate on the remaining 394 non-CrewAI configurations is ∼87.6% (345/394), driven by empty systemPrompt (272) and
+missing model (46). Whether these are genuine defects depends on whether the missing fields are
+supplied externally (Python code, environment variables, databases). We address this ambiguity
+with two controlled experiments below.
+Framework-aware lint v3. After identifying the false positive problem with rule L004, we deployed
+the framework-aware lint v3 described in Section 5. Re-running on the same 835 configurations:
+• L004a (ERROR, genuine): 88 configurations have no terminate tool and no alternative
+termination mechanism—these are real risks.
+• L004b (WARN, bounded fallback): 95 configurations have max_iter but no explicit base
+case—forced truncation, not graceful termination.
+• L004c/d (INFO, framework-handled): 300 configurations are CrewAI/LangChain/AutoGen
+where the framework runtime provides termination—structurally expected.
+The effective ERROR-level false positive rate for L004 drops from ∼82% (v1) to <5% (v3).
+
+12
+
+Qin Liu
+
+Caveat. The L001 (empty prompt, 282) and L002 (no model, 51) findings may or may not be
+genuine defects—the missing fields could be supplied by Python code or environment variables
+that our YAML-only analysis cannot observe. We do not claim these as confirmed runtime defects.
+Instead, we validate lint rule precision through two controlled experiments:
+Experiment A: Fault injection (controlled). We prepared 10 known-good agent configurations (manually verified to run correctly), then systematically injected 5 types of faults into each: (1) remove
+terminate, (2) empty systemPrompt, (3) remove model, (4) set maxSteps=0, (5) empty routes.
+This produces 50 test cases with known ground truth.
+Result: lambdagent lint detected all 42 injected faults (100% recall) with 0 false positives on
+the 10 unmodified configurations (100% precision). 8 fault–config combinations were skipped
+as inapplicable (e.g., “remove terminate” on a non-ReAct agent). All 5 fault types achieved 100%
+detection. This confirms that the lint rules are correct: when a field is genuinely missing (not
+supplemented externally), lint reliably detects it.
+Experiment B: Manual verification (sampled). We randomly sampled 50 ERROR findings from the
+non-CrewAI configurations and manually inspected the corresponding GitHub repositories (Python
+code, README, environment files) to determine whether the flagged field was supplemented
+externally.
+Result: Of 50 sampled ERRORs, 27 were true positives (field genuinely missing in both YAML
+and code) and 23 were false positives (field supplied by Python code or environment variable). This
+gives an estimated precision of 54.0% (95% Wilson CI: [40.4%, 67.0%]). Precision varies by rule:
+model missing achieves 75% (6/8), react.maxSteps achieves 71% (10/14), but systemPrompt empty
+achieves only 39% (11/28)—many frameworks define prompts in Python code rather than YAML.
+Finding: Configuration-code semantic entanglement. The 46% false positive rate is itself a significant empirical finding: it quantifies, for the first time, the degree of semantic entanglement between
+declarative configuration and imperative code in the agent ecosystem. Nearly half of production
+configurations split their semantics across YAML and Python, with no single artifact containing
+the complete agent specification. This has three implications: (1) the 54% precision represents a
+lower bound for any static analysis operating on configuration files alone—improving beyond it
+requires joint YAML+Python analysis; (2) configuration-code entanglement is a design smell that
+hinders portability, auditability, and formal reasoning; and (3) frameworks that centralize agent
+semantics in a single declarative specification (as 𝜆𝐴 does) are better suited for static analysis.
+Precision in context. To contextualize the 54% precision, we compare with established static
+analysis tools:
+The 54% real-world precision is comparable to FindBugs (42–53%) and within the range of Pylint.
+The key difference is that lambdagent lint operates on configuration files only, without access to
+the accompanying Python code. The 100% precision on fault injection confirms that the rules
+themselves are correct; the 46% false positive rate reflects the inherent limitation of single-artifact
+analysis in a multi-artifact ecosystem.
+Experiment C: Joint YAML+Python analysis. To quantify how much precision improves when
+Python code is available, we extend the YAML-only lint with a Python AST analyzer that scans the
+same repository for supplementary definitions. The analyzer extracts: (1) constant assignments
+matching lint-flagged fields (e.g., system_prompt = "..."), (2) function keyword arguments
+(model_name="gpt-4"), (3) class attributes, and (4) framework-specific patterns (ChatOpenAI(),
+is_termination_msg).
+
+𝜆𝐴 : A Typed Lambda Calculus for LLM Agent Composition
+
+13
+
+Table 4. Precision of static analysis tools across domains.
+
+Tool
+
+Domain
+
+Precision
+
+FindBugs
+SpotBugs
+Pylint (all rules)
+ESLint (recommended)
+Infer
+
+Java bugs
+Java bugs
+Python style/bugs
+JavaScript
+C/Java memory
+
+lambdagent lint (YAML)
+Agent config
+lambdagent lint (YAML+Py) Agent config
+(fault injection)
+
+Source
+
+42–53% Ayewah et al., 2008
+∼50% FindBugs successor
+55–65% Community reports
+60–70% Varies by config
+65–80% Calcagno et al., 2015
+54% This paper
+96% This paper
+100% This paper
+
+Table 5. YAML-only vs. joint YAML+Python analysis.
+
+Metric
+
+True Positive
+False Positive
+Downgraded to Info
+Precision
+95% CI (Wilson)
+
+50-sample
+
+175-sample
+
+YAML
+
++Python
+
+YAML
+
++Python
+
+27
+23
+—
+54%
+
+27
+1
+22
+96%
+
+90
+85
+—
+51%
+
+89
+0
+86
+100%
+
+[40,67]
+
+[82,99]
+
+[44,59]
+
+[96,100]
+
+We evaluate on two scales. First, we re-evaluate the 50 manually-verified samples from Experiment B: of the 23 false positives, the AST analyzer identifies 22 as externally supplemented (96%).
+Second, we expand to 175 stratified samples (100 non-CrewAI + 75 CrewAI, random seed 42) to
+include the dominant CrewAI paradigm where tools are defined entirely in Python.
+The results are consistent across both scales: YAML-only precision is ∼52% (the 50-sample and
+175-sample CIs overlap), while joint analysis achieves ≥96%. Per-framework, CrewAI improves
+from 5% to 100% (tools are always in Python), generic from 87% to 100%, AutoGen from 85% to 100%.
+Per-field, systemPrompt rises from 39–83% to 92–100%, react.maxSteps from 24–71% to 100%.
+This result demonstrates that the lint rules themselves are highly precise: the ∼48% false positive
+rate in YAML-only mode is entirely attributable to semantic entanglement, not to rule imprecision.
+Joint analysis recovers nearly all of this lost precision, confirming that a single-artifact analysis
+boundary, not rule quality, is the bottleneck.
+Comparison. Neither LangChain nor DSPy provides a lint tool for agent configurations. Running
+the same configurations through those frameworks produces no warnings; structural incompleteness manifests only at runtime.
+7.2
+
+Expressiveness
+
+Beyond LoC reduction, lambdagent can naturally express patterns that lack direct counterparts in
+existing frameworks:
+• Self-learning function (Demo 4): 𝑌 (𝜆𝐷. guard(Lam(𝐷), test)). Requires Loop + Guard
+as composable primitives. In LangChain, a hand-written while loop with manual prompt
+reconstruction (∼40 lines vs. 8 in lambdagent).
+
+14
+
+Qin Liu
+
+Table 6. DSL wrapper overhead (excluding LLM latency).
+
+Operation
+
+Latency
+
+Relative to LLM call
+
+Tool call
+Compose (3 stages)
+If branch
+Pair
+Loop (5 steps)
+Memory (3 keys)
+Guard
+Context.log
+
+2.0 𝜇s 0.0001%
+4.9 𝜇s 0.0002%
+4.6 𝜇s 0.0002%
+3.4 𝜇s 0.0002%
+11.2 𝜇s 0.0006%
+2.4 𝜇s 0.0001%
+2.4 𝜇s 0.0001%
+0.9 𝜇s <0.0001%
+
+from_config
+lint
+
+1.3 ms one-time (compile)
+5.0 𝜇s per config
+
+Baseline: typical LLM API call latency is 1,000–3,000 ms.
+
+• Guard + Loop composition: Loop(body, stop) » Guard(P, retry=3) combines iteration with output validation in a single expression. LangChain requires nested try/except
+with manual retry logic.
+• Recursive document generator (Demo 3): MAP(expand) ≫ 𝑌 (review/fix) chains higherorder functions with bounded recursion. No existing framework provides MAP over agents
+as a first-class combinator.
+7.3
+
+Performance Overhead
+
+The DSL wrapper adds 2–11 𝜇s per operation (Table 6), negligible compared to LLM call latency
+(∼2,000 ms). Compilation is a one-time 1.3 ms cost. The 𝛽-reduction trace (Context.log) adds <1 𝜇s
+per entry. The formal semantics layer is essentially free.
+7.4
+
+Semantic Faithfulness
+
+We validate that the implementation matches the formal semantics via 125 test cases covering all
+11 term formers. Each test constructs a 𝜆𝐴 term, executes it via real LLM API calls (Claude Sonnet,
+temperature = 0), and checks the result against the expected output predicted by the operational
+semantics.
+• Church primitives (SUCC, AND, OR, NOT, IF, PAIR): 60/60 pass.
+• DSL pipeline tests: 29/29 pass.
+• Custom function generalization: 36/36 pass.
+• Total: 125/125 (100%).
+Beyond Church encodings, we validate on 8 real-world agent patterns that exercise multiple 𝜆𝐴
+constructs simultaneously. Each pattern is executed via real LLM calls (Claude, temperature = 0)
+and verified against the operational semantics:
+The 8 patterns cover all 11 𝜆𝐴 constructs in combination and represent the most common agent
+architectures across 5 mainstream frameworks (LangGraph, CrewAI, AutoGen, OpenAI SDK, Dify).
+Notably, the ReAct loop terminates in exactly 3 iterations with the correct answer, confirming
+Theorem 5.4’s bound; the guard validates output format (exactly 3 words) with retry, confirming
+the operational semantics of guard.
+
+𝜆𝐴 : A Typed Lambda Calculus for LLM Agent Composition
+
+15
+
+Table 7. Real-world agent pattern tests. Each pattern constructs a production-style 𝜆𝐴 term, executes via real
+LLM calls, and verifies the output matches the operational semantics prediction. “Output” shows the actual
+LLM result.
+Pattern
+
+𝜆𝐴 Constructs
+
+Output
+
+Pass
+
+LLM call
+3-stage pipe
+ReAct loop
+Guard+retry
+Parallel
+Router
+Handoff
+Self-learn
+
+lam
+», 3×lam
+fix3 , case
+guard
+⟨lam1, lam2 ⟩
+case, 3×lam
+case, »
+fix2 , guard
+
+“Paris”
+translate→fmt
+“105”
+3 words
+sum+kw
+“2𝑥”
+analyst→wr
+haiku
+
+Total: 133/133 (125 Church + 8 patterns)
+
+✓
+✓
+✓
+✓
+✓
+✓
+✓
+✓
+100%
+
+Table 8. Cost Bound validation: predicted vs. actual oracle calls.
+
+Agent
+
+𝑛
+
+Predicted max
+
+Actual
+
+Tightness
+
+Church factorial (3!)
+Church factorial (5!)
+ReAct research (ex02)
+Self-learning (demo4)
+Refine loop (demo1)
+
+4
+6
+20
+10
+5
+
+4 calls
+6 calls
+40 calls
+20 calls
+10 calls
+
+4
+6
+15
+8
+3
+
+1.0×
+1.0×
+2.7×
+2.5×
+3.3×
+
+Predicted max = 𝑛 × 2 (think + one tool per iteration). Tightness = predicted/actual.
+7.5
+
+Cost Bound Validation
+
+Theorem 5.6 predicts that a fix𝑛 agent costs at most 𝑛 × max𝑖 𝑐𝑖 . We validate this bound using the
+𝛽-reduction traces from our 125 experiments:
+The bound is always respected (no violations). For simple recursive computations (factorial), the
+bound is tight (tightness = 1.0×). For ReAct agents that terminate early via terminate, the bound
+overestimates by 2–3×, because the agent typically calls terminate before exhausting maxSteps.
+This conservative overestimation is a feature: it provides a worst-case budget guarantee suitable
+for pre-deployment cost planning (e.g., “this agent will never cost more than $0.40 per invocation”).
+7.6
+
+Architectural Unification
+
+We argue that 𝜆𝐴 is not merely one more framework, but a unifying calculus: five mainstream
+agent architecture paradigms are all embeddable as fragments of 𝜆𝐴 . Table 9 summarizes the
+correspondence; we formalize the claim below.
+Definition 7.1 (Framework Translation). For a framework 𝐹 with configuration language C𝐹 ,
+a 𝜆𝐴 -translation is a function T𝐹 : C𝐹 → 𝜆𝐴 that maps each configuration to a 𝜆𝐴 term. In our
+implementation, T𝐹 is realized by the from_config compiler with framework-specific normalization
+(Section 6).
+Proposition 7.2 (Architectural Embedding). For each 𝐹 ∈ {LangGraph, CrewAI, AutoGen,
+OpenAI SDK, Dify}, T𝐹 satisfies:
+(1) Type preservation: If 𝑐 ∈ C𝐹 is well-formed, then Γ ⊢ T𝐹 (𝑐) : 𝜏 for some 𝜏.
+
+16
+
+Qin Liu
+
+Table 9. Five agent architecture paradigms as 𝜆𝐴 fragments. Each paradigm uses only a subset of the 11 term
+formers. “Configs” indicates the number of real-world GitHub configurations from our dataset (Section 7)
+that exercise each paradigm’s translation.
+
+Paradigm
+
+Core Pattern
+
+𝜆𝐴 Fragment
+
+Configs
+
+Graph
+(LangGraph)
+Role-driven (CrewAI)
+SDK
+wrapper
+(OpenAI)
+Multi-agent (AutoGen)
+Low-code (Dify)
+
+Cond. edges, cy- case + fix𝑛 + »
+cles
+Role
+dispatch, case + »
+handoff
+LLM call + tools
+lam + tool
+
+35
+
+283
+
+Group chat, turns
+
+fix𝑛 + case
+
+22
+
+YAML pipeline
+
+from_config
+
+54
+
+441
+
+(2) Compositionality: Framework-level sequential composition maps to 𝜆𝐴 composition: T𝐹 (𝑐 1 ◦𝐹
+𝑐 2 ) = T𝐹 (𝑐 1 ) » T𝐹 (𝑐 2 ).
+(3) Behavioral adequacy: On the 125 semantic faithfulness tests (Section 7), the compiled 𝜆𝐴 term
+produces identical output to direct execution under the framework runtime (temperature = 0).
+Proof. We construct T𝐹 for each paradigm by case analysis on the configuration format:
+SDK wrapper (𝐹 = OpenAI/Claude SDK): A single API call translates to lam 𝑝 𝜃 ; each tool to
+tool[𝑓𝑖 ]. A tool-use loop with 𝑛 tools is:
+fix𝑘 (𝜆𝑠.𝜆𝑥 . case (lam 𝑝 𝜃 𝑥) of {𝑙𝑖 ⇒ tool[𝑓𝑖 ] » 𝑠, done ⇒ id})
+This is the atomic layer upon which all other paradigms build. Type preservation: by T-Lam-Oracle
+and T-Tool, each primitive is well-typed; by T-Fix and T-Case, the composed term is well-typed.
+Graph state machine (𝐹 = LangGraph): Nodes are 𝜆𝐴 functions 𝑒𝑖 : 𝜏 → 𝜏. Sequential edges are
+»; conditional edges are case. Cycles with a bound become fix𝑛 . The graph’s state dict maps to
+mem 𝑒 𝜎. Type preservation follows from T-Comp, T-Case, T-Fix, and T-Mem.
+Role-driven (𝐹 =CrewAI): Role agent 𝑎𝑖 maps to a 𝜆𝐴 term; dispatcher is case on role labels.
+Sequential: 𝑎 1 »· · ·»𝑎𝑛 . 441 CrewAI configs validated.
+Multi-agent (𝐹 =AutoGen): Group chat is fix𝑛 with case on speaker; is_termination_msg is the
+base case. 22 configs validated.
+Low-code (𝐹 = Dify): YAML nodes compile via from_config directly: LLM node ↦→ lam, tool
+node ↦→ tool, IF/ELSE ↦→ if, iteration ↦→ fix𝑛 , end node ↦→ terminate.
+Compositionality follows from the monoid structure of » (Theorem 5.7). Behavioral adequacy is
+verified by the 125 semantic faithfulness tests: each test compiles a configuration via T𝐹 , executes
+the resulting 𝜆𝐴 term, and checks that the output matches the expected result predicted by the
+framework semantics.
+□
+Scope and limitations. The proposition covers the configuration-level semantics—the YAML/JSON
+fragment. Framework-specific Python APIs (e.g., LangGraph’s add_edge) are not covered by T𝐹 .
+LlamaIndex’s event-driven pattern is expressible via pairs (𝜆𝑥 .⟨𝑒 1𝑥, 𝑒 2𝑥⟩) but not validated on real
+configs.
+Corollary 7.3 (Cross-Framework Composition). Since all five paradigms translate to a common
+IR (𝜆𝐴 terms), compositions that span frameworks—e.g., a LangGraph node that internally delegates to
+
+𝜆𝐴 : A Typed Lambda Calculus for LLM Agent Composition
+
+17
+
+Table 10. Comparison of agent/workflow formalisms.
+𝜆𝐴
+Formal syntax
+✓
+Type system
+✓
+Type
+safety
+Coq
+proof
+Termination
+fix𝑛
+Static analysis
+26 rules
+Empirical (con835
+figs)
+Framework cov5
+erage
+
+DSPy
+
+Agint
+
+CSP/𝜋
+
+Agentic 2.0
+
+—
+—
+—
+
+✓
+✓
+—
+
+✓
+—
+—
+
+✓
+✓
+—
+
+—
+—
+—
+
+—
+—
+—
+
+—
+—
+—
+
+—
+—
+—
+
+1
+
+1
+
+general
+
+1
+
+a CrewAI crew, or a Dify pipeline that invokes an AutoGen group chat—are expressible as well-typed
+𝜆𝐴 terms. No existing framework supports such cross-framework composition natively.
+The practical import is that 𝜆𝐴 serves as a framework-independent IR: lint rules, type safety,
+termination bounds, and cost bounds developed once for 𝜆𝐴 apply to all five paradigms without
+framework-specific reimplementation.
+8
+
+Related Work
+
+Table 10 compares 𝜆𝐴 with the most closely related formalisms for agent or AI workflow composition.
+DSLs for AI/ML.. Halide [6] and TVM [7] provide domain-specific abstractions for image processing and tensor computation, respectively. Dex [8] targets differentiable programming with a
+typed functional core. These DSLs optimize numerical computation; 𝜆𝐴 targets LLM agent composition, where the computational primitive is an oracle call (LLM inference), not a tensor operation.
+ONNX [19] serves as a universal IR for neural network models, enabling cross-framework interoperability. 𝜆𝐴 plays an analogous role for agent configurations: a framework-independent IR that
+enables unified static analysis and cross-framework compilation.
+Effect Systems and Monads. LLM calls, tool invocations, and memory updates are side effects.
+Algebraic effects [9] and monad transformers [10] provide frameworks for reasoning about effects
+in functional languages. Eff [20] and Koka [21] are languages with first-class algebraic effects. In
+𝜆𝐴 , we model effects implicitly: lam is an IO effect, tool is an IO effect, mem is a State effect,
+and terminate is a Control effect (it aborts the fixpoint). A full effect-system treatment—enabling
+effect-polymorphic agent combinators and effect-based optimization—is future work, but the
+correspondence is clear: each 𝜆𝐴 construct maps to a known effect.
+Typed Web and API DSLs. Links [22] and Ur/Web [23] provide typed DSLs for web programming,
+ensuring type safety across client-server boundaries. Servant [24] uses Haskell types to derive API
+clients and servers from a single specification. 𝜆𝐴 shares this philosophy—deriving lint, runtime,
+and compilation from a single typed specification—but targets LLM agent composition rather than
+web services.
+Probabilistic Programming. Church [11], WebPPL [12], and Pyro [13] embed probabilistic computation in functional languages. Our ⊕𝑝 operator is a simplified version of their stochastic primitives.
+The key difference is that our probabilistic oracle (lam) is opaque: we cannot inspect or differentiate
+
+18
+
+Qin Liu
+
+through it, only sample from it. Dal Lago & Zorzi [28] extend lambda calculus with probabilistic
+choice while preserving Turing completeness, which validates our temperature-as-⊕𝑝 design.
+Agent Formalisms. BDI [14] provides a logical foundation for agents based on beliefs, desires,
+and intentions. Process algebras (CSP [15], 𝜋-calculus [16]) model concurrent communicating
+agents. In the LLM agent space, DSPy [2] compiles declarative LLM modules with optimizer-driven
+prompt tuning. AFlow [3] treats workflows as searchable code graphs (ICLR 2025 Oral). Agint [4]
+introduces typed effect-aware DAGs for software engineering agents. Agentics 2.0 [5] proposes
+algebraic transducible functions for data workflows. OpenAI Swarm uses runtime handoff for multiagent coordination, and Google A2A [27] defines an HTTP-based agent-to-agent protocol. Each
+independently reinvents a fragment of lambda calculus—DSPy’s modules are lambda abstractions,
+AFlow’s edges are composition, Swarm’s handoff is dynamic routing—but none provides a typed
+calculus with formal metatheory. We show that all five paradigms embed as typed fragments of 𝜆𝐴
+(Proposition 7.2, §7.6), validated on 835 real-world configurations, establishing 𝜆𝐴 as a unifying
+calculus rather than yet another framework.
+Static Analysis for Configurations. CUE [25] and Dhall [26] provide typed configuration languages
+that catch errors at authoring time rather than deployment time. Kubernetes admission controllers
+validate YAML manifests against policy schemas. These tools perform syntactic validation (field
+types, required fields). 𝜆𝐴 enables semantic validation: detecting missing Y combinator base cases,
+vacuous fixpoints, and incomplete dispatch—properties that depend on the operational semantics,
+not just the schema.
+Verified Compilation. CompCert [17] and CakeML [18] verify compiler correctness via mechanized proofs relating two independently defined formal semantics. Our from_config compiler lacks
+a formal source semantics (YAML has none), so we argue adequacy empirically rather than proving
+correctness formally (§5.3). The gap between our work and verified compilation is a productive
+direction for future research: defining a formal semantics for a “standard” agent configuration
+format (similar to how HTML5 formalized web markup) would enable compilation correctness
+proofs.
+9
+
+Discussion and Future Work
+
+Limitations. (1) Our type system is simply typed; dependent types for richer refinements (e.g.,
+“output must be valid JSON”) are future work. (2) We study the deterministic fragment of 𝜆𝐴
+(temperature = 0). The full probabilistic semantics—where lam returns a distribution Dist(𝜏)—
+requires a monadic treatment: » becomes Kleisli composition (»=: Dist(𝜏) → (𝜏 → Dist(𝜏 ′ )) →
+Dist(𝜏 ′ )), and type safety must account for distributional types throughout the pipeline. We leave
+this extension to future work, noting that (a) probabilistic lambda calculus is known to be Turingcomplete [28], validating the theoretical feasibility, and (b) our GitHub survey found that 72%
+of configurations with explicit temperature use temperature ≤ 0.3, suggesting the deterministic
+fragment covers the majority of production use cases. (3) Core metatheory is fully mechanized in
+Coq (1,519 lines, 42 theorems, 0 Admitted). All definitions, typing rules, reduction rules, and theorem
+proofs are verified: progress, preservation, multi-step preservation, type safety, substitution lemma,
+termination of bounded fixpoints, pipeline algebra, weakening, store weakening, and canonical
+forms. (4) YAML-only lint precision (∼52%) improves to 96–100% with joint YAML+Python AST
+analysis (Experiment C, validated on 50 and 175 samples), confirming that rule quality is not the
+bottleneck.
+Threats to Validity. Internal: The 10 baseline configurations for fault injection (Experiment A) are
+hand-constructed; real-world defect patterns may differ. Our Coq mechanization models LLM and
+
+𝜆𝐴 : A Typed Lambda Calculus for LLM Agent Composition
+
+19
+
+tool calls as axiomatized total functions, which may not hold for real APIs (timeouts, rate limits).
+External: The 835-configuration dataset is dominated by CrewAI (53%); results may not generalize
+to frameworks underrepresented in our sample (e.g., LlamaIndex workflows). The 175-sample
+joint analysis uses framework-knowledge-based ground truth for CrewAI rather than per-file
+manual inspection. Construct: “Structurally incomplete” (94.1%) does not imply “has a runtime
+bug”—production frameworks supplement YAML with Python code. Our stratified analysis (§7)
+and joint analysis (Experiment C) quantify this gap precisely.
+Future Work. (1) Extended Coq mechanization: our fully verified development (1,519 lines, 42
+Qed, 0 Admitted) could be extended with richer type features (dependent types, effect system) and
+a verified from_config compiler if a formal YAML semantics is established. (2) Type-and-effect
+system. Each 𝜆𝐴 construct maps to a known effect: lam → llm(𝑚), tool → io, mem → state(𝑠),
+and pure constructs → pure. The extended judgment Γ ⊢ 𝑒 : 𝜏 ! 𝜀 tracks which effects an agent
+may perform. We sketch the key rules:
+TE-Lam
+
+TE-Comp
+
+Γ ⊢ 𝑒 1 : 𝜏1 → 𝜏2 ! 𝜀 1
+
+𝜃 : Model
+Γ ⊢ lam 𝑝 𝜃 : Str → Str ! llm(𝜃 )
+TE-Fix
+
+Γ ⊢ 𝑒 : (𝜏 → 𝜏) → (𝜏 → 𝜏) ! 𝜀
+Γ ⊢ fix𝑛 𝑒 : 𝜏 → 𝜏 ! 𝜀
+
+𝑛
+
+Γ ⊢ 𝑒 2 : 𝜏2 → 𝜏3 ! 𝜀 2
+
+Γ ⊢ 𝑒 1 » 𝑒 2 : 𝜏1 → 𝜏3 ! 𝜀 1 · 𝜀 2
+TE-Mem
+
+Γ ⊢ 𝑒 : 𝜏 → 𝜏′ ! 𝜀
+
+𝜎:Σ
+
+Γ ⊢ mem 𝑒 𝜎 : 𝜏 → 𝜏 ! 𝜀 · state(Σ)
+′
+
+is serial effect composition and 𝜀 𝑛 is 𝑛-fold iteration. The effect algebra (𝜀, ·, pure) forms a
+
+Here 𝜀 1 ·𝜀 2
+monoid. This enables effect-based handler substitution: a production handler executes llm effects via
+real API calls, while a test handler uses mocks—both type-safe. A full development is in preparation.
+(3) Semantic-preserving transformations: agent refactoring rules justified by the equational theory
+of 𝜆𝐴 . The pipeline algebra (Theorem 5.7) provides the foundation; richer rewrite rules (e.g., fusing
+adjacent lam calls, hoisting shared memory) could reduce API costs. (4) Productionizing joint
+YAML+Python analysis: our prototype (Experiment C) achieves 96.4% precision on sampled data;
+scaling to arbitrary repositories requires robust Python import resolution and cross-module dataflow
+analysis. (5) Monadic probabilistic extension: full Dist(𝜏) types with Kleisli composition, enabling
+compositional reasoning about stochastic agent pipelines.
+10
+
+Conclusion
+
+We presented 𝜆𝐴 , a typed lambda calculus for LLM agent composition, and lambdagent, its
+executable realization. The key insight is that existing agent configurations already encode a lambda
+calculus—making this structure explicit enables type safety, termination guarantees, compilation
+correctness, and practical lint tooling. Our evaluation shows that formal semantics is not merely
+an academic exercise: it finds real bugs in real configurations that no existing framework detects.
+Artifact availability. The lambdagent implementation (4,903 lines Python), Coq mechanization
+(1,519 lines, 42 Qed, 0 Admitted), 835 GitHub agent configurations, and all experiment scripts are
+available at https://github.com/kenny67nju/lambdagent.1
+References
+[1] S. Yao et al. ReAct: Synergizing reasoning and acting in language models. ICLR, 2023.
+[2] O. Khattab et al. DSPy: Compiling declarative language model calls into self-improving pipelines. ICLR, 2024.
+[3] J. Zhang et al. AFlow: Automating agentic workflow generation. ICLR (Oral), 2025.
+1 URL will be made public upon publication.
+
+20
+
+Qin Liu
+
+[4] A. Chivukula et al. Agint: Agentic graph compilation for software engineering agents. NeurIPS Workshop, 2025.
+[5] A. M. Gliozzo et al. Agentics 2.0: Logical transduction algebra for agentic data workflows. arXiv:2603.04241, 2026.
+[6] J. Ragan-Kelley et al. Halide: A language and compiler for optimizing parallelism, locality, and recomputation in image
+processing pipelines. PLDI, 2013.
+[7] T. Chen et al. TVM: An automated end-to-end optimizing compiler for deep learning. OSDI, 2018.
+[8] A. Paszke et al. Getting to the point: Index sets and parallelism-preserving autodiff for pointful array processing.
+PACMPL (ICFP), 2021.
+[9] G. Plotkin, M. Pretnar. Handlers of algebraic effects. ESOP, 2009.
+[10] S. Liang, P. Hudak, M. Jones. Monad transformers and modular interpreters. POPL, 1995.
+[11] N. D. Goodman et al. Church: A language for generative models. UAI, 2008.
+[12] N. D. Goodman, A. Stuhlmüller. The Design and Implementation of Probabilistic Programming Languages. http:
+//dippl.org, 2014.
+[13] E. Bingham et al. Pyro: Deep universal probabilistic programming. JMLR, 2019.
+[14] A. S. Rao, M. P. Georgeff. BDI agents: From theory to practice. ICMAS, 1995.
+[15] C. A. R. Hoare. Communicating sequential processes. CACM, 21(8), 1978.
+[16] R. Milner. Communicating and Mobile Systems: The 𝜋 -Calculus. Cambridge, 1999.
+[17] X. Leroy. Formal verification of a realistic compiler. CACM, 52(7), 2009.
+[18] R. Kumar et al. CakeML: A verified implementation of ML. POPL, 2014.
+[19] J. Bai et al. ONNX: Open neural network exchange. https://onnx.ai, 2019.
+[20] A. Bauer, M. Pretnar. Programming with algebraic effects and handlers. J. Log. Algebr. Meth. Program., 84(1), 2015.
+[21] D. Leijen. Koka: Programming with row polymorphic effect types. MSFP, 2014.
+[22] E. Cooper et al. Links: Web programming without tiers. FMCO, 2006.
+[23] A. Chlipala. Ur/Web: A simple model for programming the Web. POPL, 2015.
+[24] A. Mestanogullari et al. Type-level web APIs with Servant. Haskell Symposium, 2015.
+[25] M. P. Jones et al. The CUE data constraint language. https://cuelang.org, 2023.
+[26] G. Gonzalez. Dhall: A programmable configuration language. https://dhall-lang.org, 2020.
+[27] Google. Agent-to-Agent (A2A) protocol specification. https://google.github.io/A2A/, 2025.
+[28] U. Dal Lago, M. Zorzi. Probabilistic operational semantics for the lambda calculus. RAIRO—Theor. Inform. Appl.,
+46(3):413–450, 2012.
+
+

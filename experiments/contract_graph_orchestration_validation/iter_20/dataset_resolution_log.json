@@ -1,0 +1,147 @@
+{
+  "datasets": [
+    {
+      "alias": "DS-QUARKS-PHASE-GRAPH-TRACESET-v1",
+      "candidate_sources": [
+        {
+          "checksum": "e2c886f43f887c3ad29aa63879da43e9399a4568076fd96ecac35241b3b98c4c",
+          "label": "User-uploaded quarks.zip extraction",
+          "license": null,
+          "source_type": "resource",
+          "source_url": "workspace/resources/quarks.zip",
+          "version": "upload-2026-04-22"
+        }
+      ],
+      "chosen_source": {
+        "checksum": "e2c886f43f887c3ad29aa63879da43e9399a4568076fd96ecac35241b3b98c4c",
+        "label": "User-uploaded quarks.zip extraction",
+        "license": null,
+        "source_type": "resource",
+        "source_url": "workspace/resources/quarks.zip",
+        "version": "upload-2026-04-22"
+      },
+      "descriptor": "Local Quarks implementation substrate for theorem-grounded transition traces.",
+      "loader_strategy": "Parse orchestrator graph/coordinator contracts and generate canonical transition traces.",
+      "local_path": "resources/codebases/quarks-e2c886f43f88",
+      "recovery_notes": "Real substrate already available locally; validation must treat this as canonical implementation context.",
+      "retrieval_status": "materialized",
+      "local_exists": true
+    },
+    {
+      "alias": "DS-CONTRACT-COUNTEREXAMPLE-SUITE-v1",
+      "candidate_sources": [
+        {
+          "checksum": null,
+          "label": "Generated from Quarks trace substrate",
+          "license": null,
+          "source_type": "resource",
+          "source_url": "workspace/resources/codebases/quarks-e2c886f43f88",
+          "version": "counterexample-suite-v1"
+        }
+      ],
+      "chosen_source": null,
+      "descriptor": "Counterexample generator and replay set for schema-pass/semantic-fail and weakened assumption tests.",
+      "loader_strategy": "Generate from local trace substrate and serialize theorem-premise toggles as JSONL.",
+      "local_path": "experiments/data/counterexamples",
+      "recovery_notes": "Materialize during validation preflight; expected size 100-400 MB. Real substrate is local executable trace replay.",
+      "retrieval_status": "candidate_identified",
+      "local_exists": false
+    },
+    {
+      "alias": "DS-QUARKS-RECOVERY-EPISODE-SUITE-v1",
+      "candidate_sources": [
+        {
+          "checksum": null,
+          "label": "Generated from Quarks phase graph",
+          "license": null,
+          "source_type": "resource",
+          "source_url": "workspace/resources/codebases/quarks-e2c886f43f88",
+          "version": "recovery-suite-v1"
+        }
+      ],
+      "chosen_source": null,
+      "descriptor": "Recovery-episode benchmark for reroute/backtrack boundedness and oscillation tests.",
+      "loader_strategy": "Generate controlled uncertainty episodes with finite-B and unbounded-B toggles.",
+      "local_path": "experiments/data/recovery",
+      "recovery_notes": "Materialize in validation; expected size 150-500 MB.",
+      "retrieval_status": "candidate_identified",
+      "local_exists": false
+    },
+    {
+      "alias": "DS-TREE-SEARCH-FAILURE-INJECTION-v1",
+      "candidate_sources": [
+        {
+          "checksum": null,
+          "label": "Local generation pipeline",
+          "license": null,
+          "source_type": "resource",
+          "source_url": "workspace/experiments",
+          "version": "failure-injection-v1"
+        }
+      ],
+      "chosen_source": null,
+      "descriptor": "Failure-injection traces for branch explosion and non-oscillation falsification.",
+      "loader_strategy": "Injection-driven synthetic extensions over real transition traces.",
+      "local_path": "experiments/data/failure_injection",
+      "recovery_notes": "Materialize during validation; expected size 100-300 MB.",
+      "retrieval_status": "candidate_identified",
+      "local_exists": false
+    },
+    {
+      "alias": "DS-PROTOCOL-ATTACK-TRACESET-v1",
+      "candidate_sources": [
+        {
+          "checksum": null,
+          "label": "AutoGen comparator repository",
+          "license": "MIT",
+          "source_type": "repo",
+          "source_url": "https://github.com/microsoft/autogen",
+          "version": null
+        },
+        {
+          "checksum": null,
+          "label": "LangGraph comparator repository",
+          "license": "MIT",
+          "source_type": "repo",
+          "source_url": "https://github.com/langchain-ai/langgraph",
+          "version": null
+        },
+        {
+          "checksum": null,
+          "label": "MetaGPT comparator repository",
+          "license": "MIT",
+          "source_type": "repo",
+          "source_url": "https://github.com/geekan/MetaGPT",
+          "version": null
+        }
+      ],
+      "chosen_source": null,
+      "descriptor": "Protocol-level adversarial traces for HM-TH-03 guard evaluation.",
+      "loader_strategy": "Compose attack templates over transition traces and label covered/uncovered classes.",
+      "local_path": "experiments/data/attacks",
+      "recovery_notes": "Optional external acquisition for comparator enrichment; expected pull size ~0.5-2 GB total. Must pin URL+commit, capture LICENSE, and store checksum manifest before full run.",
+      "retrieval_status": "candidate_identified",
+      "local_exists": false
+    },
+    {
+      "alias": "DS-PROVENANCE-HASH-CHAIN-AUDIT-v1",
+      "candidate_sources": [
+        {
+          "checksum": null,
+          "label": "Local trace logs from Quarks substrate",
+          "license": null,
+          "source_type": "resource",
+          "source_url": "workspace/experiments/data",
+          "version": "hash-audit-v1"
+        }
+      ],
+      "chosen_source": null,
+      "descriptor": "Trace-integrity audit dataset for append-only hash-link invariance checks.",
+      "loader_strategy": "Derive hash chains from trace logs and inject controlled mutations for falsification tests.",
+      "local_path": "experiments/data/provenance_audit",
+      "recovery_notes": "Materialize during validation; expected size 50-250 MB.",
+      "retrieval_status": "candidate_identified",
+      "local_exists": false
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "hm_th_01": {
+    "unsafe_commit_rate_summary": {
+      "mean": 0.9166666666666666,
+      "std": 0.2763853991962833
+    },
+    "unsafe_commit_rate_ci": {
+      "low": 0.028748089271291785,
+      "high": 0.2182701027691885
+    },
+    "counterexample_count": 12
+  },
+  "hm_th_02": {
+    "oscillation_rate_summary": {
+      "mean": 0.4166666666666667,
+      "std": 0.4930066485916347
+    },
+    "bound_violation_summary": {
+      "mean": 0.25,
+      "std": 0.4330127018922193
+    },
+    "regret_summary": {
+      "mean": 0.065,
+      "std": 0.008660254037844388
+    }
+  },
+  "hm_th_03": {
+    "far_summary": {
+      "mean": 0.1516,
+      "std": 0.06448676005369026
+    },
+    "frr_summary": {
+      "mean": 0.12533333333333332,
+      "std": 0.01597567595509568
+    },
+    "hash_integrity_summary": {
+      "mean": 0.3333333333333333,
+      "std": 0.4714045207910317
+    }
+  }
+}

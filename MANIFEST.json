@@ -1,0 +1,33 @@
+{
+  "artifacts": [],
+  "code": [
+    "code/run_experiments.py",
+    "code/contract_semantics.py",
+    "code/quarks_trace_adapter.py",
+    "code/theorem_metrics.py",
+    "code/build_artifacts.py",
+    "code/sympy_checks.py"
+  ],
+  "created_at": "2026-04-22T19:41:09.989084+00:00",
+  "paper": {
+    "bibtex": "paper/references.bib",
+    "latex": "paper/main.tex",
+    "pdf": "paper/main.pdf",
+    "thumbnail": "paper/thumbnail.png"
+  },
+  "phases": [
+    "insights_refinement",
+    "review_feedback",
+    "validation_simulation",
+    "writing_presentation"
+  ],
+  "session_id": "adb3d74e-13b6-4ec0-8d7f-652bdb97fd1c",
+  "sources": null,
+  "workspace": {
+    "experiments": "experiments",
+    "knowledge": "knowledge",
+    "paper_data": "paper/data",
+    "paper_figures": "paper/figures",
+    "paper_tables": "paper/tables"
+  }
+}
