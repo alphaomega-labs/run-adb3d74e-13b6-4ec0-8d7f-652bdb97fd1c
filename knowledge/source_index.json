@@ -1171,16 +1171,16 @@
       ]
     },
     {
-      "id": "manuscript:formal_applicability_scope",
-      "title": "Formal applicability scope for contract-governed orchestration manuscript",
+      "id": "report:formal_applicability_scope",
+      "title": "Formal applicability scope for contract-governed orchestration report",
       "url": "paper/main.tex#sec:formal_scope",
-      "source_type": "manuscript_structured_scope",
-      "citation": "Manuscript-defined formal setting in paper/main.tex, Sections 3-5.",
+      "source_type": "report_structured_scope",
+      "citation": "Report-defined formal setting in paper/main.tex, Sections 3-5.",
       "year": 2026,
       "authors": [
         "Anonymous Authors"
       ],
-      "summary": "Structured scope ledger for manuscript-defined variables, equations, theorem regimes, and audit boundary probes.",
+      "summary": "Structured scope ledger for report-defined variables, equations, theorem regimes, and audit boundary probes.",
       "key_equations": [
         "Q=(G,C,Phi,Pi,M,T), where G=(V,E) is finite and acyclic, E subset V x V, and empirical time is t in {0,...,H_hor-1} with H_hor in N_{>=1}.",
         "U:S x A x Y_e x {0,1}^{m_t} x M -> S for typed transition updates, with A={continue, reroute, backtrack, branch}.",
@@ -1190,7 +1190,7 @@
         "h_t=Hash(h_{t-1} || r_t), with r_t in record space R, h_t in digest space D, and Hash:D x R -> D under the operational collision-resistance assumption."
       ],
       "assumptions": [
-        "The manuscript theorems use a finite typed discrete-time transition system with Boolean admissibility predicates, topological commit order, finite-horizon sums, and finite-probability audit expectations.",
+        "The report theorems use a finite typed discrete-time transition system with Boolean admissibility predicates, topological commit order, finite-horizon sums, and finite-probability audit expectations.",
         "A1-A4 define the committed-prefix soundness regime; schema-only, trust-only, disabled-hard-guard, cyclic, and concurrent-commit configurations are recorded as boundary probes.",
         "B1-B4 define the bounded-recovery regime with B in N_{>=1}, strict descent delta in R_{>0}, bounded stage costs, and rollback-comparator alignment; unbounded branching, potential-plateau, nonpositive-descent, and unbounded-cost runs are stress probes.",
         "C1-C4 define the security/provenance regime; FAR contraction is evaluated on covered attack classes under a common covered-class distribution, and mutation probes test trace-integrity diagnostics."
