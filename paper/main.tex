@@ -196,36 +196,7 @@ This algebra resolves an ambiguity common in workflow reports: whether correctiv
 
 The algebra also clarifies optimization responsibility. Policy creativity does not imply unconstrained commits: actions from $\Pi$ remain subordinate to hard validators and contract admissibility. This asymmetry is central to why committed-prefix safety can be proved in \secref{sec:formal} and falsified in controlled boundary runs.
 
-\subsection{Notation Table}
-\label{sec:notation}
-Table~\ref{tab:notation} summarizes recurrent symbols after they have been introduced in context. The placement is deliberate. In dense formal reports, readers often need a compact lookup while evaluating proof steps, but placing notation before definitions can obscure role-specific semantics. We therefore define objects first and then consolidate them. This keeps the narrative forward-moving while preserving quick reference support for later theorem and evidence sections.
-The table also encodes provenance at the symbol level. Graph, contract, and validator primitives follow conventions from the cited orchestration and formal-method literature, while objective symbols and some audit quantities are report-defined. Distinguishing these categories supports reproducibility: future work can adopt inherited conventions without reproducing every modeling decision, and can separately test whether report-defined objectives remain appropriate in new domains.
-\begin{table}[t]
-\caption{Core notation used in the formal development. The table is placed after definitions so symbols are disambiguated in context. Symbols marked ``defined here'' are report-specific formal objects, while others are inherited conventions adapted from cited orchestration and formal-method sources.}
-\label{tab:notation}
-\centering
-\small
-\renewcommand{\arraystretch}{1.1}
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{p{0.13\linewidth}p{0.82\linewidth}}
-\hline
-Symbol & Meaning \\
-\hline
-$G=(V,E)$ & Phase graph with nodes $V$ and edges $E$. \\
-$C_e$ & Edge contract tuple in \eqref{eq:edge_contract}. \\
-$\Phi_e^{\mathrm{hard}}$ & Mandatory hard validator on edge $e$. \\
-$\Pi$ & Meta-orchestration policy over actions \{continue, reroute, backtrack, branch\}. \\
-$\mathcal{T}$ & Append-only trace with provenance records. \\
-$J_1$ & Unsafe-commit objective (defined here). \\
-$J_2$ & Recovery-cost objective (defined here). \\
-$J_3$ & Security--provenance objective (defined here). \\
-$V(s_t)$ & Recovery potential at state $s_t$. \\
-$\mathrm{FAR},\mathrm{FRR}$ & False-accept and false-reject rates. \\
-$h_t$ & Hash-chain state after record $r_t$. \\
-\hline
-\end{tabular}
-\end{table}
-The notation summary additionally constrains interpretation of results. Each metric that appears in later tables or figures is tied to one of the symbols and objectives defined here. This avoids a common ambiguity in orchestration papers where empirical labels are introduced without a clear formal anchor.
+The recurring symbols used below are therefore introduced in place rather than collected in a separate notation table. Graph and contract primitives are defined in \eqref{eq:system_tuple}--\eqref{eq:edge_contract}; validator outputs, policy actions, and trace updates are defined in \eqref{eq:update_operator}--\eqref{eq:append_rule}; and objective-level quantities are defined alongside $J_1$, $J_2$, and $J_3$ in the method section. This keeps each symbol close to its first mathematical use while Table~\ref{tab:formal_scope} provides the consolidated domain, range, and applicability information needed for proof checking.
 
 \section{Method: Objectives, Feasible Sets, and Policy Structure}
 \label{sec:method}
