@@ -1180,29 +1180,30 @@
       "authors": [
         "Anonymous Authors"
       ],
-      "summary": "Structured scope ledger for manuscript-defined variables, equations, theorem regimes, and exclusions.",
+      "summary": "Structured scope ledger for manuscript-defined variables, equations, theorem regimes, and audit boundary probes.",
       "key_equations": [
         "Q=(G,C,Phi,Pi,M,T), where G=(V,E) is finite and acyclic, E subset V x V, and empirical time is t in {0,...,H_hor-1} with H_hor in N_{>=1}.",
         "U:S x A x Y_e x {0,1}^{m_t} x M -> S for typed transition updates, with A={continue, reroute, backtrack, branch}.",
         "J1=sum_{t=0}^{H_hor-1} 1[commit_t and not Safe(s_t)], with J1 in N_0 and commit_t, Safe(s_t) in {0,1}.",
-        "F2={Pi: N_rb(omega)<=B for all omega in Omega and V(s_{t+1})<=V(s_t)-delta on every corrective transition}, with B in N_0 and delta>0.",
+        "F2={Pi: N_rb(omega)<=B for all omega in Omega and V(s_{t+1})<=V(s_t)-delta on every corrective transition}, with B in N_{>=1} and delta in R_{>0}.",
         "g_{theta,kappa}:Y->{0,1}, theta in [0,1], FAR/FRR/ProvLoss in [0,1], and alpha,beta,gamma nonnegative with positive sum.",
         "h_t=Hash(h_{t-1} || r_t), with r_t in record space R, h_t in digest space D, and Hash:D x R -> D under the operational collision-resistance assumption."
       ],
       "assumptions": [
-        "The manuscript theorems use a finite typed discrete-time transition system, not a Banach, Hilbert, Euclidean, smooth, compact, or convex ambient space.",
-        "A1-A4 are required for committed-prefix soundness; schema-only, trust-only, disabled-hard-guard, cyclic, or concurrent-commit settings are outside the theorem-valid regime.",
-        "B1-B4 are required for bounded recovery; unbounded branching, potential plateaus, nonpositive descent, and unbounded costs are stress regimes rather than theorem-valid settings.",
-        "C1-C4 are required for security/provenance claims; FAR contraction applies only to covered attack classes under a common covered-class distribution, and provenance invariance excludes forced trace mutation."
+        "The manuscript theorems use a finite typed discrete-time transition system with Boolean admissibility predicates, topological commit order, finite-horizon sums, and finite-probability audit expectations.",
+        "A1-A4 define the committed-prefix soundness regime; schema-only, trust-only, disabled-hard-guard, cyclic, and concurrent-commit configurations are recorded as boundary probes.",
+        "B1-B4 define the bounded-recovery regime with B in N_{>=1}, strict descent delta in R_{>0}, bounded stage costs, and rollback-comparator alignment; unbounded branching, potential-plateau, nonpositive-descent, and unbounded-cost runs are stress probes.",
+        "C1-C4 define the security/provenance regime; FAR contraction is evaluated on covered attack classes under a common covered-class distribution, and mutation probes test trace-integrity diagnostics."
       ],
       "parameters": [
         "H_hor in N_{>=1}",
         "t in {0,...,H_hor-1} for empirical objectives and t in N_0 for trace recurrences",
-        "B in N_0",
-        "delta, eta in R_{>=0}, with theorem use requiring delta>0 and experimental theorem regime requiring delta>eta",
+        "B in N_{>=1}",
+        "delta in R_{>0}; eta in R_{>=0}, with experimental theorem regime requiring delta>eta",
+        "lambda in R_{>=0}",
         "theta in [0,1]",
         "alpha,beta,gamma in R_{>=0} with alpha+beta+gamma>0",
-        "c:A x S -> [0,c_max] for finite c_max"
+        "c:A x S -> [0,c_max] for c_max in R_{>=0}"
       ],
       "notation_seeds": [
         "S: typed global state space; s_t in S",
@@ -1214,13 +1215,13 @@
       ],
       "provenance_notes": [
         "Mirrors the formal scope table and equation-specific prose added to paper/main.tex.",
-        "Intended to prevent downstream artifact generation from dropping domains, codomains, parameter ranges, theorem regimes, and exclusions."
+        "Intended to prevent downstream artifact generation from dropping domains, codomains, parameter ranges, theorem regimes, and audit boundary probes."
       ],
       "evidence_atoms": [
         {
           "atom_type": "formal_scope",
           "locator": "paper/main.tex Section 3.3",
-          "content": "Formal applicability scope table records domains, ranges, validity regimes, and exclusions for graph, state, action, validator, objective, recovery, security, and provenance symbols."
+          "content": "Formal applicability scope table records domains, ranges, applicability regimes, and boundary probes for graph, state, action, validator, objective, recovery, security, and provenance symbols."
         },
         {
           "atom_type": "equation_scope",

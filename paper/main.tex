@@ -98,7 +98,7 @@ Protocol-level threat models show that adversarial failures in multi-agent workf
 Our security formulation therefore treats trust and protocol predicates as jointly necessary and formally separable. This design choice is directly motivated by contradictions between optimistic quality-centric workflow reports and adversarial analyses that show protocol exploits can bypass purely trust-based gating \citep{ferrag2026,gao2025,ismail2025,ferrag2025}.
 
 \subsection{Agentic Science Context and Gap Synthesis}
-Agentic-science surveys and domain studies highlight a central need: reliability and auditability must scale with autonomy depth \citep{xin2025,reddy2025,wei2025}. Domain systems in chemistry, biomedical analysis, and fluid dynamics show practical feasibility of automated multistage pipelines \citep{pham2026,zhang2025,klang2025,dong2025,stewart2025}. Yet these systems rarely provide formal bounds for branch-heavy orchestration dynamics. The gap is therefore not absence of capability, but absence of compositional guarantees that remain valid under recovery policies, adversarial inputs, and provenance constraints.
+Agentic-science surveys and domain studies highlight a central need: reliability and auditability must scale with autonomy depth \citep{xin2025,reddy2025,wei2025}. Domain systems in chemistry, biomedical analysis, and fluid dynamics show practical feasibility of automated multistage pipelines \citep{pham2026,zhang2025,klang2025,dong2025,stewart2025}. Yet these systems rarely provide formal bounds for branch-heavy orchestration dynamics. The gap is a lack of compositional guarantees that remain valid under recovery policies, adversarial inputs, and provenance constraints.
 
 This manuscript addresses that gap through a hybrid contribution boundary: a formal core with explicit assumptions and proofs, supported by executed theorem-audit experiments and symbolic checks that expose both supported regimes and failure boundaries.
 
@@ -127,7 +127,7 @@ where $G=(V,E)$ is a finite directed acyclic phase graph with $V$ finite and $E\
 C_e=(\tau^{\mathrm{in}}_e,\tau^{\mathrm{out}}_e,\mathrm{pre}_e,\mathrm{post}_e),
 \label{eq:edge_contract}
 \end{equation}
-where type signatures $\tau^{\mathrm{in}}_e,\tau^{\mathrm{out}}_e$ are labels for admissible typed artifact sets and predicates $\mathrm{pre}_e,\mathrm{post}_e$ encode transition admissibility. No Banach, Hilbert, or Euclidean vector-space structure is assumed for artifacts; the ambient setting is a finite typed transition system equipped with Boolean predicates and scalar audit metrics. If a deployment instantiates artifacts as vectors in $\mathbb{R}^d$ or as elements of a richer topological space, that structure is external to the theorems below and must be revalidated with the same assumption blocks.
+where type signatures $\tau^{\mathrm{in}}_e,\tau^{\mathrm{out}}_e$ are labels for admissible typed artifact sets and predicates $\mathrm{pre}_e,\mathrm{post}_e$ encode transition admissibility. The artifact semantics used in the formal development are typed sets equipped with Boolean admissibility predicates and scalar audit metrics, giving a finite typed transition system over committed traces.
 
 We adopt validator-gated transition conventions from prior workflow literature \citep{sawant2026,chang2025,song2026b} and define in this work three manuscript-specific optimization objectives, each aligned to one scientific claim family: (i) committed-prefix safety, (ii) bounded recovery, and (iii) security--provenance tradeoff.
 The tuple in \eqref{eq:system_tuple} is intentionally minimal: every coordinate maps to an executable component used during theorem-audit runs, and no term is left as a purely narrative placeholder. This one-to-one mapping is important because later contradiction tests toggle assumptions at the level of contracts, validators, and policy actions, so theoretical premises and executable diagnostics remain synchronized.
@@ -137,18 +137,18 @@ We use three assumption blocks.
 
 \textbf{Safety block} (A1--A4): typed normalization preserves validator-relevant semantics; validator acceptance implies downstream preconditions; hard safety predicates are monotone over committed prefixes; commit order follows graph topology.
 
-\textbf{Recovery block} (B1--B4): corrective depth is bounded by $B$; corrective actions decrease a potential by at least $\delta>0$; stage costs are nonnegative and bounded; a rollback comparator policy is behaviorally comparable.
+\textbf{Recovery block} (B1--B4): corrective depth is bounded by $B\in\mathbb{N}_{\ge1}$; corrective actions decrease a potential $V:\mathcal{S}\to\mathbb{R}_{\ge0}$ by at least $\delta\in\mathbb{R}_{>0}$; stage costs $c:\mathcal{A}\times\mathcal{S}\to[0,c_{\max}]$ are nonnegative and bounded for $c_{\max}\in\mathbb{R}_{\ge0}$; a rollback comparator policy is behaviorally comparable.
 
 \textbf{Security/provenance block} (C1--C4): protocol predicates cover declared attack classes; trace updates are append-only; each record hash-links to the previous committed record; mandatory guard checks cannot be bypassed before commit.
 
-We explicitly treat these as assumption-scoped, not universal, conditions.
+These assumption blocks define the validity regimes for the theorem statements and the corresponding audit diagnostics.
 
 \subsection{Formal Applicability Scope}
 \label{sec:formal_scope}
-This subsection records the mathematical setting used by the formal statements, objectives, metrics, and reported evidence. The scope is intentionally modest: all proofs are set-theoretic, order-theoretic, or finite-probability arguments over typed traces. They do not require smoothness, convexity, compactness, differentiability, completeness, or inner-product structure unless a future instantiation adds such assumptions explicitly.
+This subsection records the mathematical setting used by the formal statements, objectives, metrics, and reported evidence. The proof layer uses finite typed state spaces, Boolean predicates, topological orders on finite graphs, finite-horizon sums, and finite-probability expectations over seeds, workloads, and policy randomization.
 
 \begin{table}[t]
-\caption{Formal applicability scope for symbols and claims. Domains, ranges, and exclusions are part of the claim contract: theorem statements apply only inside the listed regimes and the named assumption blocks.}
+\caption{Formal applicability scope for symbols and claims. Domains, ranges, and named assumption blocks are part of the claim contract for each theorem statement.}
 \label{tab:formal_scope}
 \centering
 \scriptsize
@@ -156,18 +156,18 @@ This subsection records the mathematical setting used by the formal statements, 
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{p{0.18\linewidth}p{0.37\linewidth}p{0.37\linewidth}}
 \hline
-Object & Domain or range & Validity regime and exclusions \\
+Object & Domain or range & Applicability regime \\
 \hline
-$G=(V,E)$, $e=(u,v)$ & $V$ finite, $E\subseteq V\times V$, $G$ acyclic; $e\in E$. & Commit-order results require the topological order in A4; cycles or concurrent commits are outside the theorem scope. \\
-$\mathcal{S}$, $s_t$ & $s_t\in\mathcal{S}$, where $\mathcal{S}$ is the set of typed graph, memory, policy-context, and trace configurations. & Discrete time $t\in\mathbb{N}_0$; asynchronous scheduling and continuous-time dynamics are excluded except as future extensions. \\
+$G=(V,E)$, $e=(u,v)$ & $V$ finite, $E\subseteq V\times V$, $G$ acyclic; $e\in E$. & A4 supplies a topological commit order for committed-prefix induction. \\
+$\mathcal{S}$, $s_t$ & $s_t\in\mathcal{S}$, where $\mathcal{S}$ is the set of typed graph, memory, policy-context, and trace configurations. & The audit model advances one transition at a time in discrete time $t\in\mathbb{N}_0$. \\
 $\mathcal{A}$, $a_t$, $\Pi$ & $\mathcal{A}=\{\texttt{continue},\texttt{reroute},\texttt{backtrack},\texttt{branch}\}$ and $a_t\in\mathcal{A}$; $\Pi:\mathcal{S}\to\Delta(\mathcal{A})$ for stochastic policies, with deterministic policies as point masses. & Expectations are taken on a finite probability space $(\Omega,\mathcal{F},\mathbb{P})$ induced by seeds, policy randomization, and workload draws. \\
-$y_t$, $\Phi_t$, $\phi_e^{\mathrm{hard}}$ & $y_t\in\mathcal{Y}_{e_t}$ for the active edge output space; $\Phi_t\in\{0,1\}^{m_t}$; $\phi_e^{\mathrm{hard}}:\mathcal{Y}_e\to\{0,1\}$. & Safety claims require A1--A3. Schema-only, trust-only, and disabled-hard-guard settings are falsifier regimes, not theorem-valid regimes. \\
-$\mathrm{pre}_e,\mathrm{post}_e$ & Boolean predicates on typed edge inputs, outputs, and state context. & Predicate monotonicity is assumed only for hard safety predicates over committed prefixes, not for arbitrary quality or preference scores. \\
-$J_1$, $\mathrm{commit}_t$, $\mathrm{Safe}$ & $J_1\in\mathbb{N}_0$; $\mathrm{commit}_t,\mathrm{Safe}(s_t)\in\{0,1\}$. & Zero optimum applies only over $\mathcal{F}_1$ under A1--A4; intermediate uncommitted candidates are intentionally outside $J_1$. \\
-$B,\delta,\eta,V(s_t),c$ & $B\in\mathbb{N}_0$; $\delta,\eta\in\mathbb{R}_{\ge0}$ with theorem use requiring $\delta>0$ and $\delta>\eta$ in experiments; $V:\mathcal{S}\to\mathbb{R}_{\ge0}$; $c:\mathcal{A}\times\mathcal{S}\to[0,c_{\max}]$. & Bounded-recovery claims require B1--B4. Potential plateaus, unbounded branching, and unbounded costs are excluded and used only as stress regimes. \\
-$\theta,\kappa,g_{\theta,\kappa}$ & $\theta\in[0,1]$; $\kappa$ indexes protocol predicates; $g_{\theta,\kappa}:\mathcal{Y}\to\{0,1\}$. & FAR contraction is a set-inclusion result for a common distribution on covered attack classes; it does not claim protection for uncovered or distribution-shifted classes. \\
-$\mathrm{FAR},\mathrm{FRR},\mathrm{ProvLoss}$ & Rates in $[0,1]$ estimated from finite class-stratified samples; $\alpha,\beta,\gamma\in\mathbb{R}_{\ge0}$ with $\alpha+\beta+\gamma>0$. & Threshold tradeoffs are finite-sample audit statistics, not asymptotic calibration guarantees. \\
-$r_t,h_t,\mathsf{Hash}$ & $r_t\in\mathcal{R}$, $h_t\in\mathcal{D}$, and $\mathsf{Hash}:\mathcal{D}\times\mathcal{R}\to\mathcal{D}$. & Provenance invariance requires C2--C4 and collision resistance under the operational threat model; forced mutation deliberately violates the premise. \\
+$y_t$, $\Phi_t$, $\phi_e^{\mathrm{hard}}$ & $y_t\in\mathcal{Y}_{e_t}$ for the active edge output space; $\Phi_t\in\{0,1\}^{m_t}$; $\phi_e^{\mathrm{hard}}:\mathcal{Y}_e\to\{0,1\}$. & Safety claims use A1--A3 with semantic-and-typed hard guards; schema-only, trust-only, and disabled-hard-guard settings are recorded as boundary probes. \\
+$\mathrm{pre}_e,\mathrm{post}_e$ & Boolean predicates on typed edge inputs, outputs, and state context. & A3 applies monotonicity to hard safety predicates over committed prefixes. \\
+$J_1$, $\mathrm{commit}_t$, $\mathrm{Safe}$ & $J_1\in\mathbb{N}_0$; $\mathrm{commit}_t,\mathrm{Safe}(s_t)\in\{0,1\}$. & The zero optimum is over $\mathcal{F}_1$ under A1--A4 and counts committed transitions. \\
+$B,\delta,\eta,V(s_t),c$ & $B\in\mathbb{N}_{\ge1}$; $\delta\in\mathbb{R}_{>0}$; $\eta\in\mathbb{R}_{\ge0}$ with experimental theorem-regime runs using $\delta>\eta$; $V:\mathcal{S}\to\mathbb{R}_{\ge0}$; $c:\mathcal{A}\times\mathcal{S}\to[0,c_{\max}]$. & B1--B4 specify finite corrective depth, strict descent, bounded costs, and rollback-comparator alignment. Stress runs perturb these settings to generate boundary evidence. \\
+$\theta,\kappa,g_{\theta,\kappa}$ & $\theta\in[0,1]$; $\kappa$ indexes protocol predicates; $g_{\theta,\kappa}:\mathcal{Y}\to\{0,1\}$. & FAR contraction is a set-inclusion result for a common distribution on covered attack classes. Coverage diagnostics are reported separately for uncovered or shifted classes. \\
+$\mathrm{FAR},\mathrm{FRR},\mathrm{ProvLoss}$ & Rates in $[0,1]$ estimated from finite class-stratified samples; $\alpha,\beta,\gamma\in\mathbb{R}_{\ge0}$ with $\alpha+\beta+\gamma>0$. & Threshold tradeoffs are finite-sample audit rates for the executed class-stratified protocol. \\
+$r_t,h_t,\mathsf{Hash}$ & $r_t\in\mathcal{R}$, $h_t\in\mathcal{D}$, and $\mathsf{Hash}:\mathcal{D}\times\mathcal{R}\to\mathcal{D}$. & C2--C4 specify append-only records, previous-hash links, guarded commits, and the operational collision-resistance assumption. Mutation probes test trace-integrity diagnostics. \\
 \hline
 \end{tabular}
 \end{table}
@@ -225,7 +225,7 @@ $h_t$ & Hash-chain state after record $r_t$. \\
 \hline
 \end{tabular}
 \end{table}
-The notation summary additionally constrains interpretation of results. When a metric appears in later tables or figures, it is not a standalone benchmark statistic; it is tied to one of the symbols and objectives defined here. This avoids a common ambiguity in orchestration papers where empirical labels are introduced without a clear formal anchor.
+The notation summary additionally constrains interpretation of results. Each metric that appears in later tables or figures is tied to one of the symbols and objectives defined here. This avoids a common ambiguity in orchestration papers where empirical labels are introduced without a clear formal anchor.
 
 \section{Method: Objectives, Feasible Sets, and Policy Structure}
 \label{sec:method}
@@ -263,9 +263,9 @@ with feasibility constraints
 \mathcal{F}_2=\left\{\Pi:\ N_{\mathrm{rb}}(\omega)\le B\ \forall\omega\in\Omega,\ V(s_{t+1})\le V(s_t)-\delta\ \text{for every corrective transition }t\right\}.
 \label{eq:feasible_f2}
 \end{equation}
-Here $N_{\mathrm{rb}}\in\mathbb{N}_0$ counts reroute/backtrack actions, $B\in\mathbb{N}_0$ is the configured corrective-depth bound, $V:\mathcal{S}\to\mathbb{R}_{\ge0}$ is a scalar recovery potential distinct from the node set $V$ of $G$, and $\delta>0$ enforces strict potential descent. The expectation is over the finite probability space induced by seeds, workload draws, and any stochastic policy choices. \Eqref{eq:objective_j2} and \eqref{eq:feasible_f2} are used to derive non-oscillation and bounded correction length in \secref{sec:formal}.
+Here $N_{\mathrm{rb}}\in\mathbb{N}_0$ counts reroute/backtrack actions, $N_{\mathrm{viol}}\in\mathbb{N}_0$ counts unresolved violations, $B\in\mathbb{N}_{\ge1}$ is the configured corrective-depth bound, $\lambda\in\mathbb{R}_{\ge0}$ is the violation-penalty weight, $V:\mathcal{S}\to\mathbb{R}_{\ge0}$ is a scalar recovery potential distinct from the node set $V$ of $G$, and $\delta\in\mathbb{R}_{>0}$ enforces strict potential descent. The expectation is over the finite probability space $(\Omega,\mathcal{F},\mathbb{P})$ induced by seeds, workload draws, and any stochastic policy choices. \Eqref{eq:objective_j2} and \eqref{eq:feasible_f2} are used to derive non-oscillation and bounded correction length in \secref{sec:formal}.
 The coupled constraints in $\mathcal{F}_2$ are deliberate: bounded corrective depth alone does not prevent short-cycle oscillation, and descent alone does not cap episode length under repeated branching. Their conjunction is what enables a finite-horizon guarantee. The experimental protocol therefore toggles these conditions separately to verify that each premise has distinct and observable causal impact.
-We also interpret $\lambda$ as a governance-weighted penalty on unresolved violations, not as a generic regularizer. This interpretation links optimization directly to operational policy: increasing $\lambda$ prioritizes rapid contradiction closure over exploratory branching, while decreasing $\lambda$ permits broader search at the cost of longer correction trajectories.
+The weight $\lambda$ is a governance penalty on unresolved violations. Increasing $\lambda$ prioritizes rapid contradiction closure over exploratory branching, while decreasing $\lambda$ permits broader search at the cost of longer correction trajectories.
 
 \subsection{Objective for Security and Provenance}
 For trust threshold $\theta$ and protocol policy $\kappa$, we define
@@ -359,7 +359,7 @@ Under B1--B3, corrective sequence length $m$ in a failure episode satisfies
 m \le \left\lceil \frac{V_0}{\delta} \right\rceil,
 \label{eq:length_bound}
 \end{equation}
-where $V_0$ is the potential at episode start.
+where $m\in\mathbb{N}_0$, $V_0=V(s_0)\in\mathbb{R}_{\ge0}$ is the potential at episode start, and $\delta\in\mathbb{R}_{>0}$ is the strict descent constant from B2.
 \end{lemma}
 \begin{proof}
 Each corrective action decreases potential by at least $\delta$ from B2, so after $m$ corrective steps,
@@ -367,15 +367,15 @@ Each corrective action decreases potential by at least $\delta$ from B2, so afte
 V_m \le V_0 - m\delta.
 \label{eq:telescoping}
 \end{equation}
-Because potential is nonnegative, $V_m\ge 0$, implying $m\delta\le V_0$ and thus $m\le V_0/\delta$. Taking the ceiling yields \eqref{eq:length_bound}. B1 additionally caps corrective actions by $B$, so feasible episodes satisfy $m\le\min(B,\lceil V_0/\delta\rceil)$.\qedhere
+Because potential is nonnegative, $V_m\ge 0$, implying $m\delta\le V_0$ and thus $m\le V_0/\delta$. Taking the ceiling yields \eqref{eq:length_bound}. B1 additionally caps corrective actions by $B\in\mathbb{N}_{\ge1}$, so feasible episodes satisfy $m\le\min(B,\lceil V_0/\delta\rceil)$.\qedhere
 \end{proof}
 
 \begin{theorem}[Finite Recovery and Non-Oscillation]
 \label{thm:bounded_recovery}
-Under B1--B4 with $\delta>0$, every failure episode terminates in finite steps, and infinite corrective oscillations are excluded for policies in \eqref{eq:feasible_f2}.
+Under B1--B4 with $\delta\in\mathbb{R}_{>0}$, every failure episode terminates in finite steps, and policies in \eqref{eq:feasible_f2} have finite corrective trajectories.
 \end{theorem}
 \begin{proof}
-By Lemma~\ref{lem:length_bound}, corrective length per episode is finite. Therefore an infinite sequence of strictly corrective actions is impossible in one episode. Across episodes, B1 imposes finite corrective depth and B4 ensures comparator consistency for policy costs, so repeated correction without progress would contradict either the bounded depth condition or the strict descent condition in \eqref{eq:feasible_f2}. Hence non-terminating oscillation is excluded.
+By Lemma~\ref{lem:length_bound}, corrective length per episode is finite. Therefore a failure episode contains finitely many strictly corrective actions. Across episodes, B1 imposes finite corrective depth and B4 ensures comparator consistency for policy costs, so repeated correction without progress violates either the bounded depth condition or the strict descent condition in \eqref{eq:feasible_f2}. Hence policies in \eqref{eq:feasible_f2} have finite recovery trajectories.
 
 For cost behavior, B3 gives bounded nonnegative stage costs; therefore $J_2$ in \eqref{eq:objective_j2} is finite for feasible trajectories, and regret relative to a rollback comparator is well-defined under B4.\qedhere
 \end{proof}
@@ -393,7 +393,7 @@ Assume C1 and a common probability law $\mathbb{P}_{\mathrm{cov}}$ over the cove
 \end{equation}
 \end{theorem}
 \begin{proof}
-Set inclusion $A\cap B\subseteq A$ is immediate from conjunction. Under the fixed covered-class distribution $\mathbb{P}_{\mathrm{cov}}$, event probability is monotone under set inclusion, so $\mathbb{P}_{\mathrm{cov}}(A\cap B)\le\mathbb{P}_{\mathrm{cov}}(A)$. Interpreting these probabilities as false-accept rates for covered attacks yields \eqref{eq:far_contraction}. The argument does not apply to uncovered attack classes or to distribution-shifted mixtures outside C1.\qedhere
+Set inclusion $A\cap B\subseteq A$ is immediate from conjunction. Under the fixed covered-class distribution $\mathbb{P}_{\mathrm{cov}}$, event probability is monotone under set inclusion, so $\mathbb{P}_{\mathrm{cov}}(A\cap B)\le\mathbb{P}_{\mathrm{cov}}(A)$. Interpreting these probabilities as false-accept rates for covered attacks yields \eqref{eq:far_contraction}. The equation is evaluated on $\mathcal{Z}_{\mathrm{cov}}$ with law $\mathbb{P}_{\mathrm{cov}}$; uncovered-class and distribution-shift probes are reported as coverage diagnostics.\qedhere
 \end{proof}
 
 \begin{theorem}[Provenance Invariance]
@@ -437,7 +437,7 @@ The executed audit derives claim-specific datasets from a real orchestration sub
 Boundary construction is treated as a first-class scientific step. For each claim family, at least one falsifier regime intentionally violates a premise while preserving the rest of the system. This allows failures to be attributed to premise violations rather than to uncontrolled implementation drift and supports direct comparison between proof assumptions and runtime behavior.
 
 \subsection{Threat-Model Granularity and Evaluation Semantics}
-Security and robustness claims in multi-agent systems often collapse heterogeneous failures into one aggregate error rate. That aggregation can hide qualitatively different phenomena: prompt-level vulnerabilities, protocol-level inconsistencies, trust-threshold miscalibration, and provenance-store mutation. We therefore keep threat classes explicit during evaluation. Covered classes are those for which protocol predicates are defined and enforced by construction; uncovered classes are intentionally retained to measure residual risk outside predicate scope.
+Security and robustness claims in multi-agent systems often collapse heterogeneous failures into one aggregate error rate. That aggregation can hide qualitatively different phenomena: prompt-level vulnerabilities, protocol-level inconsistencies, trust-threshold miscalibration, and provenance-store mutation. We therefore keep threat classes explicit during evaluation. Covered classes are those for which protocol predicates are defined and enforced by construction; uncovered classes are intentionally retained to measure residual risk beyond current predicate coverage.
 
 This distinction enables a stronger semantic interpretation of FAR measurements. A reduction in aggregate FAR may result from class imbalance rather than improved guard semantics. By contrast, class-conditioned FAR allows direct testing of \eqref{eq:far_contraction}: if contraction holds on covered classes but not on uncovered classes, the theorem is supported exactly where its premises hold and not elsewhere. This premise-respecting interpretation is essential for avoiding false generalization.
 
@@ -499,7 +499,7 @@ We therefore report this claim as supported in the theorem-valid regime and mixe
 
 Table~\ref{tab:assumption_matrix} is the numerical counterpart to \figref{fig:unsafe_commit}. Together, they provide direct evidence that the committed-prefix theorem is empirically aligned with its assumptions and invalid when those assumptions are intentionally violated. Appendix~\ref{app:safety_bundle} documents representative counterexample traces and minimal premise perturbations for these boundary failures.
 
-This result sharpens the paper's scope claim. We do not interpret compositional-regime success as unconditional architecture robustness. Instead, the evidence supports an assumption-qualified statement: zero unsafe commits are obtained when A1--A4 hold and validator composition is enforced; outside that regime, the same pipeline exhibits predictable failures.
+This result sharpens the paper's scope claim. The evidence supports an assumption-qualified statement: zero unsafe commits are obtained when A1--A4 hold and validator composition is enforced; boundary regimes produce the predictable failures described by the corollary.
 
 \subsection{Bounded Recovery and Non-Oscillation}
 \label{sec:results_recovery}
@@ -535,7 +535,7 @@ The mixed aggregate is informative rather than ambiguous. Confirmatory regimes s
 \label{fig:far_frr}
 \end{figure}
 
-\Figref{fig:far_frr} is consistent with \eqref{eq:far_contraction} on covered classes. Theorem~\ref{thm:far_contraction} therefore receives support in its declared domain, while uncovered classes delimit where the guarantee does not apply.
+\Figref{fig:far_frr} is consistent with \eqref{eq:far_contraction} on covered classes. Theorem~\ref{thm:far_contraction} therefore receives support in its declared domain, while uncovered classes serve as coverage diagnostics for future protocol predicates.
 
 \begin{table}[t]
 \caption{Attack-class coverage and integrity outcomes for security/provenance evaluation. Rows separate guard composition and attack-class scope, while columns report false acceptance, false rejection, nominal trace-integrity pass rate, and forced-mutation detection rate. The table makes theorem boundaries explicit by showing performance gains on covered classes, residual risk on uncovered classes, and the distinction between valid append-only traces and deliberate mutation tests.}
@@ -555,7 +555,7 @@ An additional practical consequence is policy calibration under adversarial unce
 \section{Claim-Evidence Synthesis}
 \label{sec:synthesis}
 This section integrates formal and empirical evidence into one claim-status ledger. The intent is to make support states auditable: readers can trace each high-level statement to theorem premises, symbolic checks, and runtime artifacts without relying on unstated judgment calls. We also emphasize where mixed outcomes are methodologically expected because the protocol intentionally includes boundary-failing regimes.
-The synthesis therefore functions as an inference layer, not a rhetorical summary. Its role is to encode how evidence should be read under explicit assumptions, enabling downstream revision and review phases to challenge conclusions without re-deriving the full pipeline context.
+The synthesis therefore functions as an inference layer. Its role is to encode how evidence should be read under explicit assumptions, enabling downstream revision and review phases to challenge conclusions without re-deriving the full pipeline context.
 
 \subsection{What Is Supported, Mixed, and Deliberately Conditional}
 The manuscript's evidence model separates three statuses: supported-in-regime, mixed-over-aggregate, and boundary-failing-by-design. The first status applies to the committed-prefix theorem in its compositional regime. The second applies when confirmatory and falsifier runs are aggregated intentionally, as in recovery and security analyses. The third applies to explicit premise-violation runs included to validate theorem boundaries. This taxonomy is important because long-horizon orchestration often combines these statuses in one numerical report, which can obscure scientific interpretation.
@@ -567,7 +567,7 @@ This explicit synthesis helps avoid overclaiming. In particular, it prevents the
 \subsection{Comparison to Typical Benchmark Narratives}
 Standard benchmark narratives in agentic systems emphasize end-task success, runtime, or average quality over tasks \citep{song2026,jin2025,ferrag2025}. These outcomes are useful but do not directly answer whether failure containment, branch stability, or provenance integrity are guaranteed under long-horizon control. Our synthesis differs in two ways.
 
-First, formal objectives are primary, and benchmark metrics are subordinate. Unsafe-commit rate is interpreted through \eqref{eq:objective_j1}, not as an isolated dashboard metric. Recovery metrics are interpreted through \eqref{eq:objective_j2} and \eqref{eq:length_bound}. Security metrics are interpreted through \eqref{eq:objective_j3}, \eqref{eq:far_contraction}, and \eqref{eq:hash_recurrence}. This keeps empirical reporting anchored to theorem semantics.
+First, formal objectives are primary, and benchmark metrics are subordinate. Unsafe-commit rate is interpreted through \eqref{eq:objective_j1}. Recovery metrics are interpreted through \eqref{eq:objective_j2} and \eqref{eq:length_bound}. Security metrics are interpreted through \eqref{eq:objective_j3}, \eqref{eq:far_contraction}, and \eqref{eq:hash_recurrence}. This keeps empirical reporting anchored to theorem semantics.
 
 Second, negative results are treated as planned evidence. In many reports, failures are filtered as noise or implementation defects. In our workflow they are expected outputs of falsifier regimes and are necessary to demonstrate that assumption blocks are not vacuous. A theorem that cannot be falsified by premise removal is scientifically weak; a theorem that fails exactly when premises are removed is scientifically informative.
 
@@ -610,7 +610,7 @@ There is also an organizational implication for multi-team engineering settings.
 \label{sec:limitations}
 The main limitation is assumption conditionality. The strongest safety and recovery guarantees require validator fidelity, bounded corrective depth, and descent structure. When these premises are weakened, failures emerge, and we explicitly retain those failures in the evidence narrative.
 
-A second limitation is attack coverage. Security contraction is shown on covered classes; uncovered classes remain an open frontier. This is not an implementation bug but a theorem-scope boundary induced by C1.
+A second limitation is attack coverage. Security contraction is shown on covered classes; uncovered classes remain an open frontier. This boundary is induced by C1.
 
 A third limitation is calibration realism. FAR/FRR estimates are finite-sample statistics and can shift under distributional drift, so threshold policies need periodic recalibration.
 
@@ -662,8 +662,8 @@ The robustness implication is that recovery claims should be validated under del
 
 \subsection{Detailed Security and Provenance Argument}
 The FAR contraction argument is a set-inclusion statement over acceptance events, which is exact for covered classes and intentionally non-claiming for uncovered classes. The provenance argument uses the recurrence in \eqref{eq:hash_recurrence} plus append-only updates. Mutation tests are interpreted as premise violations: failing those tests does not refute the theorem; it confirms that theorem premises are operationally meaningful.
-Operationally, this means security reporting should never collapse covered and uncovered classes into one headline number. Doing so can mask regressions in classes that are outside current predicate coverage while overstating deployable protection. The appendix therefore preserves class-granular diagnostics and mutation outcomes as first-class evidence for governance decisions.
-For provenance, we enforce a replay rule: each reported integrity decision must be reconstructable from prior digest state, mutation operator metadata, and guard outputs at the same timestep. If any of these fields are absent, the event is tagged as audit-incomplete and excluded from theorem-level evidence aggregation. This conservative policy prevents accidental inflation of integrity confidence from partially logged traces and aligns evidence eligibility with formal observability requirements. In practice, this is the key bridge between symbolic recurrence claims and executable governance artifacts.
+Operationally, this means security reporting should preserve the distinction between covered and uncovered classes. Collapsing them into one headline number can mask regressions in classes beyond current predicate coverage while overstating deployable protection. The appendix therefore preserves class-granular diagnostics and mutation outcomes as first-class evidence for governance decisions.
+For provenance, we enforce a replay rule: each reported integrity decision must be reconstructable from prior digest state, mutation operator metadata, and guard outputs at the same timestep. If any of these fields are absent, the event is tagged as audit-incomplete and omitted from theorem-level evidence aggregation. This conservative policy prevents accidental inflation of integrity confidence from partially logged traces and aligns evidence eligibility with formal observability requirements. In practice, this is the key bridge between symbolic recurrence claims and executable governance artifacts.
 
 \section{Appendix Audit Bundles}
 \label{app:bundles}
