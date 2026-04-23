@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Any
 
 import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle
 import pandas as pd
 import seaborn as sns
 
@@ -110,42 +109,18 @@ def save_claim_figures(
     )
 
     # HM-TH-01
-    validator_order = ["Semantic + typed", "Schema-only", "Trust-only", "No hard guard"]
-    assumption_order = ["A2 active", "A2 disabled", "A3 disabled"]
-    safety_summary = hm_th_01_plot.groupby(["assumption_profile", "validator_mode"], as_index=False).agg(
-        unsafe_commit_rate=("unsafe_commit_rate", "mean"),
-        seed_count=("unsafe_commit_rate", "size"),
-    )
-    safety_summary["unsafe_count"] = (
-        safety_summary["unsafe_commit_rate"] * safety_summary["seed_count"]
-    ).round().astype(int)
-    safety_matrix = safety_summary.pivot(
-        index="assumption_profile", columns="validator_mode", values="unsafe_commit_rate"
-    ).reindex(index=assumption_order, columns=validator_order)
-    safety_annotations = (
-        safety_summary.assign(
-            label=lambda df: df["unsafe_count"].astype(str) + "/" + df["seed_count"].astype(str) + "\nunsafe"
-        )
-        .pivot(index="assumption_profile", columns="validator_mode", values="label")
-        .reindex(index=assumption_order, columns=validator_order)
-    )
-    fig1, ax1 = plt.subplots(figsize=(7.5, 3.6))
-    sns.heatmap(
-        safety_matrix,
-        annot=safety_annotations,
-        fmt="",
-        cmap="RdYlGn_r",
-        vmin=0.0,
-        vmax=1.0,
-        linewidths=0.8,
-        linecolor="white",
-        cbar_kws={"label": "Unsafe commit rate"},
+    fig1, ax1 = plt.subplots(figsize=(7.5, 4.5))
+    sns.barplot(
+        data=hm_th_01_plot,
+        x="validator_mode",
+        y="unsafe_commit_rate",
+        hue="assumption_profile",
+        errorbar="sd",
         ax=ax1,
     )
-    ax1.add_patch(Rectangle((0, 0), 1, 1, fill=False, edgecolor="black", linewidth=2.2))
     ax1.set_xlabel("Validator mode")
-    ax1.set_ylabel("Assumption profile")
-    ax1.set_title("Committed-prefix safety scope matrix")
+    ax1.set_ylabel("Unsafe commit rate (proportion)")
+    ax1.legend(title="Assumption profile")
     th01 = figure_dir / "fig_hm_th_01_unsafe_commit.pdf"
     fig1.tight_layout()
     fig1.savefig(th01, format="pdf")
@@ -153,9 +128,9 @@ def save_claim_figures(
     paths.append(str(th01))
     qa[str(th01)] = _rasterize_pdf(th01)
     captions[str(th01)] = (
-        "Premise matrix of unsafe commit counts across validator modes and assumption toggles. "
-        "Rows: assumption profile; columns: validator mode; cell labels show unsafe commits over seed-level boundary probes. "
-        "Key takeaway: the theorem-valid semantic + typed / A2-active cell has 0 unsafe probes, while premise-breaking cells expose deterministic boundary failures."
+        "Single-panel bar chart of unsafe commit rates across validator modes and assumption toggles. "
+        "X-axis: validator mode; Y-axis: unsafe commit proportion. Error bars show SD across seeds. "
+        "Key takeaway: semantic + typed validation with A2 active remains at 0 while schema-only and A2-disabled settings degrade safety."
     )
 
     # HM-TH-02
